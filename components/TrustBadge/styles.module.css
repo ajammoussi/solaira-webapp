@@ -1,0 +1,95 @@
+.container114 {
+  display: flex;
+  align-items: center;
+}
+
+.container115 {
+  display: flex;
+  align-items: center;
+}
+
+.img1 {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  overflow: hidden;
+  align-items: flex-start;
+  flex-shrink: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.margin16 {
+  display: flex;
+  padding: 0 0 0 8px;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.paragraph1 {
+  display: flex;
+  align-items: flex-start;
+}
+
+.text142 {
+  color: var(--dl-color-www-bohmenergy-nl-codgray);
+  height: auto;
+  text-align: left;
+  line-height: 24px;
+}
+
+.text143 {
+  color: var(--dl-color-www-bohmenergy-nl-codgray);
+  height: auto;
+  text-align: left;
+  line-height: 24px;
+}
+
+.verticalDivider {
+  width: 1px;
+  height: 24px;
+  margin: 0 16px;
+}
+
+.container116 {
+  display: flex;
+  align-items: center;
+}
+
+.trophy {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  overflow: hidden;
+  align-items: flex-start;
+  flex-shrink: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.margin17 {
+  display: flex;
+  padding: 0 0 0 8px;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.paragraph2 {
+  display: flex;
+  align-items: flex-start;
+}
+
+.text144 {
+  color: var(--dl-color-www-bohmenergy-nl-codgray);
+  height: auto;
+  text-align: left;
+  line-height: 24px;
+}
+
+.text145 {
+  color: var(--dl-color-www-bohmenergy-nl-codgray);
+  height: auto;
+  text-align: left;
+  line-height: 24px;
+}
+

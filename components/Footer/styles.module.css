@@ -1,0 +1,244 @@
+.footer {
+  width: 100%;
+  display: flex;
+  padding: 40px 190px 24px;
+  position: relative;  /* Changed from absolute */
+  align-items: flex-start;
+  flex-shrink: 0;
+  flex-direction: column;
+  background-color: var(--dl-color-www-bohmenergy-nl-white);
+}
+
+.container266 {
+  gap: 64px;
+  display: flex;
+  padding: 0 64px;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.horizontalBorder9 {
+  gap: 234.89999389648438px;
+  display: flex;
+  padding: 49px 0 0;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-shrink: 0;
+  border-color: rgba(0, 0, 0, 0.20000000298023224);
+  border-style: solid;
+  border-width: 1px 0 0;
+  justify-content: space-between;
+}
+
+.container267 {
+  height: 206px;
+  display: flex;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-shrink: 0;
+  flex-direction: column;
+}
+
+.linkmargin13 {
+  display: flex;
+  padding: 0 0 92px;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.link5 {
+  display: flex;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.logo2 {
+  display: flex;
+  overflow: hidden;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.logoImage {
+  width: 167px;
+  height: 28px;
+}
+
+.linkmargin14,
+.linkmargin15,
+.linkmargin16,
+.linkmargin17,
+.linkmargin18,
+.linkmargin19,
+.linkmargin20,
+.linkmargin21,
+.linkmargin22,
+.linkmargin23,
+.linkmargin24,
+.linkmargin25,
+.linkmargin26 {
+  display: flex;
+  padding: 12px 0 0;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.component214,
+.component215,
+.component216,
+.component217,
+.component218,
+.component219,
+.component220,
+.component221,
+.component222,
+.component223,
+.component224,
+.component225,
+.component226 {
+  display: flex;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.text379,
+.text380 {
+  color: var(--dl-color-www-bohmenergy-nl-jade);
+  height: auto;
+  align-self: stretch;
+  text-align: left;
+  line-height: 24px;
+}
+
+.container268 {
+  height: 206px;
+  display: flex;
+  padding: 120.5px 0 5.5px;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-shrink: 0;
+  flex-direction: column;
+}
+
+.text381 {
+  color: var(--dl-color-www-bohmenergy-nl-emperor);
+  height: auto;
+  text-align: left;
+  line-height: 40px;
+}
+
+.container269 {
+  gap: 24px;
+  display: flex;
+  align-self: stretch;
+  align-items: flex-start;
+}
+
+.container270,
+.container272,
+.container274 {
+  height: 206px;
+  display: flex;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-shrink: 0;
+  flex-direction: column;
+}
+
+.margin46,
+.margin47,
+.margin48 {
+  display: flex;
+  padding: 0 0 12px;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.container271,
+.container273,
+.container275 {
+  display: flex;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.text385,
+.text391,
+.text395 {
+  color: var(--dl-color-www-bohmenergy-nl-codgray);
+  height: auto;
+  align-self: stretch;
+  text-align: left;
+  line-height: 24px;
+}
+
+.text386,
+.text387,
+.text388,
+.text389,
+.text390,
+.text392,
+.text393,
+.text394,
+.text396,
+.text397,
+.text398 {
+  color: var(--dl-color-www-bohmenergy-nl-emperor);
+  height: auto;
+  align-self: stretch;
+  text-align: left;
+  line-height: 22px;
+}
+
+.container276 {
+  gap: 1053.1300048828125px;
+  display: flex;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-shrink: 0;
+  justify-content: space-between;
+}
+
+.container277 {
+  height: 18px;
+  display: flex;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-shrink: 0;
+  flex-direction: column;
+}
+
+.text399,
+.text400 {
+  color: var(--dl-color-www-bohmenergy-nl-gray);
+  height: auto;
+  text-align: left;
+  line-height: 18px;
+}
+
+.container278 {
+  gap: 4.263256414560601e-14px;
+  display: flex;
+  align-self: stretch;
+  align-items: flex-start;
+}
+
+.component227 {
+  display: flex;
+  align-items: flex-start;
+}
+
+.text401 {
+  color: var(--dl-color-www-bohmenergy-nl-gray);
+  height: auto;
+  text-align: left;
+  line-height: 18px;
+}
+
