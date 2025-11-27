@@ -1,0 +1,262 @@
+/**
+ * Dashboard Page - PV Energy Management System
+ * 
+ * Main overview page showing:
+ * - Real-time energy metrics
+ * - Energy flow diagram
+ * - 24-hour production/consumption chart
+ * - Summary statistics (Today/Month/Year)
+ * - Quick recommendations
+ * 
+ * Design: Solaira clean aesthetic with teal accents
+ */
+
+import React from 'react';
+import Layout from '../../components/Layout';
+import { useAllEnergyData } from '../../lib/hooks/useEnergyData';
+import styles from './styles.module.css';
+
+const Dashboard = () => {
+  const { realtime, stats, loading, error, lastUpdated } = useAllEnergyData();
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingSpinner}></div>
+          <p className={styles.loadingText}>Loading energy data...</p>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className={styles.errorContainer}>
+          <p className={styles.errorText}>⚠️ Error loading data: {error}</p>
+          <button className={styles.retryButton}>Retry</button>
+        </div>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout>
+      <div className={styles.dashboard}>
+        {/* Page Header */}
+        <div className={styles.pageHeader}>
+          <div>
+            <h1 className={styles.pageTitle}>Dashboard</h1>
+            <p className={styles.pageSubtitle}>
+              Real-time energy monitoring • Last updated: {lastUpdated ? new Date(lastUpdated).toLocaleTimeString() : 'N/A'}
+            </p>
+          </div>
+        </div>
+
+        {/* Real-time Metrics Cards */}
+        <section className={styles.metricsSection}>
+          <div className={styles.metricsGrid}>
+            {/* PV Production */}
+            <div className={styles.metricCard}>
+              <div className={styles.metricHeader}>
+                <span className={styles.metricIcon}>☀️</span>
+                <span className={styles.metricLabel}>Solar Production</span>
+              </div>
+              <div className={styles.metricValue}>
+                {realtime?.pv_production_kw?.toFixed(2) || '0.00'}
+                <span className={styles.metricUnit}>kW</span>
+              </div>
+              <div className={styles.metricFooter}>
+                <span className={styles.metricTrend}>↑ 12%</span>
+                <span className={styles.metricCompare}>vs yesterday</span>
+              </div>
+            </div>
+
+            {/* Consumption */}
+            <div className={styles.metricCard}>
+              <div className={styles.metricHeader}>
+                <span className={styles.metricIcon}>⚡</span>
+                <span className={styles.metricLabel}>Consumption</span>
+              </div>
+              <div className={styles.metricValue}>
+                {realtime?.consumption_kw?.toFixed(2) || '0.00'}
+                <span className={styles.metricUnit}>kW</span>
+              </div>
+              <div className={styles.metricFooter}>
+                <span className={styles.metricTrend}>↓ 5%</span>
+                <span className={styles.metricCompare}>vs yesterday</span>
+              </div>
+            </div>
+
+            {/* Grid Flow */}
+            <div className={styles.metricCard}>
+              <div className={styles.metricHeader}>
+                <span className={styles.metricIcon}>🔌</span>
+                <span className={styles.metricLabel}>Grid Flow</span>
+              </div>
+              <div className={styles.metricValue}>
+                {realtime?.grid_export_kw > 0 
+                  ? `+${realtime.grid_export_kw.toFixed(2)}` 
+                  : `-${realtime?.grid_import_kw?.toFixed(2) || '0.00'}`}
+                <span className={styles.metricUnit}>kW</span>
+              </div>
+              <div className={styles.metricFooter}>
+                <span className={styles.metricStatus}>
+                  {realtime?.grid_export_kw > 0 ? 'Exporting' : 'Importing'}
+                </span>
+              </div>
+            </div>
+
+            {/* Battery SOC */}
+            <div className={styles.metricCard}>
+              <div className={styles.metricHeader}>
+                <span className={styles.metricIcon}>🔋</span>
+                <span className={styles.metricLabel}>Battery</span>
+              </div>
+              <div className={styles.metricValue}>
+                {realtime?.battery_soc_percent?.toFixed(0) || '0'}
+                <span className={styles.metricUnit}>%</span>
+              </div>
+              <div className={styles.metricFooter}>
+                <div className={styles.batteryIndicator}>
+                  <div 
+                    className={styles.batteryFill} 
+                    style={{ width: `${realtime?.battery_soc_percent || 0}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Summary Statistics */}
+        <section className={styles.summarySection}>
+          <h2 className={styles.sectionTitle}>Energy Summary</h2>
+          <div className={styles.summaryGrid}>
+            {/* Today */}
+            <div className={styles.summaryCard}>
+              <div className={styles.summaryPeriod}>Today</div>
+              <div className={styles.summaryStats}>
+                <div className={styles.summaryStatItem}>
+                  <span className={styles.summaryStatLabel}>Production</span>
+                  <span className={styles.summaryStatValue}>
+                    {stats?.today?.total_production_kwh?.toFixed(1) || '0.0'} kWh
+                  </span>
+                </div>
+                <div className={styles.summaryStatItem}>
+                  <span className={styles.summaryStatLabel}>Consumption</span>
+                  <span className={styles.summaryStatValue}>
+                    {stats?.today?.total_consumption_kwh?.toFixed(1) || '0.0'} kWh
+                  </span>
+                </div>
+                <div className={styles.summaryStatItem}>
+                  <span className={styles.summaryStatLabel}>Self-Consumption</span>
+                  <span className={styles.summaryStatValue}>
+                    {stats?.today?.self_consumption_percent?.toFixed(0) || '0'}%
+                  </span>
+                </div>
+                <div className={styles.summaryStatItem}>
+                  <span className={styles.summaryStatLabel}>Savings</span>
+                  <span className={styles.summaryStatValue}>
+                    €{stats?.today?.cost_savings_eur?.toFixed(2) || '0.00'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* This Month */}
+            <div className={styles.summaryCard}>
+              <div className={styles.summaryPeriod}>This Month</div>
+              <div className={styles.summaryStats}>
+                <div className={styles.summaryStatItem}>
+                  <span className={styles.summaryStatLabel}>Production</span>
+                  <span className={styles.summaryStatValue}>
+                    {stats?.month?.total_production_kwh?.toFixed(1) || '0.0'} kWh
+                  </span>
+                </div>
+                <div className={styles.summaryStatItem}>
+                  <span className={styles.summaryStatLabel}>Consumption</span>
+                  <span className={styles.summaryStatValue}>
+                    {stats?.month?.total_consumption_kwh?.toFixed(1) || '0.0'} kWh
+                  </span>
+                </div>
+                <div className={styles.summaryStatItem}>
+                  <span className={styles.summaryStatLabel}>Self-Consumption</span>
+                  <span className={styles.summaryStatValue}>
+                    {stats?.month?.self_consumption_percent?.toFixed(0) || '0'}%
+                  </span>
+                </div>
+                <div className={styles.summaryStatItem}>
+                  <span className={styles.summaryStatLabel}>Savings</span>
+                  <span className={styles.summaryStatValue}>
+                    €{stats?.month?.cost_savings_eur?.toFixed(2) || '0.00'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* This Year */}
+            <div className={styles.summaryCard}>
+              <div className={styles.summaryPeriod}>This Year</div>
+              <div className={styles.summaryStats}>
+                <div className={styles.summaryStatItem}>
+                  <span className={styles.summaryStatLabel}>Production</span>
+                  <span className={styles.summaryStatValue}>
+                    {stats?.year?.total_production_kwh?.toFixed(1) || '0.0'} kWh
+                  </span>
+                </div>
+                <div className={styles.summaryStatItem}>
+                  <span className={styles.summaryStatLabel}>Consumption</span>
+                  <span className={styles.summaryStatValue}>
+                    {stats?.year?.total_consumption_kwh?.toFixed(1) || '0.0'} kWh
+                  </span>
+                </div>
+                <div className={styles.summaryStatItem}>
+                  <span className={styles.summaryStatLabel}>Self-Consumption</span>
+                  <span className={styles.summaryStatValue}>
+                    {stats?.year?.self_consumption_percent?.toFixed(0) || '0'}%
+                  </span>
+                </div>
+                <div className={styles.summaryStatItem}>
+                  <span className={styles.summaryStatLabel}>Savings</span>
+                  <span className={styles.summaryStatValue}>
+                    €{stats?.year?.cost_savings_eur?.toFixed(2) || '0.00'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Placeholder for Energy Flow Diagram */}
+        <section className={styles.flowSection}>
+          <h2 className={styles.sectionTitle}>Energy Flow</h2>
+          <div className={styles.flowPlaceholder}>
+            <p className={styles.placeholderText}>
+              Energy Flow Diagram will be rendered here
+            </p>
+            <p className={styles.placeholderSubtext}>
+              Task 5: Build animated diagram showing solar → home → grid → battery
+            </p>
+          </div>
+        </section>
+
+        {/* Placeholder for 24h Chart */}
+        <section className={styles.chartSection}>
+          <h2 className={styles.sectionTitle}>24-Hour Overview</h2>
+          <div className={styles.chartPlaceholder}>
+            <p className={styles.placeholderText}>
+              Production vs Consumption Chart will be rendered here
+            </p>
+            <p className={styles.placeholderSubtext}>
+              Task 6: Implement TimeSeriesChart with Recharts
+            </p>
+          </div>
+        </section>
+      </div>
+    </Layout>
+  );
+};
+
+export default Dashboard;

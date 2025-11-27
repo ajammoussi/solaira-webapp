@@ -1,0 +1,338 @@
+/* Dashboard Styles - Solaira Design System */
+
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ============================================================================
+   PAGE HEADER
+   ============================================================================ */
+
+.pageHeader {
+  margin-bottom: 32px;
+}
+
+.pageTitle {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333333; /* Dark gray text */
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.pageSubtitle {
+  font-size: 14px;
+  color: #6B7280; /* Medium gray */
+  margin: 0;
+}
+
+/* ============================================================================
+   LOADING & ERROR STATES
+   ============================================================================ */
+
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+.loadingSpinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #E5E7EB;
+  border-top-color: #00D9A3; /* Teal spinner */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loadingText {
+  font-size: 16px;
+  color: #6B7280;
+}
+
+.errorText {
+  font-size: 16px;
+  color: #F44336;
+}
+
+.retryButton {
+  padding: 10px 24px;
+  background-color: #00D9A3; /* Teal button */
+  color: #FFFFFF;
+  border: none;
+  border-radius: 24px; /* Rounded button (Solaira spec) */
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retryButton:hover {
+  background-color: #00F5B8; /* Lighter teal on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 217, 163, 0.3);
+}
+
+/* ============================================================================
+   METRICS SECTION - REAL-TIME CARDS
+   ============================================================================ */
+
+.metricsSection {
+  margin-bottom: 32px;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.metricCard {
+  background-color: #FFFFFF; /* White card */
+  border-radius: 12px; /* Solaira rounded style */
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.metricCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.metricHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.metricIcon {
+  font-size: 24px;
+}
+
+.metricLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6B7280; /* Medium gray */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metricValue {
+  font-size: 36px;
+  font-weight: 700;
+  color: #333333; /* Dark gray */
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.metricUnit {
+  font-size: 18px;
+  font-weight: 500;
+  color: #9CA3AF;
+  margin-left: 4px;
+}
+
+.metricFooter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.metricTrend {
+  font-weight: 600;
+  color: #00A86B; /* Green for positive trend */
+}
+
+.metricCompare {
+  color: #9CA3AF;
+}
+
+.metricStatus {
+  color: #00D9A3; /* Teal status */
+  font-weight: 600;
+}
+
+/* Battery Indicator */
+.batteryIndicator {
+  width: 100%;
+  height: 8px;
+  background-color: #E5E7EB;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.batteryFill {
+  height: 100%;
+  background: linear-gradient(90deg, #00A86B 0%, #00D9A3 100%); /* Green to teal gradient */
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* ============================================================================
+   SUMMARY SECTION - DAILY/MONTHLY/YEARLY STATS
+   ============================================================================ */
+
+.summarySection {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333333;
+  margin: 0 0 20px 0;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.summaryCard {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #00D9A3; /* Teal accent border */
+}
+
+.summaryPeriod {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333333;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.summaryStats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.summaryStatItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summaryStatLabel {
+  font-size: 14px;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.summaryStatValue {
+  font-size: 16px;
+  color: #333333;
+  font-weight: 700;
+}
+
+/* ============================================================================
+   PLACEHOLDER SECTIONS (for upcoming tasks)
+   ============================================================================ */
+
+.flowSection,
+.chartSection {
+  margin-bottom: 32px;
+}
+
+.flowPlaceholder,
+.chartPlaceholder {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 60px 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  border: 2px dashed #E5E7EB;
+}
+
+.placeholderText {
+  font-size: 16px;
+  color: #333333;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.placeholderSubtext {
+  font-size: 14px;
+  color: #9CA3AF;
+  margin: 0;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .pageTitle {
+    font-size: 24px;
+  }
+
+  .pageSubtitle {
+    font-size: 13px;
+  }
+
+  .metricsGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .metricCard {
+    padding: 20px;
+  }
+
+  .metricValue {
+    font-size: 28px;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .flowPlaceholder,
+  .chartPlaceholder {
+    padding: 40px 20px;
+  }
+}
+
+@media (max-width: 479px) {
+  .pageHeader {
+    margin-bottom: 20px;
+  }
+
+  .pageTitle {
+    font-size: 20px;
+  }
+
+  .metricCard {
+    padding: 16px;
+  }
+
+  .metricValue {
+    font-size: 24px;
+  }
+
+  .summaryCard {
+    padding: 20px;
+  }
+
+  .sectionTitle {
+    font-size: 18px;
+  }
+}

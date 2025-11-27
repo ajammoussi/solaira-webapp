@@ -50,13 +50,10 @@ const Frame1920wlight = (props) => {
                 <div className="frame1920wlight-container104">
                   
                   <Button
-                    text="Contact"
-                    backgroundImage1="https://play.teleporthq.io/static/svg/default-img.svg"
-                    backgroundImage2="https://play.teleporthq.io/static/svg/default-img.svg"
-                    altText1="BackgroundI165"
-                    altText2="BackgroundI165"
                     className="frame1920wlight-component12"
-                    />
+                  >
+                    Contact
+                  </Button>
                 </div>
                 
                 <div className="frame1920wlight-group1">

@@ -1,0 +1,384 @@
+/* Layout Styles - Sidebar Navigation Version */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap');
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #FFFFFF;
+}
+
+/* ============================================================================
+   HEADER - EXACT COPY FROM LANDING PAGE
+   ============================================================================ */
+
+.header {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background: #ffffff;
+  font-family: Outfit, sans-serif;
+}
+
+.headerButton {
+  font-size: 18px !important;
+}
+
+/* Top Banner - EXACT MATCH */
+.topBanner {
+  width: 100%;
+  display: flex;
+  padding: 8px 0;
+  align-items: center;
+  justify-content: center;
+  background-color: #1a1a1a;
+}
+
+.topBannerContainer {
+  max-width: 1920px;
+  width: 100%;
+  padding: 0 254px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.topBannerLeft {
+  display: flex;
+  padding: 0 12px 0 0;
+  align-items: center;
+}
+
+.topBannerRight {
+  display: flex;
+  padding: 0 0 0 12px;
+  align-items: center;
+  gap: 8px;
+}
+
+.topBannerText {
+  color: #ffffff;
+  line-height: 18px;
+  font-size: 16px;
+  font-weight: 300;
+}
+
+.flag {
+  width: 23px;
+  height: 18px;
+  border-radius: 3px;
+  display: block;
+  object-fit: cover;
+}
+
+/* Main Navigation - EXACT MATCH */
+.mainNav {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.navContainer {
+  max-width: 1920px;
+  width: 100%;
+  display: flex;
+  padding: 20px 254px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo - EXACT MATCH */
+.logoLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.logoLink:hover {
+  opacity: 0.8;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logoText {
+  font-size: 34px;
+  font-weight: 600;
+  color: #1a1a1a;
+  line-height: 28px;
+  letter-spacing: -0.3px;
+}
+
+/* ============================================================================
+   MAIN LAYOUT WITH SIDEBAR
+   ============================================================================ */
+
+.mainLayout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  margin-top: 122px; /* Header height */
+}
+
+/* ============================================================================
+   VERTICAL SIDEBAR - MODERNIZED WITH NEXUS STYLE
+   ============================================================================ */
+
+.sidebar {
+  width: 280px;
+  background-color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.sidebarCollapsed {
+  width: 80px;
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px;
+  min-height: 72px;
+}
+
+.sidebarBrandContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebarBrand {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.toggleButton {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #6B7280;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.toggleButton:hover {
+  background-color: #F9FAFB;
+  border-color: #D1D5DB;
+}
+
+/* Horizontal Divider */
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: #E5E7EB;
+}
+
+/* Vertical Divider between sidebar and content */
+.verticalDivider {
+  width: 1px;
+  background-color: #E5E7EB;
+  flex-shrink: 0;
+}
+
+/* Search Bar */
+.searchContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 32px;
+  color: #9CA3AF;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  background-color: #F9FAFB;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: Outfit, sans-serif;
+}
+
+.searchInput::placeholder {
+  color: #9CA3AF;
+}
+
+.searchInput:focus {
+  background-color: #FFFFFF;
+  border-color: #00D9A3;
+  box-shadow: 0 0 0 3px rgba(0, 217, 163, 0.1);
+}
+
+.sidebarNav {
+  flex: 1;
+  padding: 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebarLink {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: #6B7280;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.sidebarLink:hover {
+  background-color: #F9FAFB;
+  color: #111827;
+}
+
+.sidebarLinkActive {
+  background-color: #F3F4F6;
+  color: #111827;
+  font-weight: 600;
+}
+
+.sidebarIcon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebarLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================================
+   CONTENT AREA
+   ============================================================================ */
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #F9FAFB;
+  padding: 32px;
+  min-height: calc(101vh - 122px); /* Ensure scrollbar on all pages */
+}
+
+/* ============================================================================
+   RESPONSIVE - MOBILE (MATCH LANDING PAGE)
+   ============================================================================ */
+
+@media (max-width: 1920px) {
+  .topBannerContainer {
+    padding: 0 80px;
+  }
+
+  .navContainer {
+    padding: 20px 80px;
+  }
+}
+
+@media (max-width: 1400px) {
+  .topBannerContainer {
+    padding: 0 60px;
+  }
+
+  .navContainer {
+    padding: 20px 60px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .topBannerContainer {
+    padding: 0 40px;
+  }
+
+  .navContainer {
+    padding: 20px 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .topBannerContainer {
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 20px;
+  }
+
+  .topBannerLeft,
+  .topBannerRight {
+    padding: 0;
+  }
+
+  .navContainer {
+    flex-direction: column;
+    gap: 20px;
+    padding: 16px 20px;
+  }
+
+  .sidebar {
+    position: absolute;
+    left: -280px;
+    top: 0;
+    bottom: 0;
+    z-index: 90;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .sidebarCollapsed {
+    left: -80px;
+  }
+
+  .content {
+    padding: 16px;
+  }
+
+  .verticalDivider {
+    display: none;
+  }
+}
+
+@media (max-width: 479px) {
+  .content {
+    padding: 12px;
+  }
+}
