@@ -30,8 +30,19 @@ const Maintenance = () => {
         {/* Quick System Health Preview */}
         {!loading && systemHealth && (
           <div style={{ marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
-              System Status: {systemHealth.overall_status === 'healthy' ? '✅ Healthy' : '⚠️ Needs Attention'}
+            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#333', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              System Status: 
+              {systemHealth.overall_status === 'healthy' ? (
+                <>
+                  <LucideIcons.CheckCircle size={20} color="#00A86B" />
+                  <span>Healthy</span>
+                </>
+              ) : (
+                <>
+                  <LucideIcons.AlertTriangle size={20} color="#FF9800" />
+                  <span>Needs Attention</span>
+                </>
+              )}
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
               {Object.entries(systemHealth.components).map(([key, component]) => (

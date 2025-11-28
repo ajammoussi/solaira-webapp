@@ -35,6 +35,16 @@ const Layout = ({ children }) => {
     localStorage.setItem('sidebarCollapsed', newState.toString());
   };
 
+  // Handle logout
+  const handleLogout = () => {
+    // Clear any auth tokens or user data from localStorage if needed
+    // localStorage.removeItem('authToken');
+    // localStorage.removeItem('userData');
+    
+    // Redirect to home page
+    router.push('/');
+  };
+
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LucideIcons.LayoutDashboard },
     { href: '/energy', label: 'Energy', icon: LucideIcons.Zap },
@@ -102,9 +112,9 @@ const Layout = ({ children }) => {
             {/* Spacer to push button to the right */}
             <div style={{ flex: 1 }}></div>
 
-            {/* CTA Button */}
-            <Button className={styles.headerButton} href="/sign-up">
-              <span>Sign Up</span>
+            {/* Log Out Button */}
+            <Button className={styles.headerButton} onClick={handleLogout}>
+              <span>Log Out</span>
             </Button>
           </div>
         </div>
