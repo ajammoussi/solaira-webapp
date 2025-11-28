@@ -33,7 +33,7 @@
   padding: 8px 0;
   align-items: center;
   justify-content: center;
-  background-color: #1a1a1a;
+  background-color:  #4A9D4E ;
 }
 
 .topBannerContainer {
@@ -120,7 +120,7 @@
   color: #6B7280;
   transition: all 0.2s ease;
   flex-shrink: 0;
-  margin-left: 70px; /* CHANGE THIS: Space after logo (increase = more space from logo) */
+  margin-left: 40px; /* CHANGE THIS: Space after logo (increase = more space from logo) */
   margin-right: 24px; /* CHANGE THIS: Space before divider/search (increase = more space before search) */
 }
 
@@ -135,7 +135,7 @@
   align-items: center;
   text-decoration: none;
   cursor: pointer;
-  margin-left: -325px;
+  margin-left: -55px;
 }
 
 .logoLink:hover {
@@ -162,7 +162,7 @@
   line-height: 28px;
   letter-spacing: -0.3px;
   margin-left: -29px;
-  margin-right: -42px;
+  margin-right: -10px;
 }
 
 /* Header Search Bar */

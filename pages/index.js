@@ -29,14 +29,14 @@ const Frame1920wlight = (props) => {
           <div className="frame1920wlight-frame1">
             <Header
               className="frame1920wlight-group3"
-              email="Info@bohmenergy.nl"
+              email="Info@solaira.tn"
               phone="(+31) 85-76069814"
               logoImage="flag_of_Tunisia.svg"
               logoAlt="SVG6578a5b54fa1fa278cef6591footerlogosvgfill1666"
               navItems={[
-                'Thuisbatterij',
-                'Zonnepanelen',
-                'Over ons',
+                'Home Battery',
+                'Solar Panels',
+                'About Us',
                 'Blog',
                 'Contact',
               ]}
@@ -61,7 +61,7 @@ const Frame1920wlight = (props) => {
                     <div className="frame1920wlight-container108">
                       <div className="frame1920wlight-heading1margin">
                         <div className="frame1920wlight-heading1">
-                          <span className="frame1920wlight-text122 www.bohmenergy.nlSemanticHeading1">
+                          <span className="frame1920wlight-text122 www.solaira.tnSemanticHeading1">
                             <span className="frame1920wlight-text123">
                               test challenge tsyp pes
                             </span>
@@ -75,9 +75,9 @@ const Frame1920wlight = (props) => {
                         </div>
                       </div>
                       <div className="frame1920wlight-margin14">
-                        <span className="frame1920wlight-text128 www.bohmenergy.nlOutfitLight8">
+                        <span className="frame1920wlight-text128 www.solaira.tnOutfitLight8">
                           <span className="frame1920wlight-text129">
-                            Gemiddeld besparen huishoudens
+                            On average, households save
                             <span
                               dangerouslySetInnerHTML={{
                                 __html: ' ',
@@ -85,15 +85,15 @@ const Frame1920wlight = (props) => {
                             />
                           </span>
                           <span className="frame1920wlight-text130">
-                            economiser 1200TND par mois
+                            1200 TND per month
                           </span>
                           <span className="frame1920wlight-text131">
                             {' '}
-                            en utilisant
+                            by using
                           </span>
                           <br></br>
                           <span className="frame1920wlight-text133">
-                            notre solution
+                            our solution
                             <span
                               dangerouslySetInnerHTML={{
                                 __html: ' ',
@@ -101,11 +101,11 @@ const Frame1920wlight = (props) => {
                             />
                           </span>
                           <span className="frame1920wlight-text134">
-                            more description
+                            for solar energy management
                           </span>
-                          <span> jaw ,</span>
+                          <span> and renewable power.</span>
                           <br></br>
-                          <span>idk what to say.</span>
+                          <span>Take control of your energy today.</span>
                         </span>
                       </div>
                       <div className="frame1920wlight-margin15">
@@ -118,18 +118,18 @@ const Frame1920wlight = (props) => {
     </Button>
 
     <div className="frame1920wlight-container111">
-      <span className="frame1920wlight-text139 www.bohmenergy.nlOutfitLight2">
+      <span className="frame1920wlight-text139 www.solaira.tnOutfitLight2">
         of
       </span>
     </div>
     <div className="frame1920wlight-container112">
       <div className="frame1920wlight-container113">
-        <span className="frame1920wlight-text140 www.bohmenergy.nlOutfitLight2">
-          Bel ons
+        <span className="frame1920wlight-text140 www.solaira.tnOutfitLight2">
+          Call us
         </span>
       </div>
       <div className="frame1920wlight-component211">
-        <span className="frame1920wlight-text141 www.bohmenergy.nlOutfitLight2">
+        <span className="frame1920wlight-text141 www.solaira.tnOutfitLight2">
           (+216) 99-999-999
         </span>
       </div>
@@ -145,8 +145,8 @@ const Frame1920wlight = (props) => {
                         dividerAlt="VerticalDivider1377"
                         icon2=""
                         icon2Alt=""
-                        text2Part1="Slimste thuisbatterij"
-                        text2Part2="van Nederland"
+                        text2Part1="Smartest home batter"
+                        text2Part2="y in tunisia"
                         className="frame1920wlight-container114"
                       />
                     </div>
@@ -162,9 +162,9 @@ const Frame1920wlight = (props) => {
                   </div>
                   <div className="frame1920wlight-section2">
                     <div className="frame1920wlight-heading21">
-                      <span className="frame1920wlight-text146 www.bohmenergy.nlSemanticHeading22">
+                      <span className="frame1920wlight-text146 www.solaira.tnSemanticHeading22">
                         <span className="frame1920wlight-text147">
-                          Waarom heb ik een
+                          Why do I need a
                           <span
                             dangerouslySetInnerHTML={{
                               __html: ' ',
@@ -172,40 +172,38 @@ const Frame1920wlight = (props) => {
                           />
                         </span>
                         <span className="frame1920wlight-text148">
-                          more content
+                          home battery
                         </span>
-                        <span> nodig?</span>
+                        <span> system?</span>
                       </span>
                     </div>
                     <div className="frame1920wlight-container118">
                       <div className="frame1920wlight-container119">
-                        <span className="frame1920wlight-text150 www.bohmenergy.nlOutfitLight6">
+                        <span className="frame1920wlight-text150 www.solaira.tnOutfitLight6">
                           <span>
-                            Bohm Energy staat klaar voor iedereen die de
-                            controle over zijn energie terug wilt. Onze slimme
-                            thuisbatterij beschermt je tegen de
+                            Solaira is ready for everyone who wants to
+                            take back control of their energy. Our smart
+                            home battery protects you against
                           </span>
                           <br></br>
                           <span>
-                            afbouw van de salderingsregeling, maakt zonnepanelen
-                            nog rendabeler, en handelt energie op een compleet
-                            autonome wijze om
+                            the phase-out of net metering, makes solar panels
+                            even more profitable, and handles energy in a completely
+                            autonomous way to
                           </span>
                           <br></br>
                           <span>
-                            je ten alle tijden geld te besparen. Meer weten over
-                            hoe onze slimme thuisbatterij energie inkoopt en
-                            verkoopt? Lees dan verder
+                            save you money at all times. Want to know more about
+                            how our smart home battery buys and sells
+                            energy? Read more
                           </span>
                           <br></br>
-                          <span>hieronder.</span>
+                          <span>below.</span>
                         </span>
                       </div>
                       <div className="frame1920wlight-component14">
                         <div className="frame1920wlight-container120">
-                          <span className="frame1920wlight-text158 www.bohmenergy.nlOutfitLight7">
-                            Ontdek het product
-                          </span>
+                          
                 
                         </div>
                         
@@ -252,19 +250,19 @@ const Frame1920wlight = (props) => {
   />
 </FeaturesSection>
 <InfoSection
-  title="Vraag nu de btw terug op jouw thuisbatterij van"
-  highlightedTitle="Bohm Energy"
-  description="Het is vanaf nu mogelijk om de btw op jou aanschaf van een thuisbatterij terug te vragen. In samenwerking met De Centrale verzorgen wij dit voor al onze klanten."
-  buttonText="Lees meer"
-  buttonLink="/btw-terug"
+  title="Claim your VAT refund on your home battery from"
+  highlightedTitle="Solaira"
+  description="It is now possible to reclaim the VAT on your home battery purchase. In collaboration with De Centrale, we handle this for all our customers."
+  buttonText="Read more"
+  buttonLink="/vat-refund"
   image="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   logo="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   logoAlt="De Centrale"
 />
 <SectionHeading 
-  text="Wat maakt dat Bohm Energy de"
-  highlightedText="best presterende thuisbatterij"
-  subtitle="Ontdek hoe de innovatieve thuisbatterijen van Bohm Energy duurzame energieopslag revolutioneren"
+  text="What makes Solaira the"
+  highlightedText="best performing home battery"
+  subtitle="Discover how Solaira's innovative home batteries are revolutionizing sustainable energy storage"
 />
 
                     
@@ -273,20 +271,20 @@ const Frame1920wlight = (props) => {
                     logoImage="https://play.teleporthq.io/static/svg/default-img.svg"
                     logoAlt="SVG6578a5b54fa1fa278cef6591footerlogosvgfill1657"
                     phone="(+31) 85-7606981"
-                    email="info@bohmenergy.nl"
+                    email="info@solaira.tn"
                     address={
                       <>
-                            <span>Hogebrinkerweg 14m</span>
+                            <span>Centre Urbain Nord</span>
                         <br />
-                            <span>3871 KM, Hoevelaken</span>
+                            <span>676 CUN BP, Tunis 1080</span>
                       </>
                     }
-                    aboutLinks={['Zonnepanelen', 'Thuisbatterij', 'Over ons', 'Blog', 'Product']}
+                    aboutLinks={['Solar Panels', 'Home Battery', 'About Us', 'Blog', 'Product']}
                     supportLinks={['Contact', 'Privacy Policy', 'Terms of Service']}
                     connectLinks={['LinkedIn', 'Instagram', 'Facebook']}
-                    copyrightText="2023 Bohm Energy. All right reserved."
-                    designedByText="designed by "
-                    designerName="yassine"
+                    copyrightText="2025 Solaira. All right reserved."
+                    designedByText="Designedby "
+                    designerName="Yassine"
                   />
                   
                         </div>
