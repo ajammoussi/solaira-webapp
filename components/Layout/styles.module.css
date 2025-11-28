@@ -103,6 +103,7 @@
   padding: 20px 254px;
   align-items: center;
   gap: 24px;
+  height: 96px; /* Fixed height to prevent expansion */
 }
 
 /* Header Toggle Button */
@@ -144,14 +145,24 @@
 .logo {
   display: flex;
   align-items: center;
+  gap: 12px;
+  margin-left: -24px;
+}
+
+.logoImage {
+  height: 80px;
+  width: auto;
+  display: block;
 }
 
 .logoText {
   font-size: 34px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #7CC063;
   line-height: 28px;
   letter-spacing: -0.3px;
+  margin-left: -29px;
+  margin-right: -42px;
 }
 
 /* Header Search Bar */
