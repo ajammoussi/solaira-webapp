@@ -9,6 +9,7 @@
  */
 
 import React from 'react';
+import * as LucideIcons from 'lucide-react';
 import Layout from '../../components/Layout';
 import { useRecommendations } from '../../lib/hooks/useEnergyData';
 import styles from '../energy/styles.module.css';
@@ -76,7 +77,7 @@ const Predictions = () => {
         )}
 
         <div className={styles.placeholder}>
-          <div className={styles.placeholderIcon}>🔮</div>
+          <div className={styles.placeholderIcon}><LucideIcons.TrendingUp size={64} strokeWidth={1.5} /></div>
           <h2 className={styles.placeholderTitle}>Forecast Charts Coming Soon</h2>
           <p className={styles.placeholderText}>
             Tasks 10-11: Forecast Charts & Full Recommendations Panel

@@ -9,6 +9,7 @@
  */
 
 import React from 'react';
+import * as LucideIcons from 'lucide-react';
 import Layout from '../../components/Layout';
 import styles from './styles.module.css';
 
@@ -24,7 +25,7 @@ const Energy = () => {
         </div>
 
         <div className={styles.placeholder}>
-          <div className={styles.placeholderIcon}>⚡</div>
+          <div className={styles.placeholderIcon}><LucideIcons.Zap size={64} strokeWidth={1.5} /></div>
           <h2 className={styles.placeholderTitle}>Energy Analysis Coming Soon</h2>
           <p className={styles.placeholderText}>
             Tasks 8-9: Production Panel & Consumption Panel will be implemented here

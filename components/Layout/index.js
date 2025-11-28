@@ -3,7 +3,7 @@
  * Minimal header + Vertical sidebar with modern icons
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import * as LucideIcons from 'lucide-react';
@@ -12,8 +12,28 @@ import styles from './styles.module.css';
 
 const Layout = ({ children }) => {
   const router = useRouter();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // Default to true to prevent flash
+  const [isLoaded, setIsLoaded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Load sidebar state from localStorage on mount
+  useEffect(() => {
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    if (savedState !== null) {
+      setSidebarCollapsed(savedState === 'true');
+    } else {
+      setSidebarCollapsed(false); // Default to expanded if no saved state
+    }
+    // Small delay to ensure smooth render
+    setTimeout(() => setIsLoaded(true), 50);
+  }, []);
+
+  // Save sidebar state to localStorage whenever it changes
+  const toggleSidebar = () => {
+    const newState = !sidebarCollapsed;
+    setSidebarCollapsed(newState);
+    localStorage.setItem('sidebarCollapsed', newState.toString());
+  };
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LucideIcons.LayoutDashboard },
@@ -27,7 +47,7 @@ const Layout = ({ children }) => {
 
   return (
     <div className={styles.container}>
-      {/* Minimal Header - No Navigation */}
+      {/* Minimal Header with Search */}
       <header className={styles.header}>
         {/* Top Banner */}
         <div className={styles.topBanner}>
@@ -42,8 +62,11 @@ const Layout = ({ children }) => {
           </div>
         </div>
 
-        {/* Main Header - Just Branding and Button */}
+        {/* Main Header - Logo, Toggle, Search, and Button */}
         <div className={styles.mainNav}>
+          {/* Vertical Divider between Toggle and Search */}
+          <div className={styles.headerVerticalDivider}></div>
+          
           <div className={styles.navContainer}>
             {/* Logo */}
             <Link href="/dashboard">
@@ -54,7 +77,28 @@ const Layout = ({ children }) => {
               </a>
             </Link>
 
-            {/* Spacer */}
+            {/* Toggle Button */}
+            <button 
+              className={styles.headerToggleButton}
+              onClick={toggleSidebar}
+              aria-label="Toggle sidebar"
+            >
+              <LucideIcons.Menu size={20} />
+            </button>
+
+            {/* Search Bar */}
+            <div className={styles.headerSearchContainer}>
+              <LucideIcons.Search size={18} className={styles.headerSearchIcon} />
+              <input 
+                type="text" 
+                placeholder="Search"
+                className={styles.headerSearchInput}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            {/* Spacer to push button to the right */}
             <div style={{ flex: 1 }}></div>
 
             {/* CTA Button */}
@@ -68,39 +112,8 @@ const Layout = ({ children }) => {
       {/* Main Layout with Sidebar */}
       <div className={styles.mainLayout}>
         {/* Vertical Sidebar */}
-        <aside className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''}`}>
-          {/* Sidebar Header with Toggle and Brand */}
-          <div className={styles.sidebarHeader}>
-            <div className={styles.sidebarBrandContainer}>
-              <span className={styles.sidebarBrand}>Solaira</span>
-            </div>
-            <button 
-              className={styles.toggleButton}
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              aria-label="Toggle sidebar"
-            >
-              <LucideIcons.Menu size={18} />
-            </button>
-          </div>
-
-          {/* Divider */}
-          <div className={styles.divider}></div>
-
-          {/* Search Bar */}
-          {!sidebarCollapsed && (
-            <div className={styles.searchContainer}>
-              <LucideIcons.Search size={18} className={styles.searchIcon} />
-              <input 
-                type="text" 
-                placeholder="Search"
-                className={styles.searchInput}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          )}
-
-          {/* Divider */}
+        <aside className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''} ${!isLoaded ? styles.sidebarNoTransition : ''}`}>
+          {/* Divider at top */}
           <div className={styles.divider}></div>
 
           {/* Sidebar Navigation */}

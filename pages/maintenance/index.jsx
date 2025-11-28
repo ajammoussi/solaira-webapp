@@ -9,6 +9,7 @@
  */
 
 import React from 'react';
+import * as LucideIcons from 'lucide-react';
 import Layout from '../../components/Layout';
 import { useMaintenanceAlerts } from '../../lib/hooks/useEnergyData';
 import styles from '../energy/styles.module.css';
@@ -95,8 +96,8 @@ const Maintenance = () => {
                     {alert.description}
                   </div>
                   {alert.suggested_action && (
-                    <div style={{ fontSize: '12px', color: '#00D9A3', fontWeight: 600 }}>
-                      💡 {alert.suggested_action}
+                    <div style={{ fontSize: '12px', color: '#00D9A3', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <LucideIcons.Lightbulb size={14} /> {alert.suggested_action}
                     </div>
                   )}
                 </div>
@@ -106,7 +107,7 @@ const Maintenance = () => {
         )}
 
         <div className={styles.placeholder}>
-          <div className={styles.placeholderIcon}>🔧</div>
+          <div className={styles.placeholderIcon}><LucideIcons.Wrench size={64} strokeWidth={1.5} /></div>
           <h2 className={styles.placeholderTitle}>Full Maintenance Dashboard Coming Soon</h2>
           <p className={styles.placeholderText}>
             Tasks 13-14: System Health Dashboard & Detailed Alerts Panel

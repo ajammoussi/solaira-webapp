@@ -9,6 +9,7 @@
  */
 
 import React from 'react';
+import * as LucideIcons from 'lucide-react';
 import Layout from '../../components/Layout';
 import { useSystemConfig } from '../../lib/hooks/useEnergyData';
 import styles from '../energy/styles.module.css';
@@ -93,7 +94,7 @@ const Settings = () => {
         )}
 
         <div className={styles.placeholder}>
-          <div className={styles.placeholderIcon}>⚙️</div>
+          <div className={styles.placeholderIcon}><LucideIcons.Settings size={64} strokeWidth={1.5} /></div>
           <h2 className={styles.placeholderTitle}>Configuration Forms Coming Soon</h2>
           <p className={styles.placeholderText}>
             Task 12: System Configuration Forms with validation

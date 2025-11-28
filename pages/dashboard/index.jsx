@@ -12,6 +12,7 @@
  */
 
 import React from 'react';
+import * as LucideIcons from 'lucide-react';
 import Layout from '../../components/Layout';
 import { useAllEnergyData } from '../../lib/hooks/useEnergyData';
 import styles from './styles.module.css';
@@ -60,7 +61,7 @@ const Dashboard = () => {
             {/* PV Production */}
             <div className={styles.metricCard}>
               <div className={styles.metricHeader}>
-                <span className={styles.metricIcon}>☀️</span>
+                <span className={styles.metricIcon}><LucideIcons.Sun size={24} strokeWidth={2} /></span>
                 <span className={styles.metricLabel}>Solar Production</span>
               </div>
               <div className={styles.metricValue}>
@@ -76,7 +77,7 @@ const Dashboard = () => {
             {/* Consumption */}
             <div className={styles.metricCard}>
               <div className={styles.metricHeader}>
-                <span className={styles.metricIcon}>⚡</span>
+                <span className={styles.metricIcon}><LucideIcons.Zap size={24} strokeWidth={2} /></span>
                 <span className={styles.metricLabel}>Consumption</span>
               </div>
               <div className={styles.metricValue}>
@@ -92,7 +93,7 @@ const Dashboard = () => {
             {/* Grid Flow */}
             <div className={styles.metricCard}>
               <div className={styles.metricHeader}>
-                <span className={styles.metricIcon}>🔌</span>
+                <span className={styles.metricIcon}><LucideIcons.Plug size={24} strokeWidth={2} /></span>
                 <span className={styles.metricLabel}>Grid Flow</span>
               </div>
               <div className={styles.metricValue}>
@@ -111,7 +112,7 @@ const Dashboard = () => {
             {/* Battery SOC */}
             <div className={styles.metricCard}>
               <div className={styles.metricHeader}>
-                <span className={styles.metricIcon}>🔋</span>
+                <span className={styles.metricIcon}><LucideIcons.Battery size={24} strokeWidth={2} /></span>
                 <span className={styles.metricLabel}>Battery</span>
               </div>
               <div className={styles.metricValue}>
