@@ -48,8 +48,8 @@ The main site header containing the top banner with contact info, logo, navigati
 **Usage Example:**
 ```jsx
 <Header
-  email="Info@bohmenergy.nl"
-  phone="(+31) 85-76069814"
+  email="Info@solaira.tn"
+  phone="(+216) 99-999-999"
   logoImage="https://play.teleporthq.io/static/svg/default-img.svg"
   logoAlt="SVG6578a5b54fa1fa278cef6591footerlogosvgfill1666"
   navItems={['Thuisbatterij', 'Zonnepanelen', 'Over ons', 'Blog', 'Contact']}
@@ -119,8 +119,8 @@ The site footer with logo, contact information, navigation links, and copyright 
 <Footer
   logoImage="https://play.teleporthq.io/static/svg/default-img.svg"
   logoAlt="SVG6578a5b54fa1fa278cef6591footerlogosvgfill1657"
-  phone="(+31) 85-7606981"
-  email="info@bohmenergy.nl"
+  phone="(+216) 99-999-999"
+  email="info@solaira.tn"
   address={
     <>
       <span>Hogebrinkerweg 14m</span>
@@ -131,7 +131,7 @@ The site footer with logo, contact information, navigation links, and copyright 
   aboutLinks={['Zonnepanelen', 'Thuisbatterij', 'Over ons', 'Blog', 'Product']}
   supportLinks={['Contact', 'Privacy Policy', 'Terms of Service']}
   connectLinks={['LinkedIn', 'Instagram', 'Facebook']}
-  copyrightText="2023 Bohm Energy. All right reserved."
+  copyrightText="2025 Solaira Energy. All right reserved."
   designedByText="designed by "
   designerName="yassine"
 />
@@ -235,7 +235,7 @@ components/
 ```jsx
 <div className="frame1920wlight-component12">
   <div className="frame1920wlight-container106">
-    <span className="frame1920wlight-text121 www.bohmenergy.nlOutfitLight7">
+    <span className="frame1920wlight-text121 www.solaira.tnOutfitLight7">
       Contact
     </span>
   </div>

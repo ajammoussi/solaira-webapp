@@ -18,18 +18,7 @@ import { useAllEnergyData } from '../../lib/hooks/useEnergyData';
 import styles from './styles.module.css';
 
 const Dashboard = () => {
-  const { realtime, stats, loading, error, lastUpdated } = useAllEnergyData();
-
-  if (loading) {
-    return (
-      <Layout>
-        <div className={styles.loadingContainer}>
-          <div className={styles.loadingSpinner}></div>
-          <p className={styles.loadingText}>Loading energy data...</p>
-        </div>
-      </Layout>
-    );
-  }
+  const { realtime, stats, error, lastUpdated } = useAllEnergyData();
 
   if (error) {
     return (

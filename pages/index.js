@@ -30,7 +30,7 @@ const Frame1920wlight = (props) => {
             <Header
               className="frame1920wlight-group3"
               email="Info@solaira.tn"
-              phone="(+31) 85-76069814"
+              phone="(+216) 99-999-999"
               logoImage="flag_of_Tunisia.svg"
               logoAlt="SVG6578a5b54fa1fa278cef6591footerlogosvgfill1666"
               navItems={[
@@ -270,7 +270,7 @@ const Frame1920wlight = (props) => {
                   <Footer
                     logoImage="https://play.teleporthq.io/static/svg/default-img.svg"
                     logoAlt="SVG6578a5b54fa1fa278cef6591footerlogosvgfill1657"
-                    phone="(+31) 85-7606981"
+                    phone="(+216) 99-999-999"
                     email="info@solaira.tn"
                     address={
                       <>

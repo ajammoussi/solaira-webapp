@@ -324,14 +324,14 @@ peschallengeweb2/
 
 ```bash
 # .env.local (not committed to repo)
-NEXT_PUBLIC_SITE_URL=https://bohmenergy.nl
-NEXT_PUBLIC_CONTACT_EMAIL=info@bohmenergy.nl
+NEXT_PUBLIC_SITE_URL=https://solaira.tn
+NEXT_PUBLIC_CONTACT_EMAIL=info@solaira.tn
 NEXT_PUBLIC_CONTACT_PHONE=+31857606981
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 
 # Email service (if contact form added)
 SENDGRID_API_KEY=SG.xxxxx
-CONTACT_FORM_TO_EMAIL=info@bohmenergy.nl
+CONTACT_FORM_TO_EMAIL=info@solaira.tn
 
 # CMS (if integrated)
 CONTENTFUL_SPACE_ID=xxxxx
@@ -479,9 +479,8 @@ npm install -D eslint prettier husky lint-staged
 
 **Company:** Bohm Energy  
 **Website:** (To be deployed)  
-**Email:** info@bohmenergy.nl  
-**Phone:** (+31) 85-7606981  
-**Address:** Hogebrinkerweg 14m, 3871 KM, Hoevelaken, Netherlands
+**Email:** info@solaira.tn  
+**Phone:** (+216) 99-999-999  
 
 **Original Export:** TeleportHQ  
 **Current Status:** Refactored & Optimized  
