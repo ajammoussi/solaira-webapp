@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "next",
+    "db:import": "node ./scripts/db-import.js",
     "build": "next build",
     "start": "next start",
     "export": "next export"
@@ -16,7 +17,11 @@
     "next": "^12.1.10",
     "next-intl": "2.10.0",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "mysql2": "^3.3.1",
+    "jsonwebtoken": "^9.0.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.0.3"
   },
   "engines": {
     "node": ">=18.x"
