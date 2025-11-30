@@ -33,7 +33,7 @@
   padding: 8px 0;
   align-items: center;
   justify-content: center;
-  background-color:  #4A9D4E ;
+  background-color:  #008B72 ;
 }
 
 .topBannerContainer {
@@ -158,7 +158,7 @@
 .logoText {
   font-size: 34px;
   font-weight: 600;
-  color: #7CC063;
+  color: #00a952;
   line-height: 28px;
   letter-spacing: -0.3px;
   margin-left: -29px;

@@ -6,7 +6,7 @@
   align-items: flex-start;
   flex-shrink: 0;
   flex-direction: column;
-  background-color: var(--dl-color-www-bohmenergy-nl-white);
+  background-color: var(--dl-color-www-solaira-nl-white);
 }
 
 .container266 {
@@ -108,7 +108,7 @@
 
 .text379,
 .text380 {
-  color: var(--dl-color-www-bohmenergy-nl-jade);
+  color: var(--dl-color-www-solaira-nl-jade);
   height: auto;
   align-self: stretch;
   text-align: left;
@@ -126,7 +126,7 @@
 }
 
 .text381 {
-  color: var(--dl-color-www-bohmenergy-nl-emperor);
+  color: var(--dl-color-www-solaira-nl-emperor);
   height: auto;
   text-align: left;
   line-height: 40px;
@@ -172,7 +172,7 @@
 .text385,
 .text391,
 .text395 {
-  color: var(--dl-color-www-bohmenergy-nl-codgray);
+  color: var(--dl-color-www-solaira-nl-codgray);
   height: auto;
   align-self: stretch;
   text-align: left;
@@ -190,7 +190,7 @@
 .text396,
 .text397,
 .text398 {
-  color: var(--dl-color-www-bohmenergy-nl-emperor);
+  color: var(--dl-color-www-solaira-nl-emperor);
   height: auto;
   align-self: stretch;
   text-align: left;
@@ -217,7 +217,7 @@
 
 .text399,
 .text400 {
-  color: var(--dl-color-www-bohmenergy-nl-gray);
+  color: var(--dl-color-www-solaira-nl-gray);
   height: auto;
   text-align: left;
   line-height: 18px;
@@ -236,7 +236,7 @@
 }
 
 .text401 {
-  color: var(--dl-color-www-bohmenergy-nl-gray);
+  color: var(--dl-color-www-solaira-nl-gray);
   height: auto;
   text-align: left;
   line-height: 18px;

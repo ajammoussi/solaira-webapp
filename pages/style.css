@@ -29,65 +29,65 @@
   --dl-layout-radius-imageradius: 8px;
   --dl-layout-radius-inputradius: 24px;
   --dl-layout-radius-buttonradius: 24px;
-  --dl-color-www-bohmenergy-nl-alto: rgba(220, 220, 220, 1);
-  --dl-color-www-bohmenergy-nl-bush: rgba(12, 38, 31, 1);
-  --dl-color-www-bohmenergy-nl-corn: rgba(227, 177, 0, 1);
-  --dl-color-www-bohmenergy-nl-gray: rgba(132, 132, 132, 1);
-  --dl-color-www-bohmenergy-nl-jade: rgba(0, 173, 98, 1);
-  --dl-color-www-bohmenergy-nl-java: rgba(32, 205, 195, 1);
+  --dl-color-www-solaira-nl-alto: rgba(220, 220, 220, 1);
+  --dl-color-www-solaira-nl-bush: rgba(12, 38, 31, 1);
+  --dl-color-www-solaira-nl-corn: rgba(227, 177, 0, 1);
+  --dl-color-www-solaira-nl-gray: rgba(132, 132, 132, 1);
+  --dl-color-www-solaira-nl-jade: rgba(0, 173, 98, 1);
+  --dl-color-www-solaira-nl-java: rgba(32, 205, 195, 1);
   --dl-layout-space-oneandhalfunits: 24px;
-  --dl-color-www-bohmenergy-nl-black: rgba(0, 0, 0, 1);
-  --dl-color-www-bohmenergy-nl-cedar: rgba(60, 36, 21, 1);
-  --dl-color-www-bohmenergy-nl-jewel: rgba(18, 135, 63, 1);
-  --dl-color-www-bohmenergy-nl-monza: rgba(210, 13, 13, 1);
-  --dl-color-www-bohmenergy-nl-salem: rgba(0, 173, 98, 1);
-  --dl-color-www-bohmenergy-nl-white: rgba(255, 255, 255, 1);
-  --dl-color-www-bohmenergy-nl-nevada: rgba(105, 110, 120, 1);
-  --dl-color-www-bohmenergy-nl-pizazz: rgba(255, 140, 5, 1);
-  --dl-color-www-bohmenergy-nl-selago: rgba(240, 237, 254, 1);
-  --dl-color-www-bohmenergy-nl-silver: rgba(191, 191, 191, 1);
-  --dl-color-www-bohmenergy-nl-black20: rgba(0, 0, 0, 0.20000000298023224);
-  --dl-color-www-bohmenergy-nl-codgray: rgba(20, 20, 20, 1);
-  --dl-color-www-bohmenergy-nl-emerald: rgba(98, 213, 138, 1);
-  --dl-color-www-bohmenergy-nl-emperor: rgba(81, 81, 81, 1);
-  --dl-color-www-bohmenergy-nl-gallery: rgba(236, 236, 236, 1);
-  --dl-color-www-bohmenergy-nl-manatee: rgba(134, 141, 158, 1);
-  --dl-color-www-bohmenergy-nl-mercury: rgba(226, 226, 226, 1);
-  --dl-color-www-bohmenergy-nl-oldlace: rgba(254, 252, 247, 1);
-  --dl-color-www-bohmenergy-nl-ottoman: rgba(240, 237, 254, 1);
-  --dl-color-www-bohmenergy-nl-palesky: rgba(101, 111, 135, 1);
-  --dl-color-www-bohmenergy-nl-panache: rgba(240, 245, 245, 1);
-  --dl-color-www-bohmenergy-nl-white10: rgba(255, 255, 255, 0.10000000149011612);
-  --dl-color-www-bohmenergy-nl-white20: rgba(255, 255, 255, 0.20000000298023224);
-  --dl-color-www-bohmenergy-nl-white40: rgba(255, 255, 255, 0.4000000059604645);
-  --dl-color-www-bohmenergy-nl-white80: rgba(255, 255, 255, 0.800000011920929);
-  --dl-color-www-bohmenergy-nl-aeroblue: rgba(189, 254, 211, 1);
-  --dl-color-www-bohmenergy-nl-concrete: rgba(240, 245, 245, 1);
-  --dl-color-www-bohmenergy-nl-darkfern: rgba(10, 79, 38, 1);
-  --dl-color-www-bohmenergy-nl-fungreen: rgba(1, 137, 58, 1);
-  --dl-color-www-bohmenergy-nl-greenpea: rgba(30, 89, 76, 1);
-  --dl-color-www-bohmenergy-nl-teagreen: rgba(199, 238, 194, 1);
-  --dl-color-www-bohmenergy-nl-tranquil: rgba(240, 245, 245, 1);
-  --dl-color-www-bohmenergy-nl-alabaster: rgba(246, 251, 251, 1);
-  --dl-color-www-bohmenergy-nl-blackbean: rgba(6, 20, 16, 1);
-  --dl-color-www-bohmenergy-nl-cadetblue: rgba(181, 185, 201, 1);
-  --dl-color-www-bohmenergy-nl-greenhaze: rgba(0, 181, 51, 1);
-  --dl-color-www-bohmenergy-nl-jambalaya: rgba(96, 57, 19, 1);
-  --dl-color-www-bohmenergy-nl-malachite: rgba(8, 178, 15, 1);
-  --dl-color-www-bohmenergy-nl-porcelain: rgba(240, 245, 245, 1);
-  --dl-color-www-bohmenergy-nl-rosewhite: rgba(255, 248, 248, 1);
-  --dl-color-www-bohmenergy-nl-bluezodiac: rgba(15, 44, 73, 1);
-  --dl-color-www-bohmenergy-nl-casablanca: rgba(245, 175, 65, 1);
-  --dl-color-www-bohmenergy-nl-frenchpass: rgba(187, 226, 255, 1);
-  --dl-color-www-bohmenergy-nl-pictonblue: rgba(77, 168, 244, 1);
-  --dl-color-www-bohmenergy-nl-santasgray: rgba(154, 159, 176, 1);
-  --dl-color-www-bohmenergy-nl-whitelilac: rgba(240, 237, 254, 1);
-  --dl-color-www-bohmenergy-nl-islandspice: rgba(246, 251, 251, 1);
-  --dl-color-www-bohmenergy-nl-persiangreen: rgba(0, 180, 169, 1);
-  --dl-color-www-bohmenergy-nl-rollingstone: rgba(117, 120, 123, 1);
-  --dl-color-www-bohmenergy-nl-catskillwhite: rgba(246, 251, 251, 1);
-  --dl-color-www-bohmenergy-nl-electricviolet: rgba(139, 68, 255, 1);
-  --dl-color-www-bohmenergy-nl-mountainmeadow: rgba(28, 207, 96, 1);
+  --dl-color-www-solaira-nl-black: rgba(0, 0, 0, 1);
+  --dl-color-www-solaira-nl-cedar: rgba(60, 36, 21, 1);
+  --dl-color-www-solaira-nl-jewel: rgba(18, 135, 63, 1);
+  --dl-color-www-solaira-nl-monza: rgba(210, 13, 13, 1);
+  --dl-color-www-solaira-nl-salem: rgba(0, 173, 98, 1);
+  --dl-color-www-solaira-nl-white: rgba(255, 255, 255, 1);
+  --dl-color-www-solaira-nl-nevada: rgba(105, 110, 120, 1);
+  --dl-color-www-solaira-nl-pizazz: rgba(255, 140, 5, 1);
+  --dl-color-www-solaira-nl-selago: rgba(240, 237, 254, 1);
+  --dl-color-www-solaira-nl-silver: rgba(191, 191, 191, 1);
+  --dl-color-www-solaira-nl-black20: rgba(0, 0, 0, 0.20000000298023224);
+  --dl-color-www-solaira-nl-codgray: rgba(20, 20, 20, 1);
+  --dl-color-www-solaira-nl-emerald: rgba(98, 213, 138, 1);
+  --dl-color-www-solaira-nl-emperor: rgba(81, 81, 81, 1);
+  --dl-color-www-solaira-nl-gallery: rgba(236, 236, 236, 1);
+  --dl-color-www-solaira-nl-manatee: rgba(134, 141, 158, 1);
+  --dl-color-www-solaira-nl-mercury: rgba(226, 226, 226, 1);
+  --dl-color-www-solaira-nl-oldlace: rgba(254, 252, 247, 1);
+  --dl-color-www-solaira-nl-ottoman: rgba(240, 237, 254, 1);
+  --dl-color-www-solaira-nl-palesky: rgba(101, 111, 135, 1);
+  --dl-color-www-solaira-nl-panache: rgba(240, 245, 245, 1);
+  --dl-color-www-solaira-nl-white10: rgba(255, 255, 255, 0.10000000149011612);
+  --dl-color-www-solaira-nl-white20: rgba(255, 255, 255, 0.20000000298023224);
+  --dl-color-www-solaira-nl-white40: rgba(255, 255, 255, 0.4000000059604645);
+  --dl-color-www-solaira-nl-white80: rgba(255, 255, 255, 0.800000011920929);
+  --dl-color-www-solaira-nl-aeroblue: rgba(189, 254, 211, 1);
+  --dl-color-www-solaira-nl-concrete: rgba(240, 245, 245, 1);
+  --dl-color-www-solaira-nl-darkfern: rgba(10, 79, 38, 1);
+  --dl-color-www-solaira-nl-fungreen: rgba(1, 137, 58, 1);
+  --dl-color-www-solaira-nl-greenpea: rgba(30, 89, 76, 1);
+  --dl-color-www-solaira-nl-teagreen: rgba(199, 238, 194, 1);
+  --dl-color-www-solaira-nl-tranquil: rgba(240, 245, 245, 1);
+  --dl-color-www-solaira-nl-alabaster: rgba(246, 251, 251, 1);
+  --dl-color-www-solaira-nl-blackbean: rgba(6, 20, 16, 1);
+  --dl-color-www-solaira-nl-cadetblue: rgba(181, 185, 201, 1);
+  --dl-color-www-solaira-nl-greenhaze: rgba(0, 181, 51, 1);
+  --dl-color-www-solaira-nl-jambalaya: rgba(96, 57, 19, 1);
+  --dl-color-www-solaira-nl-malachite: rgba(8, 178, 15, 1);
+  --dl-color-www-solaira-nl-porcelain: rgba(240, 245, 245, 1);
+  --dl-color-www-solaira-nl-rosewhite: rgba(255, 248, 248, 1);
+  --dl-color-www-solaira-nl-bluezodiac: rgba(15, 44, 73, 1);
+  --dl-color-www-solaira-nl-casablanca: rgba(245, 175, 65, 1);
+  --dl-color-www-solaira-nl-frenchpass: rgba(187, 226, 255, 1);
+  --dl-color-www-solaira-nl-pictonblue: rgba(77, 168, 244, 1);
+  --dl-color-www-solaira-nl-santasgray: rgba(154, 159, 176, 1);
+  --dl-color-www-solaira-nl-whitelilac: rgba(240, 237, 254, 1);
+  --dl-color-www-solaira-nl-islandspice: rgba(246, 251, 251, 1);
+  --dl-color-www-solaira-nl-persiangreen: rgba(0, 180, 169, 1);
+  --dl-color-www-solaira-nl-rollingstone: rgba(117, 120, 123, 1);
+  --dl-color-www-solaira-nl-catskillwhite: rgba(246, 251, 251, 1);
+  --dl-color-www-solaira-nl-electricviolet: rgba(139, 68, 255, 1);
+  --dl-color-www-solaira-nl-mountainmeadow: rgba(28, 207, 96, 1);
 }
  
 .button {
@@ -605,7 +605,7 @@
   text-decoration: none;
 }
  
-.www\.bohmenergy\.nlOutfitLight {
+.www\.solaira\.nlOutfitLight {
   font-size: 14px;
   font-style: normal;
   font-family: Outfit;
@@ -614,7 +614,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlOutfitLight1 {
+.www\.solaira\.nlOutfitLight1 {
   font-size: 16px;
   font-style: normal;
   font-family: Outfit;
@@ -623,7 +623,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlOutfitLight2 {
+.www\.solaira\.nlOutfitLight2 {
   font-size: 18px;
   font-style: normal;
   font-family: Outfit;
@@ -632,7 +632,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlOutfitLight3 {
+.www\.solaira\.nlOutfitLight3 {
   font-size: 18px;
   font-style: normal;
   font-family: Outfit;
@@ -641,7 +641,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlOutfitLight4 {
+.www\.solaira\.nlOutfitLight4 {
   font-size: 18px;
   font-style: normal;
   font-family: Outfit;
@@ -650,7 +650,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlOutfitLight5 {
+.www\.solaira\.nlOutfitLight5 {
   font-size: 18px;
   font-style: normal;
   font-family: Outfit;
@@ -659,7 +659,7 @@
   letter-spacing: 0.30000001192092896px;
 }
  
-.www\.bohmenergy\.nlOutfitLight6 {
+.www\.solaira\.nlOutfitLight6 {
   font-size: 18px;
   font-style: normal;
   font-family: Outfit;
@@ -668,7 +668,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlOutfitLight7 {
+.www\.solaira\.nlOutfitLight7 {
   font-size: 20px;
   font-style: normal;
   font-family: Outfit;
@@ -677,7 +677,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlOutfitLight8 {
+.www\.solaira\.nlOutfitLight8 {
   font-size: 22px;
   font-style: normal;
   font-family: Outfit;
@@ -686,7 +686,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlOutfitRegular {
+.www\.solaira\.nlOutfitRegular {
   font-size: 24px;
   font-style: normal;
   font-family: Outfit;
@@ -695,7 +695,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlOutfitLight9 {
+.www\.solaira\.nlOutfitLight9 {
   font-size: 20px;
   font-style: normal;
   font-family: Outfit;
@@ -704,7 +704,7 @@
   letter-spacing: 0.30000001192092896px;
 }
  
-.www\.bohmenergy\.nlOutfitLight10 {
+.www\.solaira\.nlOutfitLight10 {
   font-size: 20px;
   font-style: normal;
   font-family: Outfit;
@@ -713,7 +713,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlOutfitRegular1 {
+.www\.solaira\.nlOutfitRegular1 {
   font-size: 32px;
   font-style: normal;
   font-family: Outfit;
@@ -722,7 +722,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlSemanticHeading1 {
+.www\.solaira\.nlSemanticHeading1 {
   font-size: 66px;
   font-style: normal;
   font-family: Outfit;
@@ -731,7 +731,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlSemanticHeading2 {
+.www\.solaira\.nlSemanticHeading2 {
   font-size: 44px;
   font-style: normal;
   font-family: Outfit;
@@ -740,7 +740,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlSemanticHeading21 {
+.www\.solaira\.nlSemanticHeading21 {
   font-size: 46px;
   font-style: normal;
   font-family: Outfit;
@@ -749,7 +749,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlSemanticHeading22 {
+.www\.solaira\.nlSemanticHeading22 {
   font-size: 48px;
   font-style: normal;
   font-family: Outfit;
@@ -758,7 +758,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlSemanticHeading3 {
+.www\.solaira\.nlSemanticHeading3 {
   font-size: 24px;
   font-style: normal;
   font-family: Outfit;
@@ -767,7 +767,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlSemanticHeading31 {
+.www\.solaira\.nlSemanticHeading31 {
   font-size: 34px;
   font-style: normal;
   font-family: Outfit;
@@ -776,7 +776,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlSemanticHeading32 {
+.www\.solaira\.nlSemanticHeading32 {
   font-size: 60px;
   font-style: normal;
   font-family: Outfit;
@@ -785,7 +785,7 @@
   letter-spacing: 0.30000001192092896px;
 }
  
-.www\.bohmenergy\.nlSemanticHeading4 {
+.www\.solaira\.nlSemanticHeading4 {
   font-size: 24px;
   font-style: normal;
   font-family: Outfit;
@@ -794,7 +794,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlSemanticHeading33 {
+.www\.solaira\.nlSemanticHeading33 {
   font-size: 36px;
   font-style: normal;
   font-family: Outfit;
@@ -803,7 +803,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlSemanticLink {
+.www\.solaira\.nlSemanticLink {
   font-size: 16px;
   font-style: normal;
   font-family: Outfit;
@@ -812,7 +812,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlSemanticLink1 {
+.www\.solaira\.nlSemanticLink1 {
   font-size: 18px;
   font-style: normal;
   font-family: Outfit;
@@ -821,7 +821,7 @@
   letter-spacing: 0em;
 }
  
-.www\.bohmenergy\.nlSemanticLink2 {
+.www\.solaira\.nlSemanticLink2 {
   font-size: 20px;
   font-style: normal;
   font-family: Outfit;
@@ -911,3 +911,4 @@
     grid-template-columns: 1fr;
   }
 }
+
