@@ -15,7 +15,7 @@ import { useMaintenanceAlerts } from '../../lib/hooks/useEnergyData';
 import styles from '../energy/styles.module.css';
 
 const Maintenance = () => {
-  const { alerts, systemHealth } = useMaintenanceAlerts();
+  const { alerts, systemHealth, loading } = useMaintenanceAlerts();
 
   return (
     <Layout>
@@ -28,7 +28,7 @@ const Maintenance = () => {
         </div>
 
         {/* Quick System Health Preview */}
-        {systemHealth && (
+        {!loading && systemHealth && (
           <div style={{ marginBottom: '24px' }}>
             <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#333', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               System Status: 
@@ -79,7 +79,7 @@ const Maintenance = () => {
         )}
 
         {/* Active Alerts Preview */}
-        {alerts && alerts.filter(a => a.status === 'active').length > 0 && (
+        {!loading && alerts && alerts.filter(a => a.status === 'active').length > 0 && (
           <div style={{ marginBottom: '24px' }}>
             <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
               Active Alerts ({alerts.filter(a => a.status === 'active').length})
