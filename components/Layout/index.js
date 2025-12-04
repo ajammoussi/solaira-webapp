@@ -1,20 +1,80 @@
 /**
  * Main Layout Component - Sidebar Navigation for Dashboard Pages
- * Minimal header + Vertical sidebar with modern icons
+ * Minimal header + Vertical sidebar with modern icons + Account section
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import * as LucideIcons from 'lucide-react';
 import Button from '../Button';
+import { useAuth } from '../../lib/hooks/useAuth';
 import styles from './styles.module.css';
+
+// Key used to signal logout across tabs
+const LOGOUT_EVENT_KEY = 'solaira_logout_event';
 
 const Layout = ({ children }) => {
   const router = useRouter();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // Default to true to prevent flash
+  const { user, profile, isGuest, signOut } = useAuth();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [signOutLoading, setSignOutLoading] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const accountMenuRef = useRef(null);
+
+  // Get display name from user/profile
+  const displayName = profile?.full_name 
+    || user?.user_metadata?.full_name 
+    || user?.email?.split('@')[0] 
+    || (isGuest ? 'Guest' : 'User');
+  
+  // Get initials for avatar
+  const initials = displayName
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
+  const handleSignOut = async () => {
+    console.log('Layout: handleSignOut called');
+    setSignOutLoading(true);
+    
+    try {
+      console.log('Layout: Calling signOut...');
+      await signOut();
+      console.log('Layout: signOut completed');
+      
+      // Signal other tabs to logout
+      localStorage.setItem(LOGOUT_EVENT_KEY, Date.now().toString());
+      
+      // Small delay to ensure state is fully cleared
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Force reload to signin page (clears all React state)
+      console.log('Layout: Redirecting to signin...');
+      window.location.replace('/');
+    } catch (error) {
+      console.error('Layout: signOut error:', error);
+      // Still redirect even on error
+      window.location.replace('/signin');
+    }
+  };
+
+  // Listen for logout events from other tabs
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === LOGOUT_EVENT_KEY && e.newValue) {
+        console.log('Layout: Logout detected from another tab, redirecting...');
+        window.location.href = '/signin';
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // Load sidebar state from localStorage on mount
   useEffect(() => {
@@ -22,11 +82,27 @@ const Layout = ({ children }) => {
     if (savedState !== null) {
       setSidebarCollapsed(savedState === 'true');
     } else {
-      setSidebarCollapsed(false); // Default to expanded if no saved state
+      setSidebarCollapsed(false);
     }
-    // Small delay to ensure smooth render
     setTimeout(() => setIsLoaded(true), 50);
   }, []);
+
+  // Close account menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target)) {
+        setAccountMenuOpen(false);
+      }
+    };
+
+    if (accountMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [accountMenuOpen]);
 
   // Save sidebar state to localStorage whenever it changes
   const toggleSidebar = () => {
@@ -103,8 +179,8 @@ const Layout = ({ children }) => {
             <div style={{ flex: 1 }}></div>
 
             {/* CTA Button */}
-            <Button className={styles.headerButton} href="/">
-              <span>Log Out</span>
+            <Button className={styles.headerButton} onClick={handleSignOut} disabled={signOutLoading}>
+              <span>{signOutLoading ? 'Logging out...' : 'Log Out'}</span>
             </Button>
           </div>
         </div>
@@ -138,6 +214,120 @@ const Layout = ({ children }) => {
               );
             })}
           </nav>
+
+          {/* Account Section at Bottom */}
+          <div style={{ padding: '12px', borderTop: '1px solid #E5E7EB', position: 'relative' }} ref={accountMenuRef}>
+            <button
+              onClick={() => setAccountMenuOpen(!accountMenuOpen)}
+              style={{ 
+                border: 'none', 
+                background: 'transparent',
+                cursor: 'pointer',
+                width: '100%',
+                padding: sidebarCollapsed ? '8px' : '8px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                borderRadius: '8px',
+                transition: 'background-color 0.15s ease'
+              }}
+              title="Account"
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F3F4F6'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            >
+              <div style={{
+                width: '40px',
+                height: '40px',
+                minWidth: '40px',
+                minHeight: '40px',
+                borderRadius: '50%',
+                backgroundColor: '#00D9A3',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#FFFFFF',
+                fontSize: '15px',
+                fontWeight: '600',
+                flexShrink: 0
+              }}>
+                {initials}
+              </div>
+              {!sidebarCollapsed && (
+                <span style={{ flex: 1, textAlign: 'left', fontSize: '14px', color: '#374151', fontWeight: '500' }}>
+                  {displayName}
+                </span>
+              )}
+              {!sidebarCollapsed && (
+                <LucideIcons.ChevronUp 
+                  size={16} 
+                  color="#6B7280"
+                  style={{ 
+                    transition: 'transform 0.2s ease',
+                    transform: accountMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+                  }} 
+                />
+              )}
+            </button>
+
+            {/* Dropdown Menu */}
+            {accountMenuOpen && (
+              <div style={{
+                position: 'absolute',
+                bottom: '100%',
+                left: sidebarCollapsed ? '70px' : '12px',
+                right: sidebarCollapsed ? 'auto' : '12px',
+                marginBottom: '8px',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E5E7EB',
+                borderRadius: '10px',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                overflow: 'hidden',
+                minWidth: sidebarCollapsed ? '180px' : 'auto',
+                zIndex: 1000
+              }}>
+                <Link href="/account">
+                  <a 
+                    className={styles.sidebarLink}
+                    style={{ 
+                      borderRadius: '0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '12px 16px'
+                    }}
+                    onClick={() => setAccountMenuOpen(false)}
+                  >
+                    <LucideIcons.User size={18} strokeWidth={2} />
+                    <span>Account</span>
+                  </a>
+                </Link>
+                <div style={{ width: '100%', height: '1px', backgroundColor: '#E5E7EB' }}></div>
+                <button
+                  onClick={() => {
+                    setAccountMenuOpen(false);
+                    handleSignOut();
+                  }}
+                  className={styles.sidebarLink}
+                  style={{ 
+                    border: 'none',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                    width: '100%',
+                    borderRadius: '0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '12px 16px',
+                    textAlign: 'left'
+                  }}
+                  disabled={signOutLoading}
+                >
+                  <LucideIcons.LogOut size={18} strokeWidth={2} />
+                  <span>{signOutLoading ? 'Logging out...' : 'Log out'}</span>
+                </button>
+              </div>
+            )}
+          </div>
         </aside>
 
         {/* Vertical Divider between sidebar and content */}

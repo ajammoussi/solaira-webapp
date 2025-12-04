@@ -8,12 +8,45 @@
  * - Grid interaction stats
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import * as LucideIcons from 'lucide-react';
 import Layout from '../../components/Layout';
+import { useAuth } from '../../lib/hooks/useAuth';
 import styles from './styles.module.css';
 
 const Energy = () => {
+  const router = useRouter();
+  const { user, isGuest, loading: authLoading } = useAuth();
+
+  // Protect this page
+  useEffect(() => {
+    if (!authLoading && !user && !isGuest) {
+      router.replace('/signin');
+    }
+  }, [user, isGuest, authLoading, router]);
+
+  if (authLoading || (!user && !isGuest)) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f5f5f5' }}>
+        <div className="spinner" />
+        <style jsx>{`
+          .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e2e2;
+            border-top-color: #00D9A3;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+          }
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   return (
     <Layout>
       <div className={styles.pageContainer}>

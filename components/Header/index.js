@@ -50,8 +50,8 @@ const Header = () => {
           </nav>
 
           {/* CTA Button */}
-          <Button className={styles.headerButton} href="/dashboard">
-            Sign Up
+          <Button className={styles.headerButton} href="/signin">
+            Sign In
           </Button>
         </div>
       </div>
