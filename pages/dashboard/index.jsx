@@ -15,6 +15,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import * as LucideIcons from 'lucide-react';
 import Layout from '../../components/Layout';
+import EnergyFlowDiagram from '../../components/EnergyFlowDiagram';
 import { useAuth } from '../../lib/hooks/useAuth';
 import { useAllEnergyData } from '../../lib/hooks/useEnergyData';
 import styles from './styles.module.css';
@@ -264,16 +265,26 @@ const Dashboard = () => {
           </div>
         </section>
 
-        {/* Placeholder for Energy Flow Diagram */}
+        {/* Energy Flow Diagram */}
         <section className={styles.flowSection}>
           <h2 className={styles.sectionTitle}>Energy Flow</h2>
-          <div className={styles.flowPlaceholder}>
-            <p className={styles.placeholderText}>
-              Energy Flow Diagram will be rendered here
-            </p>
-            <p className={styles.placeholderSubtext}>
-              Task 5: Build animated diagram showing solar → home → grid → battery
-            </p>
+          <div className={styles.flowContainer}>
+            <EnergyFlowDiagram 
+              data={{
+                solar: realtime?.pv_production_kw || 0,
+                grid_import: realtime?.grid_import_kw || 0,
+                home_consumption: realtime?.consumption_kw || 0,
+                grid_export: realtime?.grid_export_kw || 0,
+                appliances: {
+                  electric_car: (realtime?.consumption_kw || 0) * 0.21,
+                  air_conditioning: (realtime?.consumption_kw || 0) * 0.17,
+                  washing_machine: (realtime?.consumption_kw || 0) * 0.13,
+                  dryer: (realtime?.consumption_kw || 0) * 0.17,
+                  heat_pump: (realtime?.consumption_kw || 0) * 0.21,
+                  boiler: (realtime?.consumption_kw || 0) * 0.11
+                }
+              }}
+            />
           </div>
         </section>
 
