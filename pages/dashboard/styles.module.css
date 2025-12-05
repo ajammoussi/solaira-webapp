@@ -243,10 +243,25 @@
 }
 
 /* ============================================================================
+   ENERGY FLOW SECTION
+   ============================================================================ */
+
+.flowSection {
+  margin-bottom: 32px;
+}
+
+.flowContainer {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  min-height: 400px;
+}
+
+/* ============================================================================
    PLACEHOLDER SECTIONS (for upcoming tasks)
    ============================================================================ */
 
-.flowSection,
 .chartSection {
   margin-bottom: 32px;
 }
@@ -305,6 +320,10 @@
     gap: 16px;
   }
 
+  .flowContainer {
+    min-height: 400px;
+  }
+
   .flowPlaceholder,
   .chartPlaceholder {
     padding: 40px 20px;
@@ -334,5 +353,9 @@
 
   .sectionTitle {
     font-size: 18px;
+  }
+
+  .flowContainer {
+    min-height: 350px;
   }
 }
