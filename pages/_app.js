@@ -2,7 +2,19 @@ import './style.css'
 
 import { GlobalProvider } from '../global-context'
 import { NextIntlProvider } from 'next-intl'
-import { AuthProvider } from '../lib/hooks/useAuth'
+import { AuthProvider, useAuth } from '../lib/hooks/useAuth'
+import SolarChatbot from '../components/SolarChatbot'
+
+function ChatbotWrapper() {
+  const { user, isGuest } = useAuth()
+  
+  // Only render chatbot when user is logged in (not a guest)
+  if (isGuest || !user) {
+    return null
+  }
+  
+  return <SolarChatbot energyData={null} />
+}
 
 export default function MyApp({ Component, pageProps }) {
   return (
@@ -10,6 +22,7 @@ export default function MyApp({ Component, pageProps }) {
       <AuthProvider>
         <GlobalProvider>
           <Component {...pageProps} />
+          <ChatbotWrapper />
         </GlobalProvider>
       </AuthProvider>
     </NextIntlProvider>
