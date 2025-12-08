@@ -14,6 +14,9 @@ import * as LucideIcons from 'lucide-react';
 import Layout from '../../components/Layout';
 import { useAuth } from '../../lib/hooks/useAuth';
 import styles from './styles.module.css';
+import EnergyDistributionCard from '../../components/EnergyDistributionCard';
+import BarChart from '../../components/BarChart';
+import PowerSourcesChart from '../../components/PowerSourcesChart';
 
 const Energy = () => {
   const router = useRouter();
@@ -58,40 +61,24 @@ const Energy = () => {
             Monitor your solar panel output with interactive charts
           </p>
           
-          <div className={styles.chartContainer}>
-            {/* Time Range Selector */}
-            <div className={styles.timeRangeSelector}>
-              {['day', 'week', 'month', 'year'].map((range) => (
-                <button
-                  key={range}
-                  className={`${styles.timeRangeButton} ${timeRange === range ? styles.active : ''}`}
-                  onClick={() => setTimeRange(range)}
-                >
-                  {range.charAt(0).toUpperCase() + range.slice(1)}
-                </button>
-              ))}
-            </div>
-            
-            {/* Chart Placeholder */}
-            <div className={styles.chartPlaceholder}>
-              <LucideIcons.BarChart3 className={styles.chartIcon} />
-              <p>Solar production chart for {timeRange} view</p>
-              <div className={styles.chartData}>
-                <div className={styles.dataPoint}>
-                  <span className={styles.dataLabel}>Current Production:</span>
-                  <span className={styles.dataValue}>3.2 kW</span>
-                </div>
-                <div className={styles.dataPoint}>
-                  <span className={styles.dataLabel}>Today's Total:</span>
-                  <span className={styles.dataValue}>18.5 kWh</span>
-                </div>
-                <div className={styles.dataPoint}>
-                  <span className={styles.dataLabel}>Efficiency:</span>
-                  <span className={styles.dataValue}>92%</span>
-                </div>
-              </div>
-            </div>
+          <BarChart 
+            color="#4FC3F7"
+            unit="kW"
+            yAxisTitle="Power (kW)"
+            card={false}
+          />
+        </section>
+
+        {/* Power Sources Chart Section */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <LucideIcons.Activity className={styles.sectionIcon} />
+            <h2 className={styles.sectionTitle}>Power Sources</h2>
           </div>
+          <p className={styles.sectionDescription}>
+            Breakdown of power sources over the last 24 hours
+          </p>
+          <PowerSourcesChart card={false} />
         </section>
 
         {/* Consumption Patterns Section */}
@@ -180,57 +167,11 @@ const Energy = () => {
           <p className={styles.sectionDescription}>
             Visualize how energy flows through your system with Sankey diagrams
           </p>
-          
-          <div className={styles.sankeyContainer}>
-            <div className={styles.sankeyDiagram}>
-              {/* Simplified Sankey representation */}
-              <div className={styles.sankeyNode} style={{ left: '0%', top: '50%' }}>
-                <div className={styles.nodeLabel}>Solar Panels</div>
-                <div className={styles.nodeValue}>18.5 kWh</div>
-              </div>
-              <div className={styles.sankeyFlow} style={{ width: '20%', top: '50%' }} />
-              
-              <div className={styles.sankeyNode} style={{ left: '25%', top: '30%' }}>
-                <div className={styles.nodeLabel}>Home Usage</div>
-                <div className={styles.nodeValue}>12.8 kWh</div>
-              </div>
-              <div className={styles.sankeyFlow} style={{ width: '15%', top: '30%', transform: 'rotate(45deg)' }} />
-              
-              <div className={styles.sankeyNode} style={{ left: '25%', top: '70%' }}>
-                <div className={styles.nodeLabel}>Battery</div>
-                <div className={styles.nodeValue}>4.2 kWh</div>
-              </div>
-              <div className={styles.sankeyFlow} style={{ width: '15%', top: '70%', transform: 'rotate(-45deg)' }} />
-              
-              <div className={styles.sankeyNode} style={{ left: '50%', top: '10%' }}>
-                <div className={styles.nodeLabel}>Grid Export</div>
-                <div className={styles.nodeValue}>1.5 kWh</div>
-              </div>
-              
-              <div className={styles.sankeyNode} style={{ left: '50%', top: '90%' }}>
-                <div className={styles.nodeLabel}>Grid Import</div>
-                <div className={styles.nodeValue}>0.8 kWh</div>
-              </div>
-            </div>
-            
-            <div className={styles.distributionStats}>
-              <h3>Distribution Summary</h3>
-              <div className={styles.distributionList}>
-                <div className={styles.distributionItem}>
-                  <span className={styles.distributionLabel}>Direct Consumption:</span>
-                  <span className={styles.distributionValue}>69.2%</span>
-                </div>
-                <div className={styles.distributionItem}>
-                  <span className={styles.distributionLabel}>Battery Storage:</span>
-                  <span className={styles.distributionValue}>22.7%</span>
-                </div>
-                <div className={styles.distributionItem}>
-                  <span className={styles.distributionLabel}>Grid Export:</span>
-                  <span className={styles.distributionValue}>8.1%</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <EnergyDistributionCard
+            title="Energy Usage" 
+            darkMode={false}
+            locale="en-US"
+          />
         </section>
 
         {/* Grid Interaction Section */}
@@ -264,7 +205,6 @@ const Energy = () => {
                 </div>
               </div>
             </div>
-
             {/* Grid Balance */}
             <div className={styles.balanceContainer}>
               <h3>Grid Balance</h3>
