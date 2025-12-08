@@ -258,6 +258,94 @@
   min-height: 400px;
 }
 
+/* Energy Flow Diagram Styles */
+.energyFlowContainer {
+  width: 100%;
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.energyFlowSvg {
+  max-width: 100%;
+  height: auto;
+}
+
+.flowPath {
+  cursor: pointer;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+.flowPath:hover {
+  opacity: 0.9 !important;
+  filter: brightness(1.1);
+}
+
+.energyNode {
+  cursor: default;
+  transition: transform 0.2s ease;
+}
+
+.energyNode:hover {
+  transform: translateY(-2px);
+}
+
+.nodeText {
+  user-select: none;
+  pointer-events: none;
+}
+
+.nodeLabelText {
+  font-weight: 500;
+  fill: #333333;
+  user-select: none;
+  pointer-events: none;
+}
+
+.powerValue {
+  font-size: 11px;
+  font-weight: 500;
+  fill: #666666;
+  user-select: none;
+  pointer-events: none;
+}
+
+.applianceNode {
+  transition: transform 0.2s ease;
+}
+
+.applianceNode:hover {
+  transform: translateX(3px);
+}
+
+.flowTooltip {
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 6px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+.tooltipTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.tooltipValue {
+  font-size: 15px;
+  font-weight: 700;
+  color: #00D9A3;
+  text-align: center;
+}
+
 /* ============================================================================
    PLACEHOLDER SECTIONS (for upcoming tasks)
    ============================================================================ */

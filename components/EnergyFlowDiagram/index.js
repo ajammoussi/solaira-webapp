@@ -1,9 +1,17 @@
+/**
+ * EnergyFlowDiagram Component
+ * Sankey-style diagram showing energy flow from sources (Solar, Grid) 
+ * through Home to various appliances
+ * 
+ * Save this as: components/EnergyFlowDiagram.jsx
+ */
+
 import React, { useMemo, useState } from 'react';
-import styles from './style.module.css';
 
 const EnergyFlowDiagram = ({ data }) => {
   const [hoveredFlow, setHoveredFlow] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  
   // Default data structure if none provided
   const defaultData = {
     solar: 100,
@@ -105,7 +113,6 @@ const EnergyFlowDiagram = ({ data }) => {
 
   // Handle mouse events for tooltips
   const handleFlowHover = (flowInfo, event) => {
-    const rect = event.currentTarget.getBoundingClientRect();
     const svgRect = event.currentTarget.ownerSVGElement.getBoundingClientRect();
     setTooltipPos({
       x: event.clientX - svgRect.left,
@@ -119,11 +126,21 @@ const EnergyFlowDiagram = ({ data }) => {
   };
 
   return (
-    <div className={styles.energyFlowContainer}>
+    <div style={{ 
+      width: '100%', 
+      height: '400px', 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      background: '#FFFFFF',
+      borderRadius: '12px',
+      padding: '20px',
+      overflow: 'hidden'
+    }}>
       <svg 
         width={width} 
         height={height} 
-        className={styles.energyFlowSvg}
+        style={{ maxWidth: '100%', height: 'auto' }}
         viewBox={`0 0 ${width} ${height}`}
       >
         {/* Define gradients for nodes */}
@@ -144,7 +161,7 @@ const EnergyFlowDiagram = ({ data }) => {
 
         {/* Grid to Home flow - always show at least a minimum flow */}
         <path
-          className={styles.flowPath}
+          style={{ cursor: 'pointer', transition: 'opacity 0.2s' }}
           d={generatePath(
             nodes.grid.x + nodes.grid.width,
             nodes.grid.y + nodes.grid.height / 2,
@@ -174,7 +191,7 @@ const EnergyFlowDiagram = ({ data }) => {
         {/* Solar to Home flow */}
         {flows.solarToHome > 0 && (
           <path
-            className={styles.flowPath}
+            style={{ cursor: 'pointer', transition: 'opacity 0.2s' }}
             d={generatePath(
               nodes.solar.x + nodes.solar.width,
               nodes.solar.y + nodes.solar.height / 2,
@@ -205,7 +222,7 @@ const EnergyFlowDiagram = ({ data }) => {
         {/* Solar to Grid flow (export) */}
         {flows.solarToGrid > 0 && (
           <path
-            className={styles.flowPath}
+            style={{ cursor: 'pointer', transition: 'opacity 0.2s' }}
             d={generatePath(
               nodes.solar.x + nodes.solar.width / 2,
               nodes.solar.y,
@@ -244,7 +261,7 @@ const EnergyFlowDiagram = ({ data }) => {
           return (
             <path
               key={appliance}
-              className={styles.flowPath}
+              style={{ cursor: 'pointer', transition: 'opacity 0.2s' }}
               d={generatePath(
                 nodes.home.x + nodes.home.width,
                 nodes.home.y,
@@ -274,7 +291,7 @@ const EnergyFlowDiagram = ({ data }) => {
         })}
 
         {/* Grid Node */}
-        <g className={styles.energyNode}>
+        <g>
           <rect
             x={nodes.grid.x}
             y={nodes.grid.y}
@@ -284,7 +301,6 @@ const EnergyFlowDiagram = ({ data }) => {
             rx="6"
           />
           <text
-            className={styles.nodeText}
             x={nodes.grid.x + nodes.grid.width / 2}
             y={nodes.grid.y + nodes.grid.height / 2 + 5}
             textAnchor="middle"
@@ -295,17 +311,19 @@ const EnergyFlowDiagram = ({ data }) => {
             Grid
           </text>
           <text
-            className={styles.powerValue}
             x={nodes.grid.x + nodes.grid.width / 2}
             y={nodes.grid.y - 8}
             textAnchor="middle"
+            fontSize="11"
+            fontWeight="500"
+            fill="#666"
           >
             {flows.gridToHome?.toFixed(1) || '0.0'} kW
           </text>
         </g>
 
         {/* Solar Node */}
-        <g className={styles.energyNode}>
+        <g>
           <rect
             x={nodes.solar.x}
             y={nodes.solar.y}
@@ -315,7 +333,6 @@ const EnergyFlowDiagram = ({ data }) => {
             rx="6"
           />
           <text
-            className={styles.nodeText}
             x={nodes.solar.x + nodes.solar.width / 2}
             y={nodes.solar.y + nodes.solar.height / 2 + 5}
             textAnchor="middle"
@@ -326,19 +343,23 @@ const EnergyFlowDiagram = ({ data }) => {
             Solar
           </text>
           <text
-            className={styles.powerValue}
             x={nodes.solar.x + nodes.solar.width / 2}
             y={nodes.solar.y + nodes.solar.height + 18}
             textAnchor="middle"
+            fontSize="11"
+            fontWeight="500"
+            fill="#666"
           >
             {energyData.solar?.toFixed(1) || '0.0'} kW
           </text>
           {/* Grid label below solar when exporting */}
           {flows.solarToGrid > 0 && (
             <text
-              className={styles.powerValue}
               x={nodes.solar.x + nodes.solar.width + 15}
               y={nodes.solar.y - 10}
+              fontSize="11"
+              fontWeight="500"
+              fill="#666"
             >
               Grid
             </text>
@@ -346,7 +367,7 @@ const EnergyFlowDiagram = ({ data }) => {
         </g>
 
         {/* Home Node */}
-        <g className={styles.energyNode}>
+        <g>
           <rect
             x={nodes.home.x}
             y={nodes.home.y - nodes.home.height / 2}
@@ -356,7 +377,6 @@ const EnergyFlowDiagram = ({ data }) => {
             rx="8"
           />
           <text
-            className={styles.nodeText}
             x={nodes.home.x + nodes.home.width / 2}
             y={nodes.home.y + 6}
             textAnchor="middle"
@@ -369,12 +389,12 @@ const EnergyFlowDiagram = ({ data }) => {
         </g>
 
         {/* Appliance Nodes with labels on the right */}
-        {Object.entries(flows.appliances).map(([appliance, value]) => {
+        {Object.entries(flows.appliances).map(([appliance]) => {
           const node = nodes[appliance];
           const color = applianceColors[appliance];
           
           return (
-            <g key={appliance} className={styles.applianceNode}>
+            <g key={appliance}>
               <rect
                 x={node.x}
                 y={node.y}
@@ -384,10 +404,11 @@ const EnergyFlowDiagram = ({ data }) => {
                 rx="4"
               />
               <text
-                className={styles.nodeLabelText}
                 x={node.x + node.width + 10}
                 y={node.y + node.height / 2 + 5}
                 fontSize="14"
+                fontWeight="500"
+                fill="#333"
               >
                 {node.label}
               </text>
@@ -397,23 +418,35 @@ const EnergyFlowDiagram = ({ data }) => {
 
         {/* Tooltip */}
         {hoveredFlow && (
-          <g>
-            <foreignObject
+          <g style={{ pointerEvents: 'none' }}>
+            <rect
               x={tooltipPos.x - 80}
-              y={tooltipPos.y - 60}
+              y={tooltipPos.y - 50}
               width="160"
-              height="60"
-              style={{ pointerEvents: 'none' }}
+              height="50"
+              fill="rgba(0, 0, 0, 0.85)"
+              rx="6"
+            />
+            <text
+              x={tooltipPos.x}
+              y={tooltipPos.y - 30}
+              textAnchor="middle"
+              fontSize="13"
+              fontWeight="600"
+              fill="white"
             >
-              <div className={styles.flowTooltip}>
-                <div className={styles.tooltipTitle}>
-                  {hoveredFlow.from} → {hoveredFlow.to}
-                </div>
-                <div className={styles.tooltipValue}>
-                  {hoveredFlow.value.toFixed(2)} {hoveredFlow.unit}h
-                </div>
-              </div>
-            </foreignObject>
+              {hoveredFlow.from} → {hoveredFlow.to}
+            </text>
+            <text
+              x={tooltipPos.x}
+              y={tooltipPos.y - 12}
+              textAnchor="middle"
+              fontSize="15"
+              fontWeight="700"
+              fill="#00D9A3"
+            >
+              {hoveredFlow.value.toFixed(2)} {hoveredFlow.unit}
+            </text>
           </g>
         )}
       </svg>
