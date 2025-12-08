@@ -16,6 +16,7 @@ import { useRouter } from 'next/router';
 import * as LucideIcons from 'lucide-react';
 import Layout from '../../components/Layout';
 import EnergyFlowDiagram from '../../components/EnergyFlowDiagram';
+import ElectricityUsage from '../../components/ElectricityUsage';
 import { useAuth } from '../../lib/hooks/useAuth';
 import { useAllEnergyData } from '../../lib/hooks/useEnergyData';
 import styles from './styles.module.css';
@@ -166,6 +167,50 @@ const Dashboard = () => {
           </div>
         </section>
 
+        {/* 24h Chart */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <LucideIcons.BarChart className={styles.sectionIcon} />
+            <h2 className={styles.sectionTitle}>24-Hour Overview</h2>
+          </div>
+          <p className={styles.sectionDescription}>
+            Hourly breakdown of energy import, export, and solar production
+          </p>
+          <div className={styles.chartContainer}>
+            <ElectricityUsage card={false} />
+          </div>
+        </section>
+
+        {/* Energy Flow Diagram */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <LucideIcons.Activity className={styles.sectionIcon} />
+            <h2 className={styles.sectionTitle}>Energy Flow</h2>
+          </div>
+          <p className={styles.sectionDescription}>
+            Real-time visualization of energy distribution across your home
+          </p>
+          <div className={styles.flowContainer}>
+            <EnergyFlowDiagram 
+              card={false}
+              data={{
+                solar: realtime?.pv_production_kw || 0,
+                grid_import: realtime?.grid_import_kw || 0,
+                home_consumption: realtime?.consumption_kw || 0,
+                grid_export: realtime?.grid_export_kw || 0,
+                appliances: {
+                  electric_car: (realtime?.consumption_kw || 0) * 0.21,
+                  air_conditioning: (realtime?.consumption_kw || 0) * 0.17,
+                  washing_machine: (realtime?.consumption_kw || 0) * 0.13,
+                  dryer: (realtime?.consumption_kw || 0) * 0.17,
+                  heat_pump: (realtime?.consumption_kw || 0) * 0.21,
+                  boiler: (realtime?.consumption_kw || 0) * 0.11
+                }
+              }}
+            />
+          </div>
+        </section>
+
         {/* Summary Statistics */}
         <section className={styles.summarySection}>
           <h2 className={styles.sectionTitle}>Energy Summary</h2>
@@ -262,42 +307,6 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Energy Flow Diagram */}
-        <section className={styles.flowSection}>
-          <h2 className={styles.sectionTitle}>Energy Flow</h2>
-          <div className={styles.flowContainer}>
-            <EnergyFlowDiagram 
-              data={{
-                solar: realtime?.pv_production_kw || 0,
-                grid_import: realtime?.grid_import_kw || 0,
-                home_consumption: realtime?.consumption_kw || 0,
-                grid_export: realtime?.grid_export_kw || 0,
-                appliances: {
-                  electric_car: (realtime?.consumption_kw || 0) * 0.21,
-                  air_conditioning: (realtime?.consumption_kw || 0) * 0.17,
-                  washing_machine: (realtime?.consumption_kw || 0) * 0.13,
-                  dryer: (realtime?.consumption_kw || 0) * 0.17,
-                  heat_pump: (realtime?.consumption_kw || 0) * 0.21,
-                  boiler: (realtime?.consumption_kw || 0) * 0.11
-                }
-              }}
-            />
-          </div>
-        </section>
-
-        {/* Placeholder for 24h Chart */}
-        <section className={styles.chartSection}>
-          <h2 className={styles.sectionTitle}>24-Hour Overview</h2>
-          <div className={styles.chartPlaceholder}>
-            <p className={styles.placeholderText}>
-              Production vs Consumption Chart will be rendered here
-            </p>
-            <p className={styles.placeholderSubtext}>
-              Task 6: Implement TimeSeriesChart with Recharts
-            </p>
           </div>
         </section>
       </div>

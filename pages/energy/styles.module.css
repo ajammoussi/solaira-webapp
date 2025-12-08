@@ -3,7 +3,6 @@
 .pageContainer {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 20px;
 }
 
 .pageHeader {
@@ -549,3 +548,62 @@
   font-size: 16px;
   color: #6B7280;
 }
+/* Placeholder / Coming Soon Sections */
+.placeholder {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 64px 32px;
+  text-align: center;
+  border: 2px dashed #E5E7EB;
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholderIcon {
+  color: #D1D5DB;
+  margin-bottom: 24px;
+}
+
+.placeholderTitle {
+  font-size: 24px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 12px 0;
+}
+
+.placeholderText {
+  font-size: 16px;
+  color: #6B7280;
+  margin: 0 0 32px 0;
+  max-width: 500px;
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  display: inline-block;
+}
+
+.featureList li {
+  position: relative;
+  padding-left: 24px;
+  margin-bottom: 12px;
+  color: #4B5563;
+  font-size: 15px;
+}
+
+.featureList li::before {
+  content: '✓';
+  color: #00D9A3;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+  font-size: 18px;
+  line-height: 1;
+}
+
