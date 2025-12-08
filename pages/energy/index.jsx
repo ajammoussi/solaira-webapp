@@ -16,6 +16,7 @@ import { useAuth } from '../../lib/hooks/useAuth';
 import styles from './styles.module.css';
 import EnergyDistributionCard from '../../components/EnergyDistributionCard';
 import BarChart from '../../components/BarChart';
+import SolarChatbot from '../../components/SolarChatbot';
 import PowerSourcesChart from '../../components/PowerSourcesChart';
 
 const Energy = () => {

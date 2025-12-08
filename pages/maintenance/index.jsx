@@ -13,6 +13,7 @@ import { useRouter } from 'next/router';
 import * as LucideIcons from 'lucide-react';
 import Layout from '../../components/Layout';
 import { useAuth } from '../../lib/hooks/useAuth';
+import SolarChatbot from '../../components/SolarChatbot';
 import { useMaintenanceAlerts } from '../../lib/hooks/useEnergyData';
 import styles from '../energy/styles.module.css';
 

@@ -17,6 +17,7 @@ import * as LucideIcons from 'lucide-react';
 import Layout from '../../components/Layout';
 import EnergyFlowDiagram from '../../components/EnergyFlowDiagram';
 import ElectricityUsage from '../../components/ElectricityUsage';
+import SolarChatbot from '../../components/SolarChatbot';
 import { useAuth } from '../../lib/hooks/useAuth';
 import { useAllEnergyData } from '../../lib/hooks/useEnergyData';
 import styles from './styles.module.css';
@@ -310,6 +311,7 @@ const Dashboard = () => {
           </div>
         </section>
       </div>
+      <SolarChatbot energyData={null} />
     </Layout>
   );
 };
