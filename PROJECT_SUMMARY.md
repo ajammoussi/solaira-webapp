@@ -540,3 +540,34 @@ The codebase is now **maintainable and scalable**. The next developer should foc
 ---
 
 *Last Updated: November 26, 2025*
+
+## Python Backend Integration (AI/ML)
+
+The project now includes a Python FastAPI backend for energy prediction and simulation.
+
+### Backend Structure ('backend/')
+- **Framework:** FastAPI
+- **ML Models:** XGBoost (Production Prediction)
+- **Key Endpoints:**
+  - 'POST /predict': Predict PV generation based on weather data.
+  - 'POST /simulate': Run 24h energy simulation (PV + Battery + Consumption).
+  - 'POST /maintenance': Analyze system performance and detect faults.
+
+### Frontend Integration
+- **Service:** 'lib/services/pythonApi.js' handles API communication.
+- **Pages:**
+  - 'pages/predictions/index.jsx': Visualizes energy forecast and AI recommendations.
+  - 'pages/maintenance/index.jsx': Displays system health and performance analysis.
+
+### Running the Project
+1. **Backend:**
+   \\\ash
+   cd backend
+   pip install -r requirements.txt
+   uvicorn main:app --reload
+   \\\
+2. **Frontend:**
+   \\\ash
+   npm run dev
+   \\\
+

@@ -82,10 +82,15 @@ const EnergyDistributionCard = () => {
 
   return (
     <div style={{
+      backgroundColor: 'var(--card-background-color, #fff)',
+      borderRadius: '12px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      padding: '16px',
       maxWidth: '600px',
       margin: '0 auto',
       fontFamily: 'system-ui, -apple-system, sans-serif',
     }}>
+      <h3 style={{ margin: '0 0 16px 0', fontSize: '18px' }}>Energy Distribution</h3>
       
       <div style={{ position: 'relative' }}>
         {/* Top row: Solar */}

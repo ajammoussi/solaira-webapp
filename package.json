@@ -17,6 +17,7 @@
     "@svgdotjs/svg.js": "^3.2.5",
     "apexcharts": "^5.3.6",
     "apexsankey": "^1.2.5",
+    "axios": "^1.13.2",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.0.3",
     "jsonwebtoken": "^9.0.0",

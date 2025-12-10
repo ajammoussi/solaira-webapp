@@ -13,6 +13,7 @@ const PowerSourcesChart = ({
   solarData = DEFAULT_SOLAR_DATA,
   gridData = DEFAULT_GRID_DATA,
   labels = DEFAULT_LABELS,
+  seriesNames = { solar: 'Solar Generation', grid: 'Grid Consumption' },
   card = true
 }) => {
   const chartRef = useRef(null);
@@ -26,11 +27,11 @@ const PowerSourcesChart = ({
 
         const options = {
           series: [{
-            name: 'Solar Generation',
+            name: seriesNames.solar,
             type: 'area',
             data: solarData
           }, {
-            name: 'Grid Consumption',
+            name: seriesNames.grid,
             type: 'line',
             data: gridData
           }],
@@ -78,9 +79,7 @@ const PowerSourcesChart = ({
           yaxis: {
             title: {
               text: 'kWh'
-            },
-            min: 0,
-            max: 30
+            }
           },
           tooltip: {
             shared: true,
