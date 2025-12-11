@@ -4,7 +4,7 @@
   "description": "A next project generated based on a UIDL document",
   "main": "index.js",
   "scripts": {
-    "dev": "next",
+    "dev": "next dev -p 3000",
     "db:import": "node ./scripts/db-import.js",
     "build": "next build",
     "start": "next start",
