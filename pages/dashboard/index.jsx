@@ -79,6 +79,52 @@ const Dashboard = () => {
     );
   }
 
+  // Prepare energy data for chatbot with comprehensive information
+  const chatbotEnergyData = {
+    // Current real-time data
+    solar: realtime?.pv_production_kw || 0,
+    grid_import: realtime?.grid_import_kw || 0,
+    home_consumption: realtime?.consumption_kw || 0,
+    grid_export: realtime?.grid_export_kw || 0,
+    battery_soc: realtime?.battery_soc_percent || 0,
+    
+    // Appliance breakdown (calculated from consumption)
+    appliances: {
+      electric_car: (realtime?.consumption_kw || 0) * 0.21,
+      air_conditioning: (realtime?.consumption_kw || 0) * 0.17,
+      washing_machine: (realtime?.consumption_kw || 0) * 0.13,
+      dryer: (realtime?.consumption_kw || 0) * 0.17,
+      heat_pump: (realtime?.consumption_kw || 0) * 0.21,
+      boiler: (realtime?.consumption_kw || 0) * 0.11
+    },
+    
+    // Summary statistics for context
+    stats: {
+      today: {
+        production: stats?.today?.total_production_kwh || 0,
+        consumption: stats?.today?.total_consumption_kwh || 0,
+        self_consumption: stats?.today?.self_consumption_percent || 0,
+        savings: stats?.today?.cost_savings_eur || 0
+      },
+      month: {
+        production: stats?.month?.total_production_kwh || 0,
+        consumption: stats?.month?.total_consumption_kwh || 0,
+        self_consumption: stats?.month?.self_consumption_percent || 0,
+        savings: stats?.month?.cost_savings_eur || 0
+      },
+      year: {
+        production: stats?.year?.total_production_kwh || 0,
+        consumption: stats?.year?.total_consumption_kwh || 0,
+        self_consumption: stats?.year?.self_consumption_percent || 0,
+        savings: stats?.year?.cost_savings_eur || 0
+      }
+    },
+    
+    // Additional context
+    timestamp: lastUpdated || new Date().toISOString(),
+    grid_status: realtime?.grid_export_kw > 0 ? 'exporting' : 'importing'
+  };
+
   return (
     <Layout>
       <div className={styles.dashboard}>
@@ -311,7 +357,12 @@ const Dashboard = () => {
           </div>
         </section>
       </div>
-      <SolarChatbot energyData={null} />
+      
+      {/* Solar AI Chatbot - Now with comprehensive energy data */}
+      <SolarChatbot 
+        energyData={chatbotEnergyData}
+        userId={user?.id || user?.email || isGuest ? 'guest_user' : 'anonymous'}
+      />
     </Layout>
   );
 };

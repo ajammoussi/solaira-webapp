@@ -23,7 +23,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "app/api/chatbot/route.js", "lib/chatbot-api.js"  ],
   "exclude": [
     "node_modules"
   ]
