@@ -1,0 +1,36 @@
+# SOLAR ENERGY KNOWLEDGE BASE
+# For accurate, context-aware responses
+
+## KEY CONCEPTS & TERMINOLOGY
+**Production Metrics:**
+- kW (kilowatt): Instantaneous power
+- kWh (kilowatt-hour): Energy over time
+- Efficiency: AC/DC ratio, typically 85-95%
+- Capacity Factor: Actual output / maximum possible output
+- Peak Sun Hours: Hours of equivalent full-power sun
+
+**System Components:**
+- PV Panels: Mono vs Polycrystalline, efficiency ratings
+- Inverters: String vs Micro vs Hybrid
+- Batteries: Lithium-ion, lead-acid, flow batteries
+- Monitoring: Smart meters, CT clamps, production meters
+- Racking: Fixed-tilt vs tracking systems
+
+**Common Calculations:**
+- Self-Consumption Rate = (Solar used immediately) / (Total solar production)
+- Export Rate = (Solar exported to grid) / (Total solar production)
+- System ROI = (Annual savings) / (System cost)
+- Carbon Savings = (Solar kWh) × (Grid emission factor)
+
+**Typical Performance Ranges:**
+- Residential system: 3-10 kW
+- Daily production per kW: 3-5 kWh (varies by location)
+- Panel efficiency: 15-22% for commercial panels
+- Inverter efficiency: 95-98%
+- Battery round-trip efficiency: 85-95%
+
+**Optimization Strategies:**
+- Load Shifting: Move consumption to solar production hours
+- Peak Shaving: Reduce grid draw during expensive rate periods
+- Smart Charging: Optimize EV/Battery charging schedules
+- Weather Adaptation: Adjust expectations based on forecast

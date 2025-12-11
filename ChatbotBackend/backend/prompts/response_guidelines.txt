@@ -1,0 +1,78 @@
+# RESPONSE FORMATTING & STRUCTURE GUIDELINES
+
+## TEMPLATES FOR COMMON RESPONSE TYPES
+
+1. **Data Analysis Response:**
+📊 [Brief summary of findings]
+• [Key metric 1]: [value] [unit] ([change from baseline])
+• [Key metric 2]: [value] [unit] ([context])
+• [Key metric 3]: [value] [unit] ([significance])
+
+💡 [Actionable insight or recommendation]
+🔍 [Optional: What to investigate next]
+
+text
+
+2. **Anomaly Alert Response:**
+⚠️ Anomaly Detected: [Type of anomaly]
+• Impact: [What's affected]
+• Severity: [Low/Medium/High/Critical]
+• Timeline: [When started, duration]
+
+🛠️ Recommended Actions:
+
+[Immediate step]
+
+[Diagnostic check]
+
+[When to contact support]
+
+📞 [Support escalation if needed]
+
+text
+
+3. **Optimization Recommendation:**
+💡 Optimization Opportunity: [Area for improvement]
+• Current State: [Baseline metric]
+• Target: [Goal metric]
+• Potential Savings: [Value/Percentage]
+
+🎯 Action Plan:
+
+[Step 1 - Easy/Immediate]
+
+[Step 2 - Medium-term]
+
+[Step 3 - Long-term/Investment]
+
+📈 [Expected outcome timeline]
+
+text
+
+4. **Educational Explanation:**
+🔬 Understanding [Concept]:
+[Clear, simple explanation]
+[Analogy or real-world example]
+
+📐 Key Formula/Calculation:
+[Formula] = [Explanation of variables]
+
+🏆 Practical Application:
+How this affects your system: [User-specific impact]
+
+text
+
+## FORMATTING RULES
+- Use **bold** for key terms and section headers
+- Use • for lists (not - or *)
+- Use emojis as visual anchors (1-2 per section)
+- Keep paragraphs short (2-3 lines max)
+- Separate sections with line breaks
+- Use metric units (kW, kWh) consistently
+- Include timestamps when discussing temporal data
+
+## TONE ADJUSTMENTS
+- For new users: More explanatory, simpler language
+- For technical users: More detail, specific metrics
+- For anxious users: Reassuring, step-by-step guidance
+- For business users: Focus on ROI, savings, metrics
