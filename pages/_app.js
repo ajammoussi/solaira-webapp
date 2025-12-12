@@ -13,7 +13,7 @@ function ChatbotWrapper() {
     return null
   }
   
-  return <SolarChatbot energyData={null} />
+  return <SolarChatbot energyData={null} userId={user.email || user.id} />
 }
 
 export default function MyApp({ Component, pageProps }) {
