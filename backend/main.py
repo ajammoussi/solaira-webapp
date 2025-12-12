@@ -21,7 +21,10 @@ from backend.core.phase_3.maintenance import PerformanceRatioCalculator, Mainten
 from backend.chatbot.src import SupportAgent, MESSAGES, rate_limited
 
 # Load environment variables
-load_dotenv()
+# Explicitly load .env.local from the project root
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+env_path = os.path.join(root_dir, '.env.local')
+load_dotenv(dotenv_path=env_path)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
