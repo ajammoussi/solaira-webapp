@@ -130,23 +130,35 @@ def prepare_features_for_ml(df):
     df_ml["doy_cos"] = np.cos(2 * np.pi * df_ml["day_of_year"] / 365)
 
     # Weather and system features
-    df_ml["irradiance_wm2"] = df_ml["ALLSKY_SFC_SW_DWN"] * 277.778
-    df_ml["clearness_ratio"] = (
-        (df_ml["ALLSKY_SFC_SW_DWN"] / df_ml["CLRSKY_SFC_SW_DWN"])
-        .replace([np.inf, -np.inf], 0)
-        .clip(0, 1)
-    )
+    if "ALLSKY_SFC_SW_DWN" in df_ml.columns:
+        df_ml["irradiance_wm2"] = df_ml["ALLSKY_SFC_SW_DWN"] * 277.778
+    
+    if "ALLSKY_SFC_SW_DWN" in df_ml.columns and "CLRSKY_SFC_SW_DWN" in df_ml.columns:
+        df_ml["clearness_ratio"] = (
+            (df_ml["ALLSKY_SFC_SW_DWN"] / df_ml["CLRSKY_SFC_SW_DWN"])
+            .replace([np.inf, -np.inf], 0)
+            .clip(0, 1)
+        )
+    else:
+        # Default value if columns are missing (e.g. during inference)
+        df_ml["clearness_ratio"] = 0.5
 
     # Lag features
     for lag in [1, 2, 3, 24]:  # 1h, 2h, 3h, and 24h lags
-        df_ml[f"ac_power_lag_{lag}"] = df_ml["AC_POWER_KW"].shift(lag)
-        df_ml[f"poa_irradiance_lag_{lag}"] = df_ml["POA_IRRADIANCE"].shift(lag)
-        df_ml[f"temp_lag_{lag}"] = df_ml["T2M"].shift(lag)
+        if "AC_POWER_KW" in df_ml.columns:
+            df_ml[f"ac_power_lag_{lag}"] = df_ml["AC_POWER_KW"].shift(lag)
+        if "POA_IRRADIANCE" in df_ml.columns:
+            df_ml[f"poa_irradiance_lag_{lag}"] = df_ml["POA_IRRADIANCE"].shift(lag)
+        if "T2M" in df_ml.columns:
+            df_ml[f"temp_lag_{lag}"] = df_ml["T2M"].shift(lag)
 
     # Rolling features
-    df_ml["ac_power_rolling_3h_mean"] = df_ml["AC_POWER_KW"].rolling(3).mean()
-    df_ml["ac_power_rolling_6h_std"] = df_ml["AC_POWER_KW"].rolling(6).std()
-    df_ml["irradiance_rolling_3h_mean"] = df_ml["irradiance_wm2"].rolling(3).mean()
+    if "AC_POWER_KW" in df_ml.columns:
+        df_ml["ac_power_rolling_3h_mean"] = df_ml["AC_POWER_KW"].rolling(3).mean()
+        df_ml["ac_power_rolling_6h_std"] = df_ml["AC_POWER_KW"].rolling(6).std()
+    
+    if "irradiance_wm2" in df_ml.columns:
+        df_ml["irradiance_rolling_3h_mean"] = df_ml["irradiance_wm2"].rolling(3).mean()
 
     return df_ml
 

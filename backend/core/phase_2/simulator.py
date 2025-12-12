@@ -22,7 +22,7 @@ class EnergySimulator:
         self.load_models()
         
     def load_models(self):
-        prod_path = os.path.join(self.models_dir, 'xgb_model.pkl')
+        prod_path = os.path.join(self.models_dir, 'production_xgboost.pkl')
         if os.path.exists(prod_path):
             self.production_model = joblib.load(prod_path)
             

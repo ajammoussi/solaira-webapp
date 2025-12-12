@@ -255,7 +255,7 @@ def simulate(request: SimulationRequest):
             
             if not day_data.empty:
                 day_data.set_index('datetime', inplace=True)
-                day_data = day_data.resample('h').mean().fillna(method='ffill').fillna(method='bfill')
+                day_data = day_data.resample('h').mean().ffill().bfill()
                 df_weather = day_data
             else:
                 day_data = pv_df[
@@ -301,6 +301,8 @@ def simulate(request: SimulationRequest):
         return result
         
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/maintenance")

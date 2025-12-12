@@ -37,7 +37,7 @@ def create_regression_baseline(df):
     
     # Filter out days with very low production and handle missing values
     daily_df = daily_df[daily_df['production'] > 0.1].copy()
-    daily_df = daily_df.fillna(method='ffill').fillna(method='bfill')
+    daily_df = daily_df.ffill().bfill()
     
     # Ensure frequency is set
     daily_df.index.freq = 'D'
@@ -182,7 +182,7 @@ def prepare_exogenous_features(train_data, test_data, feature_cols):
     test_data['irrad_ma3'] = test_data['irrad_norm'].rolling(window=3, min_periods=1).mean()
     # Fill first values from train
     if test_data['irrad_ma3'].isna().any():
-        test_data['irrad_ma3'].fillna(method='bfill', inplace=True)
+        test_data['irrad_ma3'] = test_data['irrad_ma3'].bfill()
     
     # Prepare exogenous arrays with multiple weather perspectives
     exog_train = train_data[['irrad_norm', 'irrad_change_norm', 'irrad_lag1', 'irrad_ma3']].values
