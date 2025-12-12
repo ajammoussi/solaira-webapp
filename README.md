@@ -1,6 +1,6 @@
-# Bohm Energy Website & Solar Prediction Platform
+# Solaira Website & Solar Prediction Platform
 
-This project is a Next.js-based marketing website for Bohm Energy, integrated with a Python FastAPI backend for solar energy forecasting and simulation.
+This project is a Next.js-based marketing website for Solaira, integrated with a Python FastAPI backend for solar energy forecasting and simulation.
 
 ## Project Overview
 

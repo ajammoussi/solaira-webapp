@@ -2,8 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap');
 
 .container {
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background-color: #FFFFFF;
@@ -20,7 +19,7 @@
   left: 0;
   z-index: 1000;
   background: #ffffff;
-  font-family: Outfit, sans-serif;
+  font-family: 'Outfit', sans-serif;
 }
 
 .headerButton {
@@ -212,7 +211,6 @@
 .mainLayout {
   display: flex;
   flex: 1;
-  overflow: hidden;
   margin-top: 122px; /* Header height */
 }
 
@@ -226,8 +224,12 @@
   display: flex;
   flex-direction: column;
   transition: width 0.3s ease;
-  overflow: hidden;
+  /* overflow: hidden; Removed to allow popup menu to show */
   flex-shrink: 0;
+  position: sticky;
+  top: 122px;
+  height: calc(100vh - 122px);
+  z-index: 50; /* Ensure it's above content */
 }
 
 .sidebarNoTransition {
@@ -332,10 +334,9 @@
 
 .content {
   flex: 1;
-  overflow-y: auto;
   background-color: #F9FAFB;
   padding: 32px;
-  min-height: calc(101vh - 122px); /* Ensure scrollbar on all pages */
+  min-height: calc(100vh - 122px); /* Ensure scrollbar on all pages */
 }
 
 /* ============================================================================

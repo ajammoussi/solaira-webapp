@@ -145,26 +145,12 @@ const Maintenance = () => {
           </div>
         )}
 
-        {/* Loading State */}
-        {maintLoading && (
+        {/* Loading State - Removed to match Settings page pattern */}
+        {/* {maintLoading && (
           <div style={{ textAlign: 'center', padding: '3rem' }}>
-            <div className="spinner" style={{ margin: '0 auto 1rem' }} />
-            <p style={{ color: '#666' }}>Analyzing System Performance...</p>
-            <style jsx>{`
-              .spinner {
-                width: 40px;
-                height: 40px;
-                border: 3px solid #e2e2e2;
-                border-top-color: #00D9A3;
-                border-radius: 50%;
-                animation: spin 0.8s linear infinite;
-              }
-              @keyframes spin {
-                to { transform: rotate(360deg); }
-              }
-            `}</style>
+            ...
           </div>
-        )}
+        )} */}
 
         {!maintLoading && maintenanceData && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>

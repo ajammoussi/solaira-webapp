@@ -4,9 +4,4 @@
 .env.local
 /pes-challenge-solaira-webapp.backup
 /.vscode
-/ChatbotBackend/__pycache__
-/ChatbotBackend/backend/__pycache__
-/ChatbotBackend/backend/src/__pycache__
-/ChatbotBackend/backend/agent/__pycache__
-/ChatbotBackend/backend/helpers/__pycache__
-/ChatbotBackend/backend/__pycache__
+__pycache__/

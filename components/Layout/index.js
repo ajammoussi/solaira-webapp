@@ -25,8 +25,9 @@ const Layout = ({ children }) => {
   const accountMenuRef = useRef(null);
 
   // Get display name from user/profile
-  const displayName = profile?.full_name 
+  const displayName = profile?.display_name 
     || user?.user_metadata?.full_name 
+    || user?.user_metadata?.name
     || user?.email?.split('@')[0] 
     || (isGuest ? 'Guest' : 'User');
   
@@ -227,6 +228,7 @@ const Layout = ({ children }) => {
                 padding: sidebarCollapsed ? '8px' : '8px 12px',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
                 gap: '12px',
                 borderRadius: '8px',
                 transition: 'background-color 0.15s ease'

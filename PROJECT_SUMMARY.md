@@ -1,4 +1,4 @@
-# Project Summary: Bohm Energy Website (Next.js)
+# Project Summary: Solaira Website (Next.js)
 
 **Date:** November 26, 2025  
 **Status:** In Development - Component Refactoring & CSS Optimization Complete  
@@ -8,7 +8,7 @@
 
 ## Project Overview
 
-This is a **Next.js-based marketing website** for Bohm Energy, a company specializing in home battery storage solutions (thuisbatterijen) in the Netherlands. The project was originally exported from **TeleportHQ** and has undergone significant refactoring to improve code maintainability and performance.
+This is a **Next.js-based marketing website** for Solaira, a company specializing in home battery storage solutions (thuisbatterijen) in the Netherlands. The project was originally exported from **TeleportHQ** and has undergone significant refactoring to improve code maintainability and performance.
 
 ### Key Business Domain
 - **Product:** LFP battery technology (LiFeP04) for home energy storage
@@ -477,7 +477,7 @@ npm install -D eslint prettier husky lint-staged
 
 ## Contact & Project Info
 
-**Company:** Bohm Energy  
+**Company:** Solaira  
 **Website:** (To be deployed)  
 **Email:** info@solaira.tn  
 **Phone:** (+216) 99-999-999  
