@@ -94,10 +94,12 @@ const Predictions = () => {
     <Layout>
       <div className={styles.pageContainer}>
         <div className={styles.pageHeader}>
-          <h1 className={styles.pageTitle}>Predictions & Recommendations</h1>
-          <p className={styles.pageSubtitle}>
-            Smart insights and future forecasts for optimal energy usage
-          </p>
+          <div>
+            <h1 className={styles.pageTitle}>Predictions & Recommendations</h1>
+            <p className={styles.pageSubtitle}>
+              Smart insights and future forecasts for optimal energy usage
+            </p>
+          </div>
         </div>
 
         {/* Error State */}
@@ -108,13 +110,13 @@ const Predictions = () => {
           </div>
         )}
 
-        {/* Loading State */}
-        {simLoading && (
+        {/* Loading State - Removed to match Settings page pattern */}
+        {/* {simLoading && (
           <div className={styles.loadingState}>
             <div className={styles.spinner} />
             <p>Running AI Simulation...</p>
           </div>
-        )}
+        )} */}
 
         {/* Simulation Results */}
         {!simLoading && simulationResults && (

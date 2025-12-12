@@ -39,6 +39,9 @@ CREATE TYPE tilt_strategy AS ENUM (
 CREATE TABLE profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   display_name TEXT,
+  email TEXT,
+  phone_number TEXT,
+  timezone TEXT DEFAULT 'UTC+01:00',
   preferences JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -332,8 +335,18 @@ CREATE TRIGGER update_load_profiles_updated_at BEFORE UPDATE ON load_profiles
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO profiles (id, display_name)
-  VALUES (NEW.id, COALESCE(NEW.raw_user_meta_data->>'display_name', NEW.email));
+  INSERT INTO profiles (id, display_name, email, phone_number)
+  VALUES (
+    NEW.id, 
+    COALESCE(
+      NEW.raw_user_meta_data->>'display_name', 
+      NEW.raw_user_meta_data->>'full_name', 
+      NEW.raw_user_meta_data->>'name', 
+      NEW.email
+    ),
+    NEW.email,
+    NEW.phone
+  );
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

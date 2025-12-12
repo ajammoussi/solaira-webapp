@@ -17,6 +17,7 @@ import { useAuth } from '../../lib/hooks/useAuth';
 import SolarChatbot from '../../components/SolarChatbot';
 import { useMaintenanceAlerts } from '../../lib/hooks/useEnergyData';
 import pythonApi from '../../lib/services/pythonApi';
+import { PVForecastForm, PredictionChart, PredictionTable } from '../../components/solar-forecast';
 import styles from '../energy/styles.module.css';
 
 const Maintenance = () => {
@@ -27,6 +28,7 @@ const Maintenance = () => {
   const [maintenanceData, setMaintenanceData] = useState(null);
   const [maintLoading, setMaintLoading] = useState(false);
   const [maintError, setMaintError] = useState(null);
+  const [forecastPredictions, setForecastPredictions] = useState(null);
 
   // Protect this page
   useEffect(() => {
@@ -143,26 +145,12 @@ const Maintenance = () => {
           </div>
         )}
 
-        {/* Loading State */}
-        {maintLoading && (
+        {/* Loading State - Removed to match Settings page pattern */}
+        {/* {maintLoading && (
           <div style={{ textAlign: 'center', padding: '3rem' }}>
-            <div className="spinner" style={{ margin: '0 auto 1rem' }} />
-            <p style={{ color: '#666' }}>Analyzing System Performance...</p>
-            <style jsx>{`
-              .spinner {
-                width: 40px;
-                height: 40px;
-                border: 3px solid #e2e2e2;
-                border-top-color: #00D9A3;
-                border-radius: 50%;
-                animation: spin 0.8s linear infinite;
-              }
-              @keyframes spin {
-                to { transform: rotate(360deg); }
-              }
-            `}</style>
+            ...
           </div>
-        )}
+        )} */}
 
         {!maintLoading && maintenanceData && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -244,6 +232,28 @@ const Maintenance = () => {
                         </div>
                     </div>
                 )}
+
+                {/* Solar Forecast Section */}
+                <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                        <div style={{ padding: '8px', borderRadius: '8px', backgroundColor: '#ECFDF5' }}>
+                            <LucideIcons.Sun size={24} color="#059669" />
+                        </div>
+                        <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', margin: 0 }}>Solar Generation Forecast</h3>
+                    </div>
+                    <p style={{ color: '#6B7280', marginBottom: '24px' }}>
+                        Predict future solar generation based on your system configuration and weather data.
+                    </p>
+                    
+                    <PVForecastForm updatePredictions={setForecastPredictions} />
+                    
+                    {forecastPredictions && (
+                        <>
+                            <PredictionChart predictions={forecastPredictions} />
+                            <PredictionTable predictions={forecastPredictions} />
+                        </>
+                    )}
+                </div>
             </div>
         )}
 
