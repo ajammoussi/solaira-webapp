@@ -11,3 +11,6 @@ python-multipart
 python-dotenv
 statsmodels
 tensorflow
+tf2onnx
+onnx
+onnxruntime

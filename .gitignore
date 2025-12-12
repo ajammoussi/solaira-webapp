@@ -10,3 +10,6 @@
 /ChatbotBackend/backend/agent/__pycache__
 /ChatbotBackend/backend/helpers/__pycache__
 /ChatbotBackend/backend/__pycache__
+backend/**/__pycache__/
+/ChatbotBackend/venv/
+/backend/venv_backend/

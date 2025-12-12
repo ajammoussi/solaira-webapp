@@ -102,7 +102,7 @@ def plot_data_overview(df, system_params):
     print(f"Capacity factor: {(daily_production.sum() / (len(daily_production) * system_params['capacity_kw'] * 24)) * 100:.1f}%")
 
 
-def  plot_model_results_comparison(all_results):
+def plot_model_results_comparison(all_results):
     """
     Create comprehensive comparison plots for all models.
     The temporal comparison is now aggregated to a daily frequency for all models.
@@ -290,12 +290,12 @@ def  plot_model_results_comparison(all_results):
     plt.tight_layout()
     plt.show()
     
-    # ======================= NEW: DAILY AGGREGATED COMPARISON PLOT =======================
+    # ======================= =DAILY AGGREGATED COMPARISON PLOT =======================
     print("\n" + "="*80)
     print("📊 Creating DAILY Aggregated Comparison (All Models)")
     print("="*80)
     
-        # ============================================================================
+    # ============================================================================
     # STEP 1: Get SARIMA daily predictions (already daily)
     # ============================================================================
     sarima_test_data = sarima_results.get('test_data')
@@ -388,29 +388,29 @@ def  plot_model_results_comparison(all_results):
     time_range = range(sample_size)
     
     plt.plot(time_range, sarima_daily_actual.values, 
-             color='gray', linewidth=3, label='📈 Actual', alpha=0.9, zorder=3,
+             color='gray', linewidth=3, label='Actual', alpha=0.9, zorder=3,
              marker='o', markersize=4)
     
     if ml_daily_aligned['RF_Predicted'].notna().any():
         plt.plot(time_range, ml_daily_aligned['RF_Predicted'].values,
                  linestyle='--', color='#1f77b4', linewidth=2.5, alpha=0.95, 
-                 label='🌲 Random Forest', zorder=8, marker='s', markersize=3)
+                 label='Random Forest', zorder=8, marker='s', markersize=3)
     
     if ml_daily_aligned['XGB_Predicted'].notna().any():
         plt.plot(time_range, ml_daily_aligned['XGB_Predicted'].values,
                  linestyle='-.', color='#2ca02c', linewidth=2.5, alpha=0.95, 
-                 label='⚡ XGBoost', zorder=7, marker='^', markersize=3)
+                 label='XGBoost', zorder=7, marker='^', markersize=3)
     
     plt.plot(time_range, sarima_daily_pred.values,
              linestyle='-', color='#d62728', linewidth=2.5, alpha=0.95,
-             label='📊 SARIMA', zorder=6, marker='D', markersize=3)
+             label='SARIMA', zorder=6, marker='D', markersize=3)
     
     if lstm_daily_aligned is not None and lstm_daily_aligned.notna().any():
         plt.plot(time_range, lstm_daily_aligned.values,
                  linestyle=':', color='#9467bd', linewidth=3, alpha=0.95, 
-                 label='🧠 LSTM', zorder=9, marker='*', markersize=5)
+                 label='LSTM', zorder=9, marker='*', markersize=5)
     
-    plt.title('ULTIMATE Daily Prediction Comparison - ALL MODELS ALIGNED', 
+    plt.title('Daily Prediction Comparison', 
               fontsize=18, fontweight='bold', pad=20)
     plt.xlabel('Days (in test period)', fontsize=14, fontweight='bold')
     plt.ylabel('Daily Energy Production (kWh)', fontsize=14, fontweight='bold')
@@ -418,23 +418,28 @@ def  plot_model_results_comparison(all_results):
                shadow=True, framealpha=0.95, edgecolor='black')
     plt.grid(True, alpha=0.3, linestyle='-', linewidth=0.5)
     
-    for week in range(0, sample_size, 7):
-        plt.axvline(x=week, color='gray', linestyle='--', alpha=0.6, linewidth=1.5)
-        if week > 0:
-            plt.text(week+0.5, plt.ylim()[1]*0.92, f'Week {week//7+1}', 
-                     fontsize=11, fontweight='bold', alpha=0.8,
-                     bbox=dict(boxstyle='round,pad=0.4', facecolor='white', alpha=0.9))
-    
-    plt.tight_layout()
-    plt.show()
-
     rf_daily_mae = np.mean(np.abs(sarima_daily_actual.values - ml_daily_aligned['RF_Predicted'].values))
     xgb_daily_mae = np.mean(np.abs(sarima_daily_actual.values - ml_daily_aligned['XGB_Predicted'].values))
     sarima_daily_mae = sarima_metrics['MAE']
+    
 
+    # Remove model_info box, and move week labels inside the plot area
     lstm_daily_mae = None
     if lstm_daily_aligned is not None:
         lstm_daily_mae = np.mean(np.abs(sarima_daily_actual.values - lstm_daily_aligned.values))
+
+    # Move week labels inside the plot area (bottom, but above axis)
+    y_min, y_max = plt.ylim()
+    week_label_y = y_min + (y_max - y_min) * 0.08  # 8% above bottom
+    for week in range(0, sample_size, 7):
+        plt.axvline(x=week, color='gray', linestyle='--', alpha=0.6, linewidth=1.5)
+        if week > 0:
+            plt.text(week+0.5, week_label_y, f'Week {week//7+1}',
+                     fontsize=11, fontweight='bold', alpha=0.8,
+                     bbox=dict(boxstyle='round,pad=0.4', facecolor='white', alpha=0.9),
+                     ha='center', va='bottom')
+    plt.tight_layout()
+    plt.show()
     
     daily_metrics = {
         'rf_daily_mae': rf_daily_mae,
@@ -442,7 +447,7 @@ def  plot_model_results_comparison(all_results):
         'sarima_daily_mae': sarima_daily_mae,
         'lstm_daily_mae': lstm_daily_mae
     }
-    
+
     # ======================= SUMMARY TABLE =======================
     print("\n" + "="*80)
     print("COMPREHENSIVE MODEL COMPARISON")
@@ -844,3 +849,159 @@ def plot_individual_sarima_predictions(sarima_results):
         print("⚠️  SARIMA shows modest improvement over seasonal baseline")  
     else:
         print("❌ SARIMA performs worse than seasonal baseline")
+
+def plot_weather_validation_results(validation_results):
+    """
+    Create focused weather validation plots emphasizing pattern correlation
+    over absolute MAE (which includes cross-dataset calibration differences)
+    """
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import pandas as pd
+    from sklearn.preprocessing import MinMaxScaler
+    
+    if 'error' in validation_results:
+        print(f"Cannot plot validation results: {validation_results['error']}")
+        return
+    
+    validated_df = validation_results['validated_df']
+    validation_metrics = validation_results['validation_metrics']
+    model_name = validation_metrics['model_name']
+    
+    # Extract data
+    df = validated_df.dropna(subset=['Predicted', 'expected_from_actual_weather'])
+    
+    if len(df) == 0:
+        print("No valid data for plotting")
+        return
+    
+    # Normalize data to remove calibration bias
+    scaler = MinMaxScaler()
+    df_norm = pd.DataFrame(
+        scaler.fit_transform(df[['Predicted', 'expected_from_actual_weather']]),
+        columns=['Model_Normalized', 'Weather_Normalized'],
+        index=df.index
+    )
+    
+    correlation = validation_metrics.get('pattern_correlation', 0)
+    mae_improvement = validation_metrics.get('model_improvement_over_weather', 0)
+    
+    # Create focused 2x3 plot
+    fig = plt.figure(figsize=(18, 10))
+    
+    # Plot 1: Normalized Time Series (First Week)
+    ax1 = plt.subplot(2, 3, 1)
+    sample_hours = min(168, len(df_norm))  # First week
+    ax1.plot(df_norm.index[:sample_hours], df_norm['Weather_Normalized'][:sample_hours],
+             label='Expected (Open-Meteo Weather)', color='black', linestyle='--', 
+             linewidth=2, alpha=0.7)
+    ax1.plot(df_norm.index[:sample_hours], df_norm['Model_Normalized'][:sample_hours],
+             label=f'{model_name} Prediction', color='#2ecc71', linewidth=2.5)
+    ax1.set_title(f'Pattern Match: First Week\nCorrelation = {correlation:.1%}',
+                  fontsize=12, fontweight='bold')
+    ax1.set_ylabel('Normalized Power (0-1)', fontsize=11)
+    ax1.set_xlabel('Hour', fontsize=11)
+    ax1.legend(fontsize=10)
+    ax1.grid(True, alpha=0.3)
+    
+    # Plot 2: Scatter - Normalized (Physics Check)
+    ax2 = plt.subplot(2, 3, 2)
+    ax2.scatter(df_norm['Weather_Normalized'], df_norm['Model_Normalized'],
+                alpha=0.4, s=30, c='gray', edgecolors='none')
+    # Regression line
+    z = np.polyfit(df_norm['Weather_Normalized'], df_norm['Model_Normalized'], 1)
+    p = np.poly1d(z)
+    x_line = np.linspace(0, 1, 100)
+    ax2.plot(x_line, p(x_line), 'r-', linewidth=2, label=f'Trend (R={correlation:.3f})')
+    # Perfect match line
+    ax2.plot([0, 1], [0, 1], 'k--', alpha=0.3, linewidth=1, label='Perfect Match')
+    ax2.set_xlim(0, 1)
+    ax2.set_ylim(0, 1)
+    ax2.set_xlabel('Weather-Based Expected (Normalized)', fontsize=11)
+    ax2.set_ylabel(f'{model_name} Prediction (Normalized)', fontsize=11)
+    ax2.set_title(f'Physics Reality Check\nLinear Fit = Model Understands Physics',
+                  fontsize=12, fontweight='bold')
+    ax2.legend(fontsize=9)
+    ax2.grid(True, alpha=0.3)
+    
+    # Plot 3: Daily Energy Comparison
+    ax3 = plt.subplot(2, 3, 3)
+    df['date'] = df.index.date
+    daily_actual = df.groupby('date')['Actual'].sum()
+    daily_model = df.groupby('date')['Predicted'].sum()
+    daily_expected = df.groupby('date')['expected_from_actual_weather'].sum()
+    
+    x = range(len(daily_actual))
+    width = 0.25
+    ax3.bar([i-width for i in x], daily_actual, width, label='Actual', color='black', alpha=0.7)
+    ax3.bar(x, daily_model, width, label=model_name, color='blue', alpha=0.7)
+    ax3.bar([i+width for i in x], daily_expected, width, label='Weather Expected', 
+            color='green', alpha=0.7)
+    ax3.set_xlabel('Day', fontsize=11)
+    ax3.set_ylabel('Daily Energy (kWh)', fontsize=11)
+    ax3.set_title('Daily Energy Production Comparison', fontsize=12, fontweight='bold')
+    ax3.legend(fontsize=9)
+    ax3.grid(True, alpha=0.3, axis='y')
+    
+    # Plot 4: Actual Solar Radiation (Verification)
+    ax4 = plt.subplot(2, 3, 4)
+    sample_irr = df['actual_solar_radiation_wm2'].iloc[:168]  # First week
+    ax4.plot(range(len(sample_irr)), sample_irr, color='orange', linewidth=1.5)
+    ax4.fill_between(range(len(sample_irr)), 0, sample_irr, alpha=0.3, color='orange')
+    ax4.set_title('Actual Solar Radiation (First Week)\nFrom Open-Meteo API',
+                  fontsize=12, fontweight='bold')
+    ax4.set_xlabel('Hour', fontsize=11)
+    ax4.set_ylabel('Solar Radiation (W/m²)', fontsize=11)
+    ax4.grid(True, alpha=0.3)
+    
+    # Plot 5: Actual Temperature (Verification)
+    ax5 = plt.subplot(2, 3, 5)
+    sample_temp = df['actual_temperature_c'].iloc[:168]  # First week
+    ax5.plot(range(len(sample_temp)), sample_temp, color='red', linewidth=1.5)
+    ax5.set_title('Actual Temperature (First Week)\nFrom Open-Meteo API',
+                  fontsize=12, fontweight='bold')
+    ax5.set_xlabel('Hour', fontsize=11)
+    ax5.set_ylabel('Temperature (°C)', fontsize=11)
+    ax5.grid(True, alpha=0.3)
+    
+    # Plot 6: Validation Summary
+    ax6 = plt.subplot(2, 3, 6)
+    ax6.axis('off')
+    
+    n_prod = validation_metrics.get('n_production_hours', 0)
+    model_mae = validation_metrics['model_vs_actual_mae']
+    weather_mae = validation_metrics['weather_model_mae']
+    
+    summary_text = f"""Validation Metrics Summary
+
+🎯 PATTERN CORRELATION: {correlation:.1%}
+   {'✅ EXCELLENT' if correlation > 0.90 else '⚠️  GOOD' if correlation > 0.70 else '❌ WEAK'}
+   (Proves model understands physics)
+
+{model_name} vs Actual:
+  MAE:  {model_mae:.4f} kW
+  RMSE: {validation_metrics['model_vs_actual_rmse']:.4f} kW
+  R²:   {validation_metrics['model_vs_actual_r2']:.4f}
+
+Weather Model vs Actual:
+  MAE:  {weather_mae:.4f} kW
+  RMSE: {validation_metrics['weather_model_rmse']:.4f} kW
+  R²:   {validation_metrics['weather_model_r2']:.4f}
+
+Improvement: {mae_improvement:.2f}%
+Samples: {validation_metrics['n_samples']} ({n_prod} prod)
+
+Note: MAE includes calibration offset
+between NASA and Open-Meteo data.
+Correlation isolates model quality."""
+    
+    ax6.text(0.1, 0.5, summary_text, fontsize=10, verticalalignment='center',
+             family='monospace', bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.5))
+    
+    plt.suptitle(f'{model_name} Validation with Actual Weather Data | '
+                 f'Correlation: {correlation:.1%} | Improvement: {mae_improvement:.1f}%',
+                 fontsize=14, fontweight='bold', y=0.995)
+    plt.tight_layout()
+    plt.show()
+    
+    print("✅ Weather validation plots displayed")
