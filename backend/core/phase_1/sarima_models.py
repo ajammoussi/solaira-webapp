@@ -1,4 +1,4 @@
-from .data_processing import get_common_train_test_split
+from src.phase_1.data_processing import get_common_train_test_split
 
 import pandas as pd
 import numpy as np
@@ -19,11 +19,7 @@ if proj_root not in sys.path:
 
 def create_regression_baseline(df):
     """
-    Create linear regression baseline using weather variables
-    Works with daily aggregated data for faster SARIMA processing
-    Uses get_common_train_test_split() for consistent data splitting across all models
-    
-    Data split: 2023-01-01 to 2023-05-24 (training) | 2023-05-25 to 2023-06-30 (test)
+    Enhanced seasonal decomposition with more flexible patterns
     """
     print("Converting hourly data to daily aggregation for SARIMA analysis...")
     
@@ -43,18 +39,17 @@ def create_regression_baseline(df):
     daily_df = daily_df[daily_df['production'] > 0.1].copy()
     daily_df = daily_df.fillna(method='ffill').fillna(method='bfill')
     
-    # Ensure frequency is set to avoid statsmodels warnings
+    # Ensure frequency is set
     daily_df.index.freq = 'D'
     
     print(f"Daily samples: {len(daily_df)} (reduced from {len(df)} hourly samples)")
     
-    # *** USE COMMON TRAIN/TEST SPLIT FOR FAIR COMPARISON ***
-    # Use the centralized function to ensure consistency
-    split_info = get_common_train_test_split(daily_df, test_start_date='2023-05-25')
+    # Use common split
+    split_info = get_common_train_test_split(daily_df, test_start_date='2025-01-01')
     train_mask = split_info['train_mask']
     test_mask = split_info['test_mask']
     
-    # Define feature columns for baseline model (daily aggregated)
+    # Define feature columns
     available_cols = ['irradiance', 'temperature']
     
     # Create features matrix
@@ -76,11 +71,11 @@ def create_regression_baseline(df):
     train_residual = y_train - y_pred_train
     test_residual = y_test - y_pred_test
     
-    # Ensure residuals have proper frequency for SARIMA
+    # Ensure residuals have proper frequency
     train_residual.index.freq = 'D'
     test_residual.index.freq = 'D'
     
-    # Create train and test dataframes with residuals (daily data)
+    # Create train and test dataframes
     train_data = daily_df[train_mask].copy()
     test_data = daily_df[test_mask].copy()
     
@@ -96,32 +91,36 @@ def create_regression_baseline(df):
     
     print(f"Baseline Linear Regression - MAE: {baseline_mae:.4f}, RMSE: {baseline_rmse:.4f}")
     
-    # Add SIMPLIFIED seasonal modeling appropriate for 6-month data
-    print("Adding simplified seasonal components (optimized for 6-month data)...")
+    # IMPROVED seasonal modeling - more adaptive
+    print("Adding ADAPTIVE seasonal components...")
     
-    # For 6 months of data, use simpler seasonal modeling
     train_data['doy'] = train_data.index.dayofyear
     test_data['doy'] = test_data.index.dayofyear
     
-    # Only use primary annual cycle - remove semi-annual for shorter series
+    # Primary annual cycle + quarterly variations
     train_data['sin1'] = np.sin(2 * np.pi * train_data['doy'] / 365.25)
     train_data['cos1'] = np.cos(2 * np.pi * train_data['doy'] / 365.25)
+    train_data['sin2'] = np.sin(4 * np.pi * train_data['doy'] / 365.25)  # Semi-annual
+    train_data['cos2'] = np.cos(4 * np.pi * train_data['doy'] / 365.25)
+    
     test_data['sin1'] = np.sin(2 * np.pi * test_data['doy'] / 365.25)
     test_data['cos1'] = np.cos(2 * np.pi * test_data['doy'] / 365.25)
+    test_data['sin2'] = np.sin(4 * np.pi * test_data['doy'] / 365.25)
+    test_data['cos2'] = np.cos(4 * np.pi * test_data['doy'] / 365.25)
     
-    # Add a simple linear trend for the 6-month period
+    # Simple linear trend
     train_trend = np.arange(len(train_data)) / len(train_data)
     test_trend = np.arange(len(train_data), len(train_data) + len(test_data)) / len(train_data)
     
     train_data['trend'] = train_trend
     test_data['trend'] = test_trend
     
-    # Use Ridge regression with STRONG regularization for short series
-    seasonal_features = ['sin1', 'cos1', 'trend']  # Simplified features
+    # CRITICAL: Use moderate regularization, not extreme
+    seasonal_features = ['sin1', 'cos1', 'sin2', 'cos2', 'trend']
     X_seasonal_train = train_data[seasonal_features].values
     
-    # Much stronger regularization for 6-month data
-    seasonal_model = RidgeCV(alphas=[1.0, 10.0, 100.0, 1000.0])  # Higher alphas
+    # Moderate regularization - was too strong before
+    seasonal_model = RidgeCV(alphas=[0.1, 1.0, 10.0, 50.0])
     seasonal_model.fit(X_seasonal_train, train_data['production'])
     
     # Get seasonal predictions
@@ -133,93 +132,95 @@ def create_regression_baseline(df):
     train_data['residual'] = train_data['production'] - train_data['seasonal']
     test_data['residual'] = test_data['production'] - test_data['seasonal']
     
-    print(f"Simplified seasonal model R²: {seasonal_model.score(X_seasonal_train, train_data['production']):.4f}")
+    print(f"Seasonal model R²: {seasonal_model.score(X_seasonal_train, train_data['production']):.4f}")
     print(f"Regularization alpha used: {seasonal_model.alpha_}")
-    print(f"Residual range: [{train_data['residual'].min():.2f}, {train_data['residual'].max():.2f}]")
-    print(f"Residual std: {train_data['residual'].std():.4f} (smaller is better for SARIMA)")
+    print(f"Residual std: {train_data['residual'].std():.4f}")
     
     return train_data, test_data, lr_model, available_cols
 
-
 def prepare_exogenous_features(train_data, test_data, feature_cols):
     """
-    Prepare minimal and highly stable exogenous features for 6-month SARIMA
-    Focus on preventing overfitting with very simple transformations
+    Enhanced exogenous features with weather momentum
     """
-    # Ultra-conservative approach: minimal feature engineering
+    # Robust normalization for irradiance
+    irrad_median = train_data['irradiance'].median()
+    irrad_mad = (train_data['irradiance'] - irrad_median).abs().median()
     
-    # Use simple median-based robust normalization
-    overall_irrad_median = train_data['irradiance'].median()
-    overall_irrad_mad = (train_data['irradiance'] - overall_irrad_median).abs().median()
-    
-    # Robust standardization using median and MAD (more stable than mean/std)
-    if overall_irrad_mad > 0:
-        train_data['irrad_normalized'] = (train_data['irradiance'] - overall_irrad_median) / overall_irrad_mad
-        test_data['irrad_normalized'] = (test_data['irradiance'] - overall_irrad_median) / overall_irrad_mad
+    if irrad_mad > 0:
+        train_data['irrad_norm'] = (train_data['irradiance'] - irrad_median) / irrad_mad
+        test_data['irrad_norm'] = (test_data['irradiance'] - irrad_median) / irrad_mad
     else:
-        # Fallback if no variation
-        train_data['irrad_normalized'] = 0
-        test_data['irrad_normalized'] = 0
+        train_data['irrad_norm'] = 0
+        test_data['irrad_norm'] = 0
     
-    # Aggressive clipping to prevent outlier influence
-    train_data['irrad_normalized'] = np.clip(train_data['irrad_normalized'], -2, 2)
-    test_data['irrad_normalized'] = np.clip(test_data['irrad_normalized'], -2, 2)
+    # Clip extreme outliers
+    train_data['irrad_norm'] = np.clip(train_data['irrad_norm'], -3, 3)
+    test_data['irrad_norm'] = np.clip(test_data['irrad_norm'], -3, 3)
     
-    # Prepare exogenous arrays 
-    exog_train = train_data[['irrad_normalized']].values
-    exog_test = test_data[['irrad_normalized']].values
+    # Day-to-day change
+    train_data['irrad_change'] = train_data['irradiance'].diff().fillna(0)
+    test_data['irrad_change'] = test_data['irradiance'].diff().fillna(0)
     
-    # Skip additional scaling since we already normalized
-    print(f"Exogenous variable stats - Train mean: {exog_train.mean():.3f}, std: {exog_train.std():.3f}")
+    change_std = train_data['irrad_change'].std()
+    if change_std > 0:
+        train_data['irrad_change_norm'] = train_data['irrad_change'] / change_std
+        test_data['irrad_change_norm'] = test_data['irrad_change'] / change_std
+    else:
+        train_data['irrad_change_norm'] = 0
+        test_data['irrad_change_norm'] = 0
+    
+    train_data['irrad_change_norm'] = np.clip(train_data['irrad_change_norm'], -3, 3)
+    test_data['irrad_change_norm'] = np.clip(test_data['irrad_change_norm'], -3, 3)
+    
+    # CRITICAL: Add 1-day lag to capture weather persistence
+    train_data['irrad_lag1'] = train_data['irrad_norm'].shift(1).fillna(train_data['irrad_norm'].iloc[0])
+    test_data['irrad_lag1'] = test_data['irrad_norm'].shift(1)
+    test_data['irrad_lag1'].iloc[0] = train_data['irrad_norm'].iloc[-1]  # Use last train value
+    
+    # Add moving average (3-day weather smoothing)
+    train_data['irrad_ma3'] = train_data['irrad_norm'].rolling(window=3, min_periods=1).mean()
+    test_data['irrad_ma3'] = test_data['irrad_norm'].rolling(window=3, min_periods=1).mean()
+    # Fill first values from train
+    if test_data['irrad_ma3'].isna().any():
+        test_data['irrad_ma3'].fillna(method='bfill', inplace=True)
+    
+    # Prepare exogenous arrays with multiple weather perspectives
+    exog_train = train_data[['irrad_norm', 'irrad_change_norm', 'irrad_lag1', 'irrad_ma3']].values
+    exog_test = test_data[['irrad_norm', 'irrad_change_norm', 'irrad_lag1', 'irrad_ma3']].values
+    
+    print(f"Exogenous variables: level, change, lag, moving average (4 features)")
+    print(f"Train stats - Level: {exog_train[:,0].std():.3f}, Change: {exog_train[:,1].std():.3f}")
     
     return exog_train, exog_test, None
 
-
 def find_best_sarima_model(train_residual, exog_train_scaled):
     """
-    Find the best SARIMA model using simplified grid search focused on generalization
+    Two-stage search with expanded quick scan
     """
-    print("\n=== Finding Best SARIMA Model (Simplified for 6-month data) ===")
+    print("\n=== Finding Best SARIMA Model (Smart Search) ===")
     
-    # Simplified parameter ranges for better generalization on short data
-    # Focus on simple, robust models
-    p_range = range(0, 3)  # Reduced from 4
-    d_range = [0, 1]       # Keep simple differencing
-    q_range = range(0, 3)  # Reduced from 4
-    
-    # Generate conservative combinations prioritizing generalization
-    all_combinations = []
-    
-    # Priority 1: Simple non-seasonal models (most robust for short series)
-    for p, d, q in itertools.product(p_range, d_range, q_range):
-        if p == 0 and d == 0 and q == 0:
-            continue
-        # Very conservative complexity limit for better generalization
-        if p + d + q <= 3:  # Reduced from 4
-            all_combinations.append(((p, d, q), (0, 0, 0, 0)))
-    
-    # Priority 2: Only the simplest seasonal models for 6-month data
-    # These are manually selected as most appropriate for short seasonal series
-    simple_seasonal_models = [
-        ((0, 1, 1), (1, 0, 0, 7)),  # ARIMA(0,1,1) with seasonal AR(1)
-        ((1, 0, 1), (0, 0, 1, 7)),  # ARIMA(1,0,1) with seasonal MA(1)  
-        ((0, 0, 1), (1, 0, 0, 7)),  # Simple MA with seasonal AR
+    # STAGE 1: Expanded quick scan with proven configurations
+    print("Stage 1: Quick parameter scan...")
+    quick_params = [
+        # Simple non-seasonal
+        ((1, 0, 1), (0, 0, 0, 0)),
+        ((2, 0, 1), (0, 0, 0, 0)),
+        ((2, 0, 2), (0, 0, 0, 0)),
+        ((3, 0, 2), (0, 0, 0, 0)),
+        ((3, 0, 3), (0, 0, 0, 0)),
+        # With weekly seasonality
+        ((1, 0, 1), (1, 0, 0, 7)),
+        ((2, 0, 1), (1, 0, 0, 7)),
+        ((2, 0, 2), (1, 0, 0, 7)),
+        # With differencing (capture trends better)
+        ((1, 1, 1), (0, 0, 0, 0)),
+        ((2, 1, 1), (0, 0, 0, 0)),
     ]
     
-    # Only add seasonal models if they're very conservative
-    for seasonal_model in simple_seasonal_models:
-        all_combinations.append(seasonal_model)
-    
-    print(f"Total configurations to test: {len(all_combinations)}")
-    
-    # Prepare cross-validation
     tscv = TimeSeriesSplit(n_splits=3)
+    stage1_results = []
     
-    # Evaluate all models sequentially with progress bar
-    results_list = []
-    
-    print("\nEvaluating models with 3-fold CV...")
-    for order, seasonal_order in tqdm(all_combinations, desc="Model search"):
+    for order, seasonal_order in tqdm(quick_params, desc="Quick scan"):
         try:
             cv_scores = []
             
@@ -230,96 +231,127 @@ def find_best_sarima_model(train_residual, exog_train_scaled):
                     exog_cv_train = exog_train_scaled[train_idx]
                     exog_cv_val = exog_train_scaled[val_idx]
                     
-                    # Fit model with conservative settings for stability
                     model = SARIMAX(
                         y_cv_train,
                         exog=exog_cv_train,
                         order=order,
                         seasonal_order=seasonal_order,
-                        enforce_stationarity=True,   # Enforce for stability
-                        enforce_invertibility=True   # Enforce for stability
+                        enforce_stationarity=True,
+                        enforce_invertibility=True
                     )
                     
                     with warnings.catch_warnings():
                         warnings.simplefilter("ignore")
-                        result = model.fit(
-                            disp=False,
-                            maxiter=50,  # Reduced for faster, more stable fitting
-                            warn_convergence=False,
-                            method='lbfgs',
-                            low_memory=True  # More conservative memory usage
-                        )
+                        result = model.fit(disp=False, maxiter=100, method='lbfgs')
                     
-                    # Forecast
                     pred = result.forecast(steps=len(val_idx), exog=exog_cv_val)
                     
-                    # Calculate RMSE
-                    if not np.isnan(pred).any() and not np.isinf(pred).any():
+                    if not np.isnan(pred).any():
                         rmse = np.sqrt(mean_squared_error(y_cv_val, pred))
-                        if rmse < 10:  # Sanity check
-                            cv_scores.append(rmse)
+                        cv_scores.append(rmse)
                             
                 except Exception:
                     continue
             
-            # Store result if we have valid CV scores
-            if len(cv_scores) >= 2:  # At least 2 of 3 folds succeeded
+            if len(cv_scores) > 0:
                 avg_score = np.mean(cv_scores)
-                n_params = sum(order) + sum(seasonal_order[:3])
-                results_list.append((order, seasonal_order, avg_score, n_params))
+                n_params = sum(order[:2]) + order[2] + sum(seasonal_order[:3])
+                penalty = n_params * 0.025  # Slightly lighter penalty
+                stage1_results.append((order, seasonal_order, avg_score, avg_score + penalty, n_params))
                 
         except Exception:
             continue
     
-    print(f"\nCompleted: {len(results_list)} valid models found")
+    # Sort and show top 3
+    stage1_results.sort(key=lambda x: x[3])
     
-    # Find best models with strong overfitting penalty
-    if len(results_list) == 0:
-        print("No valid models found, using fallback ARIMA(1,0,0)")
-        best_order = (1, 0, 0)  # Even simpler fallback
-        best_seasonal = (0, 0, 0, 0)
-        best_score = np.inf
-        best_params = 1
-    else:
-        # Apply HEAVY complexity penalty to prevent overfitting on short series
-        adjusted_results = []
-        for order, seasonal_order, score, n_params in results_list:
-            # Much stronger penalty for complexity (increased from 0.01 to 0.05)
-            complexity_penalty = 1 + 0.05 * n_params
+    print(f"\nStage 1 Top 3:")
+    for i, res in enumerate(stage1_results[:3]):
+        seasonal_str = f"x{res[1]}" if res[1] != (0,0,0,0) else ""
+        print(f"{i+1}. ARIMA{res[0]}{seasonal_str} - RMSE: {res[2]:.4f}, Score: {res[3]:.4f}")
+    
+    best_base = stage1_results[0]
+    
+    # STAGE 2: Focused refinement around best
+    print("\nStage 2: Refining around best...")
+    p_best, d_best, q_best = best_base[0]
+    s_best = best_base[1]
+    
+    # Carefully expand around best
+    refined_params = set()
+    
+    # Variations around best non-seasonal params
+    for p in [max(1, p_best-1), p_best, min(4, p_best+1)]:
+        for q in [max(1, q_best-1), q_best, min(3, q_best+1)]:
+            refined_params.add(((p, d_best, q), (0, 0, 0, 0)))
+            # Add seasonal version if params are reasonable
+            if p <= 2 and q <= 2:
+                refined_params.add(((p, d_best, q), (1, 0, 0, 7)))
+    
+    # If best had seasonality, explore variations
+    if s_best != (0, 0, 0, 0):
+        refined_params.add(((p_best, d_best, q_best), (1, 0, 1, 7)))  # Add seasonal MA
+        refined_params.add(((p_best, d_best, q_best), (0, 0, 1, 7)))  # Seasonal MA only
+    
+    refined_params = list(refined_params)
+    
+    refined_results = []
+    for order, seasonal_order in tqdm(refined_params, desc="Refinement"):
+        try:
+            cv_scores = []
             
-            # Additional penalty for seasonal models on short data
-            seasonal_penalty = 1.1 if seasonal_order != (0, 0, 0, 0) else 1.0
+            for train_idx, val_idx in tscv.split(train_residual):
+                try:
+                    y_cv_train = train_residual.iloc[train_idx]
+                    y_cv_val = train_residual.iloc[val_idx]
+                    exog_cv_train = exog_train_scaled[train_idx]
+                    exog_cv_val = exog_train_scaled[val_idx]
+                    
+                    model = SARIMAX(
+                        y_cv_train,
+                        exog=exog_cv_train,
+                        order=order,
+                        seasonal_order=seasonal_order,
+                        enforce_stationarity=True,
+                        enforce_invertibility=True
+                    )
+                    
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore")
+                        result = model.fit(disp=False, maxiter=150, method='lbfgs')
+                    
+                    pred = result.forecast(steps=len(val_idx), exog=exog_cv_val)
+                    
+                    if not np.isnan(pred).any():
+                        rmse = np.sqrt(mean_squared_error(y_cv_val, pred))
+                        cv_scores.append(rmse)
+                            
+                except Exception:
+                    continue
             
-            # Combined penalty strongly favors simple models
-            total_penalty = complexity_penalty * seasonal_penalty
-            adjusted_score = score * total_penalty
-            adjusted_results.append((order, seasonal_order, score, adjusted_score, n_params))
-        
-        # Sort by adjusted score (heavily penalized for complexity)
-        adjusted_results.sort(key=lambda x: x[3])
-        
-        # Show top 15 models
-        print("\n" + "="*80)
-        print("TOP 15 MODELS (sorted by adjusted CV-RMSE)")
-        print("="*80)
-        print(f"{'Rank':<5} {'Order':<15} {'Seasonal':<15} {'CV-RMSE':<10} {'Adjusted':<10} {'Params':<7}")
-        print("-"*80)
-        
-        for i, (order, seasonal, cv_score, adj_score, n_params) in enumerate(adjusted_results[:15], 1):
-            seasonal_str = str(seasonal) if seasonal != (0,0,0,0) else "None"
-            print(f"{i:<5} {str(order):<15} {seasonal_str:<15} {cv_score:<10.4f} {adj_score:<10.4f} {n_params:<7}")
-        
-        # Select best model
-        best_order, best_seasonal, best_score, best_adj_score, best_params = adjusted_results[0]
-        
-        print("\n" + "="*80)
-        print(f"SELECTED MODEL: ARIMA{best_order}")
-        if best_seasonal != (0, 0, 0, 0):
-            print(f"                x {best_seasonal}")
-        print(f"CV-RMSE: {best_score:.4f}")
-        print(f"Adjusted Score: {best_adj_score:.4f}")
-        print(f"Parameters: {best_params}")
-        print("="*80)
+            if len(cv_scores) > 0:
+                avg_score = np.mean(cv_scores)
+                n_params = sum(order[:2]) + order[2] + sum(seasonal_order[:3])
+                penalty = n_params * 0.025
+                refined_results.append((order, seasonal_order, avg_score, avg_score + penalty, n_params))
+                
+        except Exception:
+            continue
+    
+    # Combine stage 1 and stage 2, find overall best
+    all_results = stage1_results + refined_results
+    all_results.sort(key=lambda x: x[3])
+    
+    print(f"\nFINAL TOP 5 MODELS:")
+    for i, res in enumerate(all_results[:5]):
+        seasonal_str = f"x{res[1]}" if res[1] != (0,0,0,0) else ""
+        print(f"{i+1}. ARIMA{res[0]}{seasonal_str} - RMSE: {res[2]:.4f}, Score: {res[3]:.4f}, Params: {res[4]}")
+    
+    best_order = all_results[0][0]
+    best_seasonal = all_results[0][1]
+    
+    seasonal_str = f"x{best_seasonal}" if best_seasonal != (0,0,0,0) else ""
+    print(f"\n✓ SELECTED: ARIMA{best_order}{seasonal_str}")
     
     return best_order, best_seasonal
 
@@ -327,28 +359,29 @@ def find_best_sarima_model(train_residual, exog_train_scaled):
 def train_final_sarima_model(train_residual, test_residual, exog_train_scaled, exog_test_scaled, 
                            best_order, best_seasonal):
     """
-    Train the final SARIMA model and make predictions
+    Train final model with optimal settings
     """
     print("\n=== Training Final SARIMA Model ===")
-    print(f"Model: ARIMA{best_order}")
-    if best_seasonal != (0, 0, 0, 0):
-        print(f"Seasonal: {best_seasonal}")
+    seasonal_str = f"x{best_seasonal}" if best_seasonal != (0,0,0,0) else ""
+    print(f"Model: ARIMA{best_order}{seasonal_str}")
     
-    # Train final model with conservative settings to prevent overfitting
+    # Train with extended iterations for convergence
     final_model = SARIMAX(
         train_residual,
         exog=exog_train_scaled,
         order=best_order,
         seasonal_order=best_seasonal,
-        enforce_stationarity=True,   # Enforce for stability on short series
-        enforce_invertibility=True   # Enforce for stability on short series
+        enforce_stationarity=True,
+        enforce_invertibility=True,
+        # Add slight trend if differencing is used
+        trend='c' if best_order[1] > 0 else None
     )
     
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         final_result = final_model.fit(
             disp=False,
-            maxiter=100,  # Reduced iterations to prevent overfitting
+            maxiter=250,  # More iterations for final fit
             warn_convergence=False,
             method='lbfgs',
             low_memory=True
@@ -358,14 +391,15 @@ def train_final_sarima_model(train_residual, test_residual, exog_train_scaled, e
     sarima_pred_residual = final_result.forecast(steps=len(test_residual), exog=exog_test_scaled)
     train_pred_residual = final_result.fittedvalues
     
-    # Calculate residual prediction metrics
+    # Calculate metrics
     residual_mae = mean_absolute_error(test_residual, sarima_pred_residual)
     residual_rmse = np.sqrt(mean_squared_error(test_residual, sarima_pred_residual))
     
     print(f"SARIMA Residual Prediction - MAE: {residual_mae:.4f}, RMSE: {residual_rmse:.4f}")
+    print(f"Model AIC: {final_result.aic:.2f}, BIC: {final_result.bic:.2f}")
+    print(f"Converged: {final_result.mle_retvals['converged']}")
     
     return final_result, sarima_pred_residual, train_pred_residual
-
 
 def evaluate_sarima_performance(test_data, train_data, sarima_pred_residual, train_pred_residual):
     """
@@ -554,6 +588,13 @@ def plot_sarima_results(train_data, test_data, sarima_metrics, best_order, best_
     plt.suptitle(f'SARIMA Model Analysis | Test RMSE: {sarima_metrics["RMSE"]:.3f} | Overfitting: {sarima_metrics["Overfitting_RMSE"]:.2f}x', 
                  fontsize=15, fontweight='bold', y=0.995)
     plt.tight_layout()
+    
+    # Save the figure
+    import os
+    os.makedirs('results/sarima', exist_ok=True)
+    plt.savefig('results/sarima/sarima_analysis.png', dpi=150, bbox_inches='tight')
+    print("   ✅ SARIMA analysis plot saved to: results/sarima/sarima_analysis.png")
+    
     plt.show()
 
 
@@ -567,6 +608,13 @@ def plot_sarima_diagnostics(sarima_model):
         sarima_model.plot_diagnostics(figsize=(14, 10))
         plt.suptitle('SARIMA Diagnostics (Residual Component)', fontsize=13, fontweight='bold')
         plt.tight_layout()
+        
+        # Save the figure
+        import os
+        os.makedirs('results/sarima', exist_ok=True)
+        plt.savefig('results/sarima/sarima_diagnostics.png', dpi=150, bbox_inches='tight')
+        print("   ✅ SARIMA diagnostics plot saved to: results/sarima/sarima_diagnostics.png")
+        
         plt.show()
     except Exception as e:
         print(f"Could not generate diagnostics: {e}")
@@ -577,7 +625,7 @@ def run_sarima_experiment(df):
     Main function to run the complete SARIMA experiment
     Uses get_common_train_test_split() for consistent data splitting across all models
     
-    Data split: 2023-01-01 to 2023-05-24 (training) | 2023-05-25 to 2023-06-30 (test)
+    Data split: 2022-01-01 to 2024-12-31 (training) | 2025-01-01 to 2025-01-31 (test)
     """
     print("=== STARTING SARIMA EXPERIMENT ===")
     

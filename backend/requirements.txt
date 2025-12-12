@@ -27,3 +27,6 @@ xarray
 zarr
 fsspec
 git+https://github.com/openclimatefix/pv-site-prediction
+tf2onnx
+onnx
+onnxruntime

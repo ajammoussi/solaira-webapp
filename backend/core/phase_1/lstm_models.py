@@ -4,7 +4,7 @@ LSTM Models for Solar PV Power Prediction
 This module provides LSTM-based deep learning models for solar PV power prediction,
 following the same pattern as other models in the project.
 """
-from .data_processing import get_common_train_test_split
+from src.phase_1.data_processing import get_common_train_test_split
 
 import numpy as np
 import pandas as pd
@@ -133,7 +133,7 @@ def split_lstm_data_with_common_split(lstm_data, df):
     
     # Apply the common split to the sequence-compatible indices
     # Use the centralized function to ensure consistency
-    split_info = get_common_train_test_split(df, test_start_date='2023-05-25')
+    split_info = get_common_train_test_split(df, test_start_date='2025-01-01')
     
     # Map the original split to sequence indices
     sequence_train_mask = split_info['train_mask'][time_steps:]  # Skip first time_steps
@@ -506,6 +506,13 @@ Suitable for: Sequential patterns"""
              family='monospace', bbox=dict(boxstyle='round', facecolor='lightcoral', alpha=0.3))
     
     plt.tight_layout()
+    
+    # Save the figure
+    import os
+    os.makedirs('results/lstm', exist_ok=True)
+    plt.savefig('results/lstm/lstm_analysis.png', dpi=150, bbox_inches='tight')
+    print("   ✅ LSTM analysis plot saved to: results/lstm/lstm_analysis.png")
+    
     plt.show()
     
     print("✅ LSTM visualization completed!")
@@ -516,7 +523,7 @@ def run_lstm_experiment(df, time_steps=24, epochs=100, batch_size=32):
     Run complete LSTM experiment following the same pattern as other models
     Uses get_common_train_test_split() for consistent data splitting across all models
     
-    Data split: 2023-01-01 to 2023-05-24 (training) | 2023-05-25 to 2023-06-30 (test)
+    Data split: 2022-01-01 to 2024-12-31 (training) | 2025-01-01 to 2025-01-31 (test)
     
     Args:
         df: DataFrame with PV data 
