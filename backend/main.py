@@ -8,6 +8,9 @@ import joblib
 import os
 import sys
 from datetime import datetime
+from contextlib import asynccontextmanager
+from dotenv import load_dotenv
+import logging
 
 # Add backend directory to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -15,17 +18,14 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from backend.core.phase_1.data_processing import prepare_features_for_ml
 from backend.core.phase_2.simulator import EnergySimulator
 from backend.core.phase_3.maintenance import PerformanceRatioCalculator, MaintenanceAnalyzer
+from backend.chatbot.src import SupportAgent, MESSAGES, rate_limited
 
-app = FastAPI(title="PV Production Prediction API", version="1.0")
+# Load environment variables
+load_dotenv()
 
-# Configure CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for dev. In production, specify the frontend URL.
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Global variables to store models
 models = {}
@@ -39,36 +39,14 @@ simulator = None
 consumption_df = None
 pv_df = None
 
-class WeatherData(BaseModel):
-    timestamp: str  # ISO format
-    ALLSKY_SFC_SW_DWN: float
-    T2M: float
-    RH2M: float
-    WS10M: float
-    WD10M: float
-    # Add other fields if necessary
-
-class PredictionRequest(BaseModel):
-    data: List[WeatherData]
-    model_type: str = "xgboost"  # xgboost, lstm, sarima
-
-class SimulationRequest(BaseModel):
-    weather_data: Optional[List[WeatherData]] = None
-    current_soc: float
-    consumption_profile: Optional[List[float]] = None # Hourly consumption for the period
-    date: Optional[str] = None # Date to simulate (YYYY-MM-DD)
-
-class MaintenanceRequest(BaseModel):
-    actual_production: List[float] # Daily actuals
-    predicted_production: List[float] # Daily predictions
-    dates: List[str] # ISO dates
-
-@app.on_event("startup")
-async def load_models():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     """
-    Load trained models on startup
+    Lifespan context for FastAPI: initialize models and chatbot agent.
     """
     global simulator, consumption_df, pv_df
+    
+    # --- Load ML Models & Data ---
     print("Loading models...")
     try:
         xgboost_path = os.path.join(MODELS_DIR, 'production_xgboost.pkl')
@@ -98,22 +76,112 @@ async def load_models():
             print("PV data loaded.")
         else:
             print(f"Warning: PV data not found at {PV_DATA_PATH}")
-
+            
         # Initialize Simulator
-        # We need a default config file. For now, we'll assume one exists or create a dummy one.
-        # If config path doesn't exist, we might fail or use defaults.
         if os.path.exists(CONFIG_PATH):
              simulator = EnergySimulator(CONFIG_PATH, MODELS_DIR)
              print("Energy Simulator initialized.")
+             print("SERVER STARTING NOW - VERSION CHECK")
         else:
-            print(f"Warning: Config not found at {CONFIG_PATH}. Simulator not initialized.")
-
+             print(f"Warning: Config not found at {CONFIG_PATH}")
+             
     except Exception as e:
         print(f"Error loading models: {e}")
 
-@app.get("/")
+    # --- Initialize Chatbot Agent ---
+    app.state.agent = None
+    app.state.model_names = []
+
+    CEREBRAS_API_KEY = os.getenv("CEREBRAS_API_KEY")
+    MODEL_NAMES = os.getenv("MODEL_NAMES", "llama3.1-8b").split(",")
+
+    if not CEREBRAS_API_KEY:
+        logger.warning("CEREBRAS_API_KEY environment variable not found. Chatbot will not function.")
+    else:
+        logger.info("Initializing SupportAgent with models: %s", MODEL_NAMES)
+        try:
+            app.state.agent = SupportAgent(
+                api_key=CEREBRAS_API_KEY,
+                model_names=MODEL_NAMES,
+                temperature=0.7,
+            )
+            app.state.model_names = MODEL_NAMES
+        except Exception as e:
+            logger.error(f"Failed to initialize SupportAgent: {e}")
+
+    try:
+        yield
+    finally:
+        # cleanup on shutdown
+        agent = getattr(app.state, 'agent', None)
+        if agent and hasattr(agent, 'close'):
+            try:
+                close_result = agent.close()
+                if close_result and hasattr(close_result, '__await__'):
+                    await close_result
+            except Exception:
+                logger.exception("Error while closing agent during shutdown")
+
+
+app = FastAPI(title="Solaira Energy API", version="2.0", lifespan=lifespan)
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins for dev. In production, specify the frontend URL.
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# --- Pydantic Models ---
+
+class WeatherData(BaseModel):
+    timestamp: str  # ISO format
+    ALLSKY_SFC_SW_DWN: float
+    T2M: float
+    RH2M: float
+    WS10M: float
+    WD10M: float
+
+class PredictionRequest(BaseModel):
+    data: List[WeatherData]
+    model_type: str = "xgboost"
+    model_config = {'protected_namespaces': ()}
+    model_config = {'protected_namespaces': ()}
+
+class SimulationRequest(BaseModel):
+    weather_data: Optional[List[WeatherData]] = None
+    current_soc: float
+    consumption_profile: Optional[List[float]] = None
+    date: Optional[str] = None
+
+class MaintenanceRequest(BaseModel):
+    actual_production: List[float]
+    predicted_production: List[float]
+    dates: List[str]
+
+class ChatRequest(BaseModel):
+    message: str
+    user_id: str
+    energy_data: Optional[dict] = None
+
+class ChatResponse(BaseModel):
+    response: str
+    error: Optional[str] = None
+
+class HealthResponse(BaseModel):
+    status: str
+    message: str
+
+# --- Endpoints ---
+
+@app.get("/", response_model=HealthResponse)
 def read_root():
-    return {"message": "PV Production Prediction API is running"}
+    return {
+        "status": "healthy",
+        "message": "Solaira Energy API is running"
+    }
 
 @app.post("/predict")
 def predict(request: PredictionRequest):
@@ -127,40 +195,24 @@ def predict(request: PredictionRequest):
         raise HTTPException(status_code=503, detail="XGBoost model not loaded.")
         
     try:
-        # Convert input to DataFrame
         data_dicts = [item.dict() for item in request.data]
         df = pd.DataFrame(data_dicts)
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         df.set_index('timestamp', inplace=True)
         
-        # Prepare features
-        # We need to ensure the input dataframe has the same structure as training data
-        # prepare_features_for_ml expects certain columns.
-        # It calculates rolling averages, so we might need historical data or just accept that
-        # the first few predictions might be NaN if we don't provide enough context.
-        
-        # For simplicity, we'll assume the user provides enough data or we handle NaNs.
-        
-        # Note: prepare_features_for_ml adds columns like 'hour', 'month', etc.
         df_features = prepare_features_for_ml(df)
         
-        # Filter columns to match training features
         if 'xgboost_features' in models:
             feature_cols = models['xgboost_features']
-            # Add missing columns with 0 or appropriate default
             for col in feature_cols:
                 if col not in df_features.columns:
                     df_features[col] = 0
-            
             X = df_features[feature_cols]
         else:
-            # Fallback if feature list not found
             X = df_features.select_dtypes(include=[np.number])
             
-        # Predict
         predictions = models['xgboost'].predict(X)
         
-        # Format response
         results = []
         for i, (idx, val) in enumerate(zip(X.index, predictions)):
             results.append({
@@ -183,22 +235,15 @@ def simulate(request: SimulationRequest):
         
     try:
         df_weather = None
-        
-        # Determine target date (default to today)
         target_date = pd.to_datetime(request.date) if request.date else pd.Timestamp.now()
-        # Shift to last year
         historical_date = target_date.replace(year=target_date.year - 1)
         
-        # 1. Get Weather/Production Data
         if request.weather_data:
-            # Use provided weather data
             data_dicts = [item.dict() for item in request.weather_data]
             df_weather = pd.DataFrame(data_dicts)
             df_weather['timestamp'] = pd.to_datetime(df_weather['timestamp'])
             df_weather.set_index('timestamp', inplace=True)
         elif pv_df is not None:
-            # Look up historical weather/features
-            # Filter for the specific day and year
             day_data = pv_df[
                 (pv_df['datetime'].dt.year == historical_date.year) &
                 (pv_df['datetime'].dt.month == historical_date.month) &
@@ -207,57 +252,41 @@ def simulate(request: SimulationRequest):
             
             if not day_data.empty:
                 day_data.set_index('datetime', inplace=True)
-                # Resample to ensure hourly frequency
                 day_data = day_data.resample('h').mean().fillna(method='ffill').fillna(method='bfill')
                 df_weather = day_data
             else:
-                # Fallback if exact date missing (e.g. leap year issues or missing data)
-                # Try to find ANY data for this month/day from other years
-                print(f"Warning: No data found for {historical_date}, trying other years.")
                 day_data = pv_df[
                     (pv_df['datetime'].dt.month == historical_date.month) &
                     (pv_df['datetime'].dt.day == historical_date.day)
                 ].copy()
                 
                 if not day_data.empty:
-                    # Take the first 24 hours found (likely from another year)
                     day_data = day_data.iloc[:24].copy()
                     day_data.set_index('datetime', inplace=True)
-                    # Reset index to match requested date to avoid frequency issues? 
-                    # Actually, simulator might not care about the exact date, just the profile.
-                    # But prepare_features_for_ml might.
                     df_weather = day_data
                 else:
-                    print(f"Warning: No data found for {historical_date} in any year, using first available day.")
                     df_weather = pv_df.iloc[:24].copy()
                     df_weather.set_index('datetime', inplace=True)
         else:
              raise HTTPException(status_code=400, detail="No weather data provided and historical data not available.")
 
-        # 2. Get Consumption Data
         consumption_profile = request.consumption_profile
         
         if not consumption_profile:
             if consumption_df is None:
-                 # Fallback if no data loaded
                  consumption_profile = [0.5] * len(df_weather)
             else:
-                # Look up consumption based on month, day
-                # Filter for the specific day
                 day_cons = consumption_df[
                     (consumption_df['Datetime'].dt.month == historical_date.month) &
                     (consumption_df['Datetime'].dt.day == historical_date.day)
                 ].sort_values('hour')
                 
                 if not day_cons.empty:
-                    # Ensure we have 24 hours or match weather length
                     consumption_profile = day_cons['consumption_kwh'].tolist()
-                    # Pad or truncate if necessary
                     if len(consumption_profile) < 24:
                         consumption_profile += [0.5] * (24 - len(consumption_profile))
                     consumption_profile = consumption_profile[:24]
                 else:
-                    # Fallback average
                     consumption_profile = [0.5] * 24
 
         result = simulator.simulate_scenario(
@@ -293,36 +322,96 @@ def analyze_maintenance(request: MaintenanceRequest):
         analyzer = MaintenanceAnalyzer()
         analysis = analyzer.analyze(pr_df)
         
-        # Include PR history in response
         pr_history = pr_df[['date', 'pr']].dropna().to_dict(orient='records')
         
         return {
             "analysis": analysis,
             "pr_history": pr_history
         }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/chat", response_model=ChatResponse)
+async def chat(request: ChatRequest):
+    """
+    Main chat endpoint for the solar AI assistant.
+    """
+    try:
+        # Validate message length
+        if len(request.message) > 2000:
+            return ChatResponse(
+                response="",
+                error=MESSAGES["length"]
+            )
+        
+        # Check rate limiting
+        if rate_limited(request.user_id):
+            return ChatResponse(
+                response="",
+                error=MESSAGES["rate_limited"]
+            )
+        
+        # Enhance prompt with energy data context if provided
+        enhanced_prompt = request.message
+        if request.energy_data:
+            context = f"""
+Current Energy System Status:
+- Solar Production: {request.energy_data.get('solar', 0)} kW
+- Grid Import: {request.energy_data.get('grid_import', 0)} kW
+- Home Consumption: {request.energy_data.get('home_consumption', 0)} kW
+- Grid Export: {request.energy_data.get('grid_export', 0)} kW
+
+User Question: {request.message}
+"""
+            enhanced_prompt = context
+        
+        # Get AI response
+        logger.info(f"Processing request from user: {request.user_id}")
+        agent = getattr(app.state, 'agent', None)
+        if not agent:
+            logger.error("Agent not initialized")
+            return ChatResponse(response="", error="Agent not initialized (Check API Key)")
+
+        response_text = await app.state.agent.get_response(
+            prompt=enhanced_prompt,
+            member_username=request.user_id
+        )
+        
+        return ChatResponse(
+            response=response_text,
+            error=None
+        )
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error processing chat request: {str(e)}")
+        return ChatResponse(
+            response="",
+            error="Sorry, I encountered an error processing your request. Please try again."
+        )
 
-@app.post("/retrain")
-async def retrain_endpoint():
-    """
-    Trigger model retraining (background task in real scenario)
-    """
-    # In a real app, use BackgroundTasks
-    from backend.core.phase_1.retrain_models import main as retrain_main
-    try:
-        retrain_main()
-        # Reload models
-        await load_models()
-        return {"message": "Retraining completed and models reloaded."}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@app.get("/api/health", response_model=HealthResponse)
+async def health_check():
+    """Detailed health check endpoint"""
+    model_msg = None
+    model_list = getattr(app.state, 'model_names', None)
+    if model_list:
+        model_msg = f"Agent initialized with model: {model_list[0]}"
+    else:
+        model_msg = "Agent not yet initialized"
+
+    return {
+        "status": "healthy",
+        "message": model_msg
+    }
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # Debug: Print all registered routes
+    print("Registered Routes:")
+    for route in app.routes:
+        if hasattr(route, 'methods'):
+            print(f"  {route.path} {route.methods}")
+        else:
+            print(f"  {route.path}")
+            
+    uvicorn.run(app, host="0.0.0.0", port=8001)

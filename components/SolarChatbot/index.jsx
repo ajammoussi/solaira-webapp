@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
+import styles from './chatbot.module.css';
 
 // API call function (you can also import from lib/chatbot-api.js)
 async function sendChatMessage(message, userId, energyData = null) {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
   
   try {
     const response = await fetch(`${API_BASE_URL}/api/chat`, {
