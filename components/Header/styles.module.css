@@ -241,3 +241,32 @@
     padding: 15px 20px;
   }
 }
+
+/* Add active state for navigation links */
+.navLink.active {
+  color: #00d084;
+  font-weight: 500;
+}
+
+/* Optional: Add underline indicator */
+.navLink.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #00d084;
+}
+
+/* Update existing .navLink to have position relative */
+.navLink {
+  color: #3d3d3d;
+  font-size: 18px;
+  font-weight: 300;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative; /* ADD THIS */
+}
