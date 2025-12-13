@@ -1,3 +1,120 @@
+-- MySQL Schema for Solaira Energy Management Backend
+-- Clean, focused schema for predictions, decisions, and operations
+
+-- ============================================================
+-- CORE TABLES
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS consumption_historic (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  timestamp DATETIME NOT NULL,
+  consumption_kwh DECIMAL(10, 4) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_consumption_timestamp (timestamp)
+);
+
+CREATE TABLE IF NOT EXISTS weather_historic (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  timestamp DATETIME NOT NULL,
+  temperature_c DECIMAL(5, 2),
+  irradiance_w_m2 DECIMAL(8, 2),
+  wind_speed_m_s DECIMAL(5, 2),
+  cloud_cover_percent INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_weather_timestamp (timestamp)
+);
+
+CREATE TABLE IF NOT EXISTS weather_forecast (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  forecast_date DATE NOT NULL,
+  temperature_c DECIMAL(5, 2),
+  irradiance_w_m2 DECIMAL(8, 2),
+  wind_speed_m_s DECIMAL(5, 2),
+  cloud_cover_percent INT,
+  fetched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY unique_forecast (forecast_date)
+);
+
+CREATE TABLE IF NOT EXISTS generation_actual (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  date DATE NOT NULL,
+  source_type ENUM('pv', 'wind_tree') NOT NULL,
+  panel_id INT,
+  total_kwh DECIMAL(10, 4) NOT NULL,
+  recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY unique_generation (date, source_type, panel_id),
+  INDEX idx_generation_date (date, source_type)
+);
+
+CREATE TABLE IF NOT EXISTS predictions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  prediction_date DATE NOT NULL,
+  source_type ENUM('pv', 'wind_tree', 'consumption') NOT NULL,
+  panel_or_source_id INT,
+  predicted_value_kwh DECIMAL(10, 4) NOT NULL,
+  error_margin_kwh DECIMAL(8, 4) DEFAULT 0,
+  model_version VARCHAR(50),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_predictions_date (prediction_date, source_type)
+);
+
+CREATE TABLE IF NOT EXISTS decisions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  decision_date DATE NOT NULL,
+  pv_activate BOOLEAN DEFAULT FALSE,
+  wind_activate BOOLEAN DEFAULT FALSE,
+  total_generation_kwh DECIMAL(10, 4),
+  total_consumption_kwh DECIMAL(10, 4),
+  battery_bilan_kwh DECIMAL(10, 4),
+  appliance_schedule JSON,
+  microgrid_action VARCHAR(50),
+  microgrid_power_kw DECIMAL(10, 4),
+  alerts JSON,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY unique_decision (decision_date)
+);
+
+CREATE TABLE IF NOT EXISTS anomalies (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  detection_date DATE NOT NULL,
+  panel_id INT NOT NULL,
+  anomaly_type ENUM('underperformance', 'degradation', 'fault') NOT NULL,
+  confidence_score DECIMAL(5, 4),
+  description TEXT,
+  notified BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_anomalies_date (detection_date, panel_id)
+);
+
+-- ============================================================
+-- OPERATIONS TABLES
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS user_appliances (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  power_kwh DECIMAL(10, 4) NOT NULL,
+  is_schedulable BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS weekly_actions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  power_kwh DECIMAL(10, 4) NOT NULL,
+  preferred_time TIME DEFAULT '10:00:00',
+  week_start DATE,
+  week_end DATE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS vacation_dates (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_vacation_dates (start_date, end_date)
+);
 -- ============================================================
 -- SOLAIRA ENERGY MANAGEMENT SYSTEM - SUPABASE SCHEMA
 -- ============================================================

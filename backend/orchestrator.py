@@ -17,7 +17,10 @@ from backend.utils.database import (
     store_predictions,
     store_decisions,
     store_anomalies,
-    fetch_actual_generation
+    fetch_actual_generation,
+    fetch_user_appliances,
+    fetch_weekly_actions,
+    is_tomorrow_vacation
 )
 from backend.utils.weather_api import fetch_weather_forecast, store_weather_forecast
 from backend.utils.decision_engine import compute_decisions
@@ -83,9 +86,13 @@ def run_daily_pipeline():
         wind_predictions = predict_wind(historic_data, forecast)
         logger.info(f"    Wind: {wind_predictions['value']:.2f} kWh")
         
-        # Consumption prediction
+        # Consumption prediction (apply vacation coefficient if needed)
         logger.info("  Running Consumption model...")
+        vacation_flag = is_tomorrow_vacation()
         consumption_prediction = predict_consumption(historic_data, forecast)
+        if vacation_flag:
+            consumption_prediction['value'] = round(consumption_prediction['value'] * 0.6, 2)
+            logger.info("    Vacation mode: applied 0.6 coefficient")
         logger.info(f"    Consumption: {consumption_prediction['value']:.2f} kWh")
         
         predictions = {
@@ -100,12 +107,28 @@ def run_daily_pipeline():
         
         # === STEP 5: COMPUTE DECISIONS (PHASE 2) ===
         logger.info("Step 5: Computing Phase 2 decisions...")
-        decisions = compute_decisions(predictions)
+        # Fetch user appliances & weekly planned actions (mocked for prototype)
+        # Load appliances and weekly actions from DB
+        user_appliances = fetch_user_appliances()
+        weekly_actions = fetch_weekly_actions(today)
+
+        # Current battery SOC (prototype: assume 50%)
+        current_battery_soc = 50.0
+
+        decisions = compute_decisions(
+            predictions,
+            user_appliances=user_appliances,
+            current_battery_soc=current_battery_soc,
+            weekly_actions=weekly_actions
+        )
         logger.info(f"  PV activate: {decisions['sources']['pv']['activate']}")
         logger.info(f"  Wind activate: {decisions['sources']['wind_tree']['activate']}")
         logger.info(f"  Battery bilan: {decisions['battery']['bilan_kwh']:.2f} kWh")
         logger.info(f"  Microgrid action: {decisions['microgrid']['action']}")
         logger.info(f"  Appliances: {len(decisions['appliances'])} actions scheduled")
+        if decisions.get('alerts'):
+            for alert in decisions['alerts']:
+                logger.warning(f"  ALERT: {alert}")
         
         # === STEP 6: STORE DECISIONS ===
         logger.info("Step 6: Storing decisions in database...")
