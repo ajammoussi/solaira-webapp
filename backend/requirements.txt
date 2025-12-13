@@ -30,3 +30,5 @@ git+https://github.com/openclimatefix/pv-site-prediction
 tf2onnx
 onnx
 onnxruntime
+pvlib
+lottie-react

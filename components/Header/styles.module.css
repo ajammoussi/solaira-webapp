@@ -8,12 +8,17 @@
   left: 0;
   z-index: 1000;
   background: #ffffff;
-  font-family: Outfit, sans-serif;
+  font-family: 'Outfit', sans-serif;
 }
+
 .headerButton {
-  font-size: 18px !important;
+  font-size: 16px !important;
+  white-space: nowrap;
 }
-/* Top Banner */
+
+/* ============================================================================
+   TOP BANNER
+   ============================================================================ */
 .topBanner {
   width: 100%;
   display: flex;
@@ -26,7 +31,8 @@
 .topBannerContainer {
   max-width: 1920px;
   width: 100%;
-  padding: 0 254px;
+  /* Matches Layout component padding logic */
+  padding: 0 clamp(20px, 5vw, 254px);
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -49,7 +55,7 @@
 .topBannerText {
   color: #ffffff;
   line-height: 18px;
-  font-size: 16px;
+  font-size: clamp(12px, 1.5vw, 16px);
   font-weight: 300;
 }
 
@@ -61,7 +67,9 @@
   object-fit: cover;
 }
 
-/* Main Navigation */
+/* ============================================================================
+   MAIN NAVIGATION
+   ============================================================================ */
 .mainNav {
   width: 100%;
   display: flex;
@@ -69,13 +77,15 @@
   justify-content: center;
   background-color: #ffffff;
   border-bottom: 1px solid #f0f0f0;
+  position: relative;
 }
 
 .navContainer {
   max-width: 1920px;
   width: 100%;
+  /* Using clamp to be responsive like Layout */
+  padding: 20px clamp(20px, 5vw, 254px);
   display: flex;
-  padding: 20px 254px;
   align-items: center;
   justify-content: space-between;
 }
@@ -86,6 +96,7 @@
   align-items: center;
   text-decoration: none;
   cursor: pointer;
+  z-index: 1002; /* Ensure logo stays above mobile menu */
 }
 
 .logoLink:hover {
@@ -98,19 +109,20 @@
 }
 
 .logoText {
-  font-size: 34px;
+  font-size: clamp(24px, 4vw, 34px);
   font-weight: 600;
   color: #1a1a1a;
-  line-height: 28px;
+  line-height: 1.2;
   letter-spacing: -0.3px;
 }
 
-.logoImage {
-  width: 167px;
-  height: 28px;
+/* Navigation Wrapper (Menu + Button) */
+.navWrapper {
+  display: flex;
+  align-items: center;
+  gap: 34px;
 }
 
-/* Navigation */
 .navigation {
   display: flex;
   align-items: center;
@@ -120,94 +132,112 @@
 /* Navigation Links */
 .navLink {
   color: #3d3d3d;
-  line-height: 22px;
-  font-size: 21px;
+  font-size: 18px;
   font-weight: 300;
   text-decoration: none;
   transition: color 0.3s ease;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .navLink:hover {
   color: #00d084;
 }
 
-.navLink.active {
-  color: #00d084;
-  font-weight: 500;
+/* Mobile Menu Button - Hidden by default */
+.mobileMenuBtn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #1a1a1a;
+  padding: 4px;
+  z-index: 1002;
 }
 
-/* Responsive Design */
-@media (max-width: 1920px) {
-  .topBannerContainer {
-    padding: 0 80px;
-  }
+/* ============================================================================
+   RESPONSIVE BREAKPOINTS
+   ============================================================================ */
 
-  .navContainer {
-    padding: 20px 80px;
-  }
-}
-
-@media (max-width: 1400px) {
-  .topBannerContainer {
-    padding: 0 60px;
-  }
-
-  .navContainer {
-    padding: 20px 60px;
-  }
-
-  .navigation {
-    gap: 28px;
-  }
-}
-
+/* Large Tablets / Small Desktops */
 @media (max-width: 1200px) {
-  .topBannerContainer {
-    padding: 0 40px;
+  .navWrapper, .navigation {
+    gap: 20px;
   }
-
-  .navContainer {
-    padding: 20px 40px;
-  }
-
-  .navigation {
-    gap: 24px;
+  .navLink {
+    font-size: 16px;
   }
 }
 
+/* Mobile & Tablet Portrait */
 @media (max-width: 992px) {
+  .mobileMenuBtn {
+    display: block; /* Show hamburger */
+  }
+
+  .navWrapper {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100vh;
+    background-color: #ffffff;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: right 0.3s ease-in-out;
+    z-index: 1001;
+    padding: 20px;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.05);
+  }
+
+  /* When menu is open */
+  .navWrapperOpen {
+    right: 0;
+  }
+
   .navigation {
-    gap: 20px;
+    flex-direction: column;
+    gap: 30px;
+    margin-bottom: 40px;
   }
 
   .navLink {
-    font-size: 14px;
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  .ctaContainer {
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .headerButton {
+    width: 100%;
+    justify-content: center;
   }
 }
 
-@media (max-width: 768px) {
+/* Small Mobile Phones */
+@media (max-width: 480px) {
   .topBannerContainer {
-    flex-direction: column;
-    gap: 6px;
-    padding: 8px 20px;
+    padding: 0 20px;
+    justify-content: space-between;
   }
 
-  .topBannerLeft,
-  .topBannerRight {
+  .topBannerLeft {
     padding: 0;
   }
 
-  .navContainer {
-    flex-direction: column;
-    gap: 20px;
-    padding: 16px 20px;
+  .topBannerRight {
+    padding: 0;
+  }
+  
+  .topBannerText {
+    font-size: 12px;
   }
 
-  .navigation {
-    flex-direction: column;
-    gap: 16px;
-    width: 100%;
-    align-items: center;
+  .navContainer {
+    padding: 15px 20px;
   }
 }

@@ -10,6 +10,8 @@ import Footer from '../components/Footer'
 import CookieBanner from '../components/CookieBanner'
 import SectionHeading from '../components/SectionHeading'
 import InfoSection from '../components/InfoSection'
+import Lottie from "lottie-react";
+import solairaHouseAnimation from "../public/solaira_house.json";
 
 const Frame1920wlight = (props) => {
   return (
@@ -152,9 +154,9 @@ const Frame1920wlight = (props) => {
                     </div>
                     <div className="frame1920wlight-container117">
                       <div className="frame1920wlight-component310">
-                        <img
-                          src="/pv-home.png"
-                          alt="Home battery illustration"
+                        <Lottie
+                          animationData={solairaHouseAnimation}
+                          loop={true}
                           className="frame1920wlight-hero-image"
                         />
                       </div>
@@ -343,7 +345,7 @@ const Frame1920wlight = (props) => {
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 60px 20px 40px;
+            padding: 20px 20px 40px;
             display: flex;
             flex-direction: column;
             gap: 20px;

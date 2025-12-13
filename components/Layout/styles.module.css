@@ -9,7 +9,7 @@
 }
 
 /* ============================================================================
-   HEADER - EXACT COPY FROM LANDING PAGE
+   HEADER - RESPONSIVE VERSION
    ============================================================================ */
 
 .header {
@@ -24,22 +24,24 @@
 
 .headerButton {
   font-size: 18px !important;
+  white-space: nowrap;
+  margin-right: 40px;
 }
 
-/* Top Banner - EXACT MATCH */
+/* Top Banner - RESPONSIVE */
 .topBanner {
   width: 100%;
   display: flex;
   padding: 8px 0;
   align-items: center;
   justify-content: center;
-  background-color:  #008B72 ;
+  background-color: #008B72;
 }
 
 .topBannerContainer {
   max-width: 1920px;
   width: 100%;
-  padding: 0 254px;
+  padding: 0 clamp(20px, 5vw, 254px);
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -62,7 +64,7 @@
 .topBannerText {
   color: #ffffff;
   line-height: 18px;
-  font-size: 16px;
+  font-size: clamp(12px, 1.5vw, 16px);
   font-weight: 300;
 }
 
@@ -72,9 +74,10 @@
   border-radius: 3px;
   display: block;
   object-fit: cover;
+  flex-shrink: 0;
 }
 
-/* Main Navigation - With Toggle and Search */
+/* Main Navigation - RESPONSIVE */
 .mainNav {
   width: 100%;
   display: flex;
@@ -85,7 +88,7 @@
   position: relative;
 }
 
-/* Header Vertical Divider - positioned absolutely */
+/* Header Vertical Divider - FIXED POSITION */
 .headerVerticalDivider {
   width: 1px;
   background-color: #E5E7EB;
@@ -100,13 +103,22 @@
   max-width: 1920px;
   width: 100%;
   display: flex;
-  padding: 20px 254px;
+  padding: 20px 0 20px clamp(20px, 3vw, 40px);
   align-items: center;
-  gap: 24px;
-  height: 96px; /* Fixed height to prevent expansion */
+  gap: 0;
+  min-height: 96px;
+  flex-wrap: nowrap;
 }
 
-/* Header Toggle Button */
+/* Sidebar Header Section - stays within 280px */
+.navContainer::before {
+  content: '';
+  display: flex;
+  width: 280px;
+  flex-shrink: 0;
+}
+
+/* Header Toggle Button - RESPONSIVE */
 .headerToggleButton {
   width: 40px;
   height: 40px;
@@ -120,8 +132,8 @@
   color: #6B7280;
   transition: all 0.2s ease;
   flex-shrink: 0;
-  margin-left: 40px; /* CHANGE THIS: Space after logo (increase = more space from logo) */
-  margin-right: 24px; /* CHANGE THIS: Space before divider/search (increase = more space before search) */
+  position: absolute;
+  left: 230px;
 }
 
 .headerToggleButton:hover {
@@ -129,13 +141,15 @@
   border-color: #D1D5DB;
 }
 
-/* Logo */
+/* Logo - RESPONSIVE */
 .logoLink {
   display: flex;
   align-items: center;
   text-decoration: none;
   cursor: pointer;
-  margin-left: -55px;
+  position: absolute;
+  left: 20px;
+  flex-shrink: 0;
 }
 
 .logoLink:hover {
@@ -146,32 +160,39 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-left: -24px;
 }
 
 .logoImage {
-  height: 80px;
+  height: 60px;
   width: auto;
   display: block;
+  flex-shrink: 0;
+  min-height: 40px;
 }
 
 .logoText {
   font-size: 34px;
   font-weight: 600;
   color: #00a952;
-  line-height: 28px;
+  line-height: 1.2;
   letter-spacing: -0.3px;
-  margin-left: -29px;
-  margin-right: -10px;
+  white-space: nowrap;
+  min-font-size: 24px;
 }
 
-/* Header Search Bar */
+/* Header Search Bar - RESPONSIVE - starts after 280px line */
+/* RETAINED ORIGINAL MARGINS FOR PROPER ALIGNMENT */
+/* Header Search Bar - FIXED */
 .headerSearchContainer {
   display: flex;
   align-items: center;
-  flex: 1;
-  max-width: 500px;
+  /* Removed fixed margin-left: 300px causing zoom issues */
+  width: 100%; 
+  max-width: 400px; /* Gives it a nice consistent size */
+  min-width: 200px; /* Prevents it from getting too small */
   position: relative;
+  /* Ensure it doesn't shrink aggressively */
+  flex-shrink: 0; 
 }
 
 .headerSearchIcon {
@@ -179,6 +200,7 @@
   left: 14px;
   color: #9CA3AF;
   pointer-events: none;
+  flex-shrink: 0;
 }
 
 .headerSearchInput {
@@ -211,11 +233,11 @@
 .mainLayout {
   display: flex;
   flex: 1;
-  margin-top: 122px; /* Header height */
+  margin-top: 122px;
 }
 
 /* ============================================================================
-   VERTICAL SIDEBAR - MODERNIZED WITH NEXUS STYLE
+   VERTICAL SIDEBAR - RESPONSIVE
    ============================================================================ */
 
 .sidebar {
@@ -224,12 +246,11 @@
   display: flex;
   flex-direction: column;
   transition: width 0.3s ease;
-  /* overflow: hidden; Removed to allow popup menu to show */
   flex-shrink: 0;
   position: sticky;
   top: 122px;
   height: calc(100vh - 122px);
-  z-index: 50; /* Ensure it's above content */
+  z-index: 50;
 }
 
 .sidebarNoTransition {
@@ -238,6 +259,11 @@
 
 .sidebarCollapsed {
   width: 70px;
+}
+
+/* Sidebar visible state for mobile */
+.sidebarVisible {
+  left: 0 !important;
 }
 
 /* Horizontal Divider */
@@ -335,94 +361,129 @@
 .content {
   flex: 1;
   background-color: #F9FAFB;
-  padding: 32px;
-  min-height: calc(100vh - 122px); /* Ensure scrollbar on all pages */
+  padding: clamp(16px, 3vw, 32px);
+  min-height: calc(100vh - 122px);
+}
+
+/* Mobile overlay */
+.mobileOverlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 89;
+}
+
+.mobileOverlay.visible {
+  display: block;
 }
 
 /* ============================================================================
-   RESPONSIVE - MOBILE (MATCH LANDING PAGE)
+   RESPONSIVE BREAKPOINTS (FIXED)
    ============================================================================ */
 
-@media (max-width: 1920px) {
-  .topBannerContainer {
-    padding: 0 80px;
-  }
-
-  .navContainer {
-    padding: 20px 80px;
-  }
-}
-
-@media (max-width: 1400px) {
-  .topBannerContainer {
-    padding: 0 60px;
-  }
-
-  .navContainer {
-    padding: 20px 60px;
-  }
-}
-
-@media (max-width: 1200px) {
-  .topBannerContainer {
-    padding: 0 40px;
-  }
-
-  .navContainer {
-    padding: 20px 40px;
-  }
-}
-
 @media (max-width: 768px) {
-  .topBannerContainer {
-    flex-direction: column;
-    gap: 6px;
-    padding: 8px 20px;
+  /* Keep top banner visible on mobile */
+  .topBanner {
+    display: flex;
   }
-
-  .topBannerLeft,
-  .topBannerRight {
-    padding: 0;
-  }
-
+  
+  /* Mobile header - Fixes 250% zoom issue */
   .navContainer {
-    flex-direction: column;
-    gap: 20px;
     padding: 16px 20px;
+    gap: 16px;
+    min-height: 64px;
+    /* Changed from flex-start to space-between to force Logo Left / Menu Right */
+    justify-content: space-between; 
+    position: relative;
+    /* Remove the pseudo-element width that pushes things on mobile */
   }
 
+  /* Remove the sidebar spacer on mobile */
+  .navContainer::before {
+    display: none; 
+  }
+  
+  /* Fix Logo Positioning */
+  .logoLink {
+    position: relative !important;
+    left: auto !important;
+    margin-right: auto; /* Ensures it pushes to the left */
+    margin-left: 0 !important;
+    order: 0; /* Ensures it appears first */
+  }
+  
+  .logo {
+    margin-left: 0 !important;
+  }
+  
+  .logoImage {
+    height: clamp(45px, 10vw, 60px);
+  }
+  
+  .logoText {
+    font-size: clamp(26px, 6vw, 34px);
+  }
+  
+  /* Fix Toggle Button Positioning */
+  .headerToggleButton {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    margin: 0;
+    order: 2; /* Ensures it appears after logo */
+  }
+  
+  /* Hide search and logout button on mobile */
   .headerSearchContainer {
-    max-width: 100%;
+    display: none;
+    margin-left: 0;
   }
-
-  .sidebar {
-    position: absolute;
-    left: -280px;
-    top: 0;
-    bottom: 0;
-    z-index: 90;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .sidebarCollapsed {
-    left: -80px;
-  }
-
-  .content {
-    padding: 16px;
-  }
-
-  .verticalDivider {
+  
+  .headerButton {
     display: none;
   }
 
   .headerVerticalDivider {
     display: none;
   }
+
+  /* Mobile sidebar - slide in from left */
+  .sidebar {
+    position: fixed;
+    left: -280px;
+    top: 90px;
+    bottom: 0;
+    z-index: 90;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    transition: left 0.3s ease;
+    width: 280px !important;
+  }
+  
+  /* Don't apply collapsed state on mobile */
+  .sidebar.sidebarCollapsed {
+    left: -280px;
+    width: 280px !important;
+  }
+
+  .verticalDivider {
+    display: none;
+  }
+  
+  .mainLayout {
+    margin-top: 90px;
+  }
 }
 
-@media (max-width: 479px) {
-  .content {
-    padding: 12px;
+@media (max-width: 480px) {
+  .logoImage {
+    height: clamp(40px, 10vw, 50px);
+  }
+  
+  .logoText {
+    font-size: clamp(22px, 6vw, 28px);
   }
 }
