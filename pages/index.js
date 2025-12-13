@@ -19,7 +19,7 @@ const Frame1920wlight = (props) => {
     
       <div className="frame1920wlight-container100">
         <Head>
-          <title>exported project</title>
+          <title>Solaira</title>
           <meta property="og:title" content="exported project" />
           <link
             rel="canonical"
@@ -65,21 +65,21 @@ const Frame1920wlight = (props) => {
                         <div className="frame1920wlight-heading1">
                           <span className="frame1920wlight-text122 www.solaira.tnSemanticHeading1">
                             <span className="frame1920wlight-text123">
-                              test challenge tsyp pes
+                              🌞Solaira,
                             </span>
                             <br></br>
                             <span className="frame1920wlight-text125">
-                              its going good
+                              Where Energy Becomes Intelligent.
                             </span>
                             <br></br>
-                            <span>i think.</span>
+                            
                           </span>
                         </div>
                       </div>
                       <div className="frame1920wlight-margin14">
                         <span className="frame1920wlight-text128 www.solaira.tnOutfitLight8">
                           <span className="frame1920wlight-text129">
-                            On average, households save
+                            With Solaira,
                             <span
                               dangerouslySetInnerHTML={{
                                 __html: ' ',
@@ -87,15 +87,15 @@ const Frame1920wlight = (props) => {
                             />
                           </span>
                           <span className="frame1920wlight-text130">
-                            1200 TND per month
+                            households save up to
                           </span>
                           <span className="frame1920wlight-text131">
                             {' '}
-                            by using
+                            1200 TND every 
                           </span>
                           <br></br>
                           <span className="frame1920wlight-text133">
-                            our solution
+                            month while moving
                             <span
                               dangerouslySetInnerHTML={{
                                 __html: ' ',
@@ -103,11 +103,11 @@ const Frame1920wlight = (props) => {
                             />
                           </span>
                           <span className="frame1920wlight-text134">
-                            for solar energy management
+                            toward cleaner,
                           </span>
-                          <span> and renewable power.</span>
+                          <span> smarter energy.</span>
                           <br></br>
-                          <span>Take control of your energy today.</span>
+                          <span>Take control of your energy. Power your future.</span>
                         </span>
                       </div>
                       <div className="frame1920wlight-margin15">
@@ -121,7 +121,7 @@ const Frame1920wlight = (props) => {
 
     <div className="frame1920wlight-container111">
       <span className="frame1920wlight-text139 www.solaira.tnOutfitLight2">
-        of
+        or
       </span>
     </div>
     <div className="frame1920wlight-container112">
@@ -223,31 +223,31 @@ const Frame1920wlight = (props) => {
                     </div>
                     <FeaturesSection>
   <FeatureCard
-    icon="💰"
+    icon="⚡"
     iconColor="#000000ff"
-    title="Card1"
-    description="This is the description for card 1"
+    title="Real-Time Power Flow"
+    description="See exactly what's happening right now. Watch live as your solar panels generate clean energy, power your home, and feed excess back to the grid—all in one intuitive view."
     image="https://plus.unsplash.com/premium_photo-1661559100329-409c3ef751b5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   />
   <FeatureCard
-    icon="🌱"
+    icon="📊"
     iconColor="#e8d4f4"
-    title="Card2"
-    description="This is the description for card 2"
+    title="Today's Performance at a Glance"
+    description="A complete summary of your day's energy story. Instantly understand your total solar production, home consumption, and net savings to see how well your system performed."
     image="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&h=400&fit=crop"
   />
   <FeatureCard
-    icon="⚡"
+    icon="🔆"
     iconColor="#fef3c7"
-    title="Card3"
-    description="This is the description for card 3"
+    title="Your System's Watchdog"
+    description="Sleep soundly knowing AI is monitoring your solar setup 24/7. Get instant alerts for any irregularities, inefficiencies, or drops in performance before they become bigger issues."
     image="https://plus.unsplash.com/premium_photo-1682148219003-cf6ffbb22175?q=80&w=2034&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   />
   <FeatureCard
     icon="✓"
     iconColor="#dbeafe"
-    title="Card4"
-    description="This is the description for card 4"
+    title="Smart Savings, Powered by AI"
+    description="Receive personalized, actionable advice to maximize your solar investment. Our AI analyzes your unique data to suggest the best times to use appliances, charge batteries, and save more money."
     image="https://images.unsplash.com/photo-1585347110442-1d1599db0db6?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   />
 </FeaturesSection>
@@ -285,8 +285,7 @@ const Frame1920wlight = (props) => {
                     supportLinks={['Contact', 'Privacy Policy', 'Terms of Service']}
                     connectLinks={['LinkedIn', 'Instagram', 'Facebook']}
                     copyrightText="2025 Solaira. All right reserved."
-                    designedByText="Designedby "
-                    designerName="Yassine"
+                    
                   />
                   
                         </div>
