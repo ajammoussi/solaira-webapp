@@ -21,11 +21,8 @@ except Exception:
 class Config:
     """Central configuration for orchestrator."""
     
-    # Database (MySQL)
-    MYSQL_HOST = os.getenv('MYSQL_HOST', 'localhost')
-    MYSQL_USER = os.getenv('MYSQL_USER', 'solaira')
-    MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD', '')
-    MYSQL_DATABASE = os.getenv('MYSQL_DATABASE', 'solaira_energy')
+    # Database (SQLite)
+    DB_PATH = os.getenv('DB_PATH', str(Path(__file__).parent.parent / 'database' / 'energy.db'))
     
     # Weather API
     WEATHER_API_KEY = os.getenv('WEATHER_API_KEY', '')
@@ -67,12 +64,16 @@ class Config:
     @staticmethod
     def validate():
         """Validate configuration."""
-        # Wind models are required for wind inference
+        missing = []
         if not Config.WIND_LSTM_MODEL_PATH.exists():
-            raise FileNotFoundError(f"Wind LSTM model not found: {Config.WIND_LSTM_MODEL_PATH}")
+            missing.append(f"Wind LSTM model not found: {Config.WIND_LSTM_MODEL_PATH}")
         if not Config.WIND_XGBOOST_MODEL_PATH.exists():
-            raise FileNotFoundError(f"Wind XGBoost model not found: {Config.WIND_XGBOOST_MODEL_PATH}")
-        print("[Config] Validation passed (wind models present).")
+            missing.append(f"Wind XGBoost model not found: {Config.WIND_XGBOOST_MODEL_PATH}")
+
+        if missing:
+            print("[Config] WARNING: " + " | ".join(missing) + " — falling back to simplified predictions.")
+        else:
+            print("[Config] Validation passed (wind models present).")
 
 # Create log directory if not exists
 Config.LOG_DIR.mkdir(exist_ok=True)

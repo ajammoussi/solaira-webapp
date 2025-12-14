@@ -4,7 +4,7 @@
 -- ============================================================
 -- CORE TABLES
 -- ============================================================
-
+USE solaira_energy;
 CREATE TABLE IF NOT EXISTS consumption_historic (
   id INT AUTO_INCREMENT PRIMARY KEY,
   timestamp DATETIME NOT NULL,
@@ -120,34 +120,6 @@ CREATE TABLE IF NOT EXISTS vacation_dates (
 -- ============================================================
 -- Run this in your Supabase SQL Editor
 -- ============================================================
-
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- ============================================================
--- ENUMS
--- ============================================================
-
-CREATE TYPE alert_type AS ENUM (
-  'BATTERY_FULL',
-  'BATTERY_LOW', 
-  'EXCESS_PRODUCTION',
-  'HIGH_CONSUMPTION',
-  'LOW_CONSUMPTION',
-  'FORECAST_DEPLETION'
-);
-
-CREATE TYPE alert_severity AS ENUM (
-  'info',
-  'warning',
-  'critical'
-);
-
-CREATE TYPE tilt_strategy AS ENUM (
-  'fixed',
-  'monthly_optimized',
-  'tracking'
-);
 
 -- ============================================================
 -- PROFILES (extends Supabase Auth)

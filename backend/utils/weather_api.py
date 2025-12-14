@@ -77,13 +77,13 @@ def store_weather_forecast(forecast, forecast_date):
     cursor.execute("""
         INSERT INTO weather_forecast 
         (forecast_date, temperature_c, irradiance_w_m2, wind_speed_m_s, cloud_cover_percent)
-        VALUES (%s, %s, %s, %s, %s)
-        ON DUPLICATE KEY UPDATE
-            temperature_c = VALUES(temperature_c),
-            irradiance_w_m2 = VALUES(irradiance_w_m2),
-            wind_speed_m_s = VALUES(wind_speed_m_s),
-            cloud_cover_percent = VALUES(cloud_cover_percent),
-            fetched_at = CURRENT_TIMESTAMP
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(forecast_date) DO UPDATE SET
+            temperature_c=excluded.temperature_c,
+            irradiance_w_m2=excluded.irradiance_w_m2,
+            wind_speed_m_s=excluded.wind_speed_m_s,
+            cloud_cover_percent=excluded.cloud_cover_percent,
+            fetched_at=CURRENT_TIMESTAMP
     """, (
         forecast_date,
         forecast['temperature_c'],

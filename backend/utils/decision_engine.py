@@ -85,8 +85,8 @@ def compute_decisions(predictions, user_appliances=None, current_battery_soc=50.
         microgrid_action = 'import'
         microgrid_power_kw = round(deficit_energy, 2)
         battery_action = 'import_deficit'
-        alerts.append(f"⚠️ ALERT: Battery below 20% ({soc_estimate:.1f}%), importing {deficit_energy:.2f} kWh from microgrid")
-        alerts.append("⚠️ Reduce non-essential loads to preserve battery")
+        alerts.append(f"ALERT: Battery below 20% ({soc_estimate:.1f}%), importing {deficit_energy:.2f} kWh from microgrid")
+        alerts.append("ALERT: Reduce non-essential loads to preserve battery")
     
     # Normal operation (20% < SOC < 80%)
     elif battery_bilan_kwh > 0:
