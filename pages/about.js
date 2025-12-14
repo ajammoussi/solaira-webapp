@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useTranslations } from 'next-intl';
@@ -44,12 +45,12 @@ const AboutPage = () => {
     }
   ];
 
-  const timeline = [
-    { year: '2019', event: 'Founded in Tunisia', description: 'Started with a vision to revolutionize home energy' },
-    { year: '2020', event: 'First 50 Installations', description: 'Proved our technology works in real homes' },
-    { year: '2022', event: 'AI Integration', description: 'Launched smart energy management system' },
-    { year: '2023', event: '400+ Customers', description: 'Became Tunisia\'s leading home battery provider' },
-    { year: '2025', event: 'Future Ready', description: 'Expanding across North Africa' }
+  const vision = [
+    { year: '2026', goal: 'Regional Expansion', description: 'Establish operations in 3 additional North African countries' },
+    { year: '2027', goal: 'Smart Grid Integration', description: 'Launch vehicle-to-grid technology for electric vehicles' },
+    { year: '2028', goal: '10,000 Homes Powered', description: 'Reach 10,000+ households with clean energy solutions' },
+    { year: '2029', goal: 'Carbon Neutral Operations', description: 'Achieve 100% carbon-neutral manufacturing and operations' },
+    { year: '2030', goal: 'Energy Independence', description: 'Help 50,000 families achieve complete energy independence' }
   ];
 
   return (
@@ -130,23 +131,22 @@ const AboutPage = () => {
           </div>
         </section>
 
-        {/* Timeline */}
-        <section className="timeline-section">
+        {/* Vision */}
+        <section className="vision-section">
           <h2 className="section-title">
-            Our <span className="highlight">Journey</span>
+            Our <span className="highlight">Vision</span>
           </h2>
           <p className="section-subtitle">
-            From a bold vision to Tunisia's leading energy solution
+            The next 5 years: Building a sustainable energy future for North Africa
           </p>
 
-          <div className="timeline">
-            {timeline.map((item, idx) => (
-              <div key={idx} className="timeline-item">
-                <div className="timeline-year">{item.year}</div>
-                <div className="timeline-content">
-                  <h3 className="timeline-event">{item.event}</h3>
-                  <p className="timeline-description">{item.description}</p>
-                </div>
+          <div className="vision-grid">
+            {vision.map((item, idx) => (
+              <div key={idx} className="vision-card">
+                <div className="vision-year">{item.year}</div>
+                <div className="vision-icon">🎯</div>
+                <h3 className="vision-goal">{item.goal}</h3>
+                <p className="vision-description">{item.description}</p>
               </div>
             ))}
           </div>
@@ -160,9 +160,11 @@ const AboutPage = () => {
           <p className="cta-text">
             Discover how Solaira can transform your home's energy independence
           </p>
-          <button className="cta-button">
-            Get Started Today →
-          </button>
+          <Link href="/signin">
+            <button className="cta-button">
+              Get Started Today →
+            </button>
+          </Link>
         </section>
 
         <Footer
@@ -352,75 +354,91 @@ const AboutPage = () => {
           line-height: 1.6;
         }
 
-        .timeline-section {
+        .vision-section {
           padding: 80px 20px;
-          max-width: 1200px;
+          max-width: 1400px;
           margin: 0 auto;
+          background: linear-gradient(to bottom, #f9fafb, #ffffff);
         }
 
-        .timeline {
+        .vision-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 32px;
+          margin-top: 60px;
+          max-width: 1200px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .vision-card {
+          background: white;
+          border-radius: 20px;
+          padding: 40px 32px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          border: 2px solid transparent;
           position: relative;
-          padding: 40px 0;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
         }
 
-        .timeline::before {
+        .vision-card::before {
           content: '';
           position: absolute;
-          left: 50%;
           top: 0;
-          bottom: 0;
-          width: 2px;
-          background: linear-gradient(to bottom, #d1fae5, #00ad62);
-          transform: translateX(-50%);
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: linear-gradient(to right, #00ad62, #01a659);
+          transform: scaleX(0);
+          transform-origin: left;
+          transition: transform 0.4s ease;
         }
 
-        .timeline-item {
-          display: flex;
-          align-items: center;
-          margin-bottom: 60px;
-          position: relative;
+        .vision-card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 20px 40px rgba(0, 173, 98, 0.15);
+          border-color: #00ad62;
         }
 
-        .timeline-item:nth-child(odd) {
-          flex-direction: row;
+        .vision-card:hover::before {
+          transform: scaleX(1);
         }
 
-        .timeline-item:nth-child(even) {
-          flex-direction: row-reverse;
-        }
-
-        .timeline-year {
-          flex: 1;
-          text-align: center;
-          font-size: 20px;
+        .vision-year {
+          display: inline-block;
+          background: linear-gradient(135deg, #00ad62, #01a659);
+          color: white;
+          padding: 8px 20px;
+          border-radius: 50px;
+          font-size: 16px;
           font-weight: bold;
-          color: #00ad62;
+          margin-bottom: 20px;
+          box-shadow: 0 4px 12px rgba(0, 173, 98, 0.3);
         }
 
-        .timeline-content {
-          flex: 1;
-          background: white;
-          border-radius: 16px;
-          padding: 24px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          transition: all 0.3s ease;
+        .vision-icon {
+          font-size: 56px;
+          margin: 20px 0;
+          display: block;
+          filter: grayscale(0);
         }
 
-        .timeline-content:hover {
-          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-          transform: translateY(-4px);
-        }
-
-        .timeline-event {
-          font-size: 20px;
-          font-weight: 600;
-          margin-bottom: 8px;
+        .vision-goal {
+          font-size: 24px;
+          font-weight: 700;
+          margin-bottom: 16px;
           color: #141414;
+          line-height: 1.3;
         }
 
-        .timeline-description {
+        .vision-description {
           color: #6b7280;
-          line-height: 1.6;
+          line-height: 1.7;
+          font-size: 16px;
         }
 
         .cta-section {
@@ -485,25 +503,31 @@ const AboutPage = () => {
             font-size: 16px;
           }
 
-          .timeline::before {
-            left: 20px;
+          .vision-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
           }
 
-          .timeline-item {
-            flex-direction: column !important;
-            align-items: flex-start;
-            padding-left: 50px;
+          .vision-card {
+            padding: 32px 24px;
           }
 
-          .timeline-year {
-            position: absolute;
-            left: 0;
-            width: 40px;
-            text-align: left;
+          .vision-year {
+            font-size: 14px;
+            padding: 6px 16px;
           }
 
-          .timeline-content {
-            width: 100%;
+          .vision-icon {
+            font-size: 48px;
+            margin: 16px 0;
+          }
+
+          .vision-goal {
+            font-size: 20px;
+          }
+
+          .vision-description {
+            font-size: 15px;
           }
         }
       `}</style>
