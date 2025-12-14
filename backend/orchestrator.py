@@ -18,6 +18,7 @@ from backend.utils.database import (
     store_decisions,
     store_anomalies,
     fetch_actual_generation,
+    fetch_predictions_by_date,
     fetch_user_appliances,
     fetch_weekly_actions,
     is_tomorrow_vacation
@@ -155,7 +156,10 @@ def run_daily_pipeline():
         historic_generation = fetch_actual_generation(seven_days_ago, today)
         
         if historic_generation:
-            anomalies = detect_anomalies(historic_generation, num_panels=3)
+            # Target date is the most recent day with actuals; fetch matching predictions
+            target_date = max(str(r.get('date')) for r in historic_generation)
+            pv_predictions = fetch_predictions_by_date(target_date, source_type='pv')
+            anomalies = detect_anomalies(historic_generation, predictions=pv_predictions, num_panels=3)
             if anomalies:
                 logger.warning(f"  Found {len(anomalies)} anomalies!")
                 for anomaly in anomalies:

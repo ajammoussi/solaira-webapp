@@ -280,3 +280,14 @@ def fetch_actual_generation(from_date, to_date):
         ORDER BY date, source_type, panel_id
     """
     return execute_query(query, [from_date, to_date])
+
+
+def fetch_predictions_by_date(prediction_date, source_type='pv'):
+    """Fetch stored predictions for a given date and source type (panel-aware)."""
+    query = """
+        SELECT prediction_date, source_type, panel_or_source_id, predicted_value_kwh, error_margin_kwh
+        FROM predictions
+        WHERE prediction_date = ? AND source_type = ?
+        ORDER BY panel_or_source_id
+    """
+    return execute_query(query, [prediction_date, source_type])
