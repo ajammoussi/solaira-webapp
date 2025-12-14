@@ -22,7 +22,11 @@ from backend.utils.database import (
     fetch_weekly_actions,
     is_tomorrow_vacation
 )
-from backend.utils.weather_api import fetch_weather_forecast, store_weather_forecast
+from backend.utils.weather_api_v2 import (
+    fetch_weather_forecast,
+    store_weather_forecast,
+    initialize_weather_provider
+)
 from backend.utils.decision_engine import compute_decisions
 from backend.inference.pv_model import predict_pv
 from backend.inference.wind_model import predict_wind
@@ -58,9 +62,19 @@ def run_daily_pipeline():
         # Validate configuration
         config.validate()
         
+        # Initialize weather provider
+        initialize_weather_provider(
+            api_key=config.WEATHER_API_KEY,
+            provider_type=config.WEATHER_API_PROVIDER
+        )
+        
         # === STEP 1: FETCH WEATHER FORECAST ===
         logger.info("Step 1: Fetching weather forecast...")
-        forecast = fetch_weather_forecast(forecast_date)
+        forecast = fetch_weather_forecast(
+            forecast_date=forecast_date,
+            latitude=config.LATITUDE,
+            longitude=config.LONGITUDE
+        )
         store_weather_forecast(forecast, forecast_date)
         logger.info(f"  Forecast: Temp={forecast['temperature_c']}°C, Irradiance={forecast['irradiance_w_m2']}W/m², Wind={forecast['wind_speed_m_s']}m/s")
         

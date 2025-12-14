@@ -63,7 +63,7 @@ def compute_decisions(predictions, user_appliances=None, current_battery_soc=50.
     soc_estimate = current_battery_soc + soc_change
     soc_estimate = max(0, min(100, soc_estimate))
     
-    print(f"[Decision Engine] Active generation: {active_generation:.2f} kWh, Bilan: {battery_bilan_kwh:.2f} kWh, SOC: {current_battery_soc:.1f}% → {soc_estimate:.1f}%")
+    print(f"[Decision Engine] Active generation: {active_generation:.2f} kWh, Bilan: {battery_bilan_kwh:.2f} kWh, SOC: {current_battery_soc:.1f}% -> {soc_estimate:.1f}%")
     
     # === BATTERY & MICROGRID MANAGEMENT ===
     microgrid_action = 'none'

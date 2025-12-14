@@ -1,13 +1,18 @@
 """
 Wind-tree generation prediction model.
 Hybrid ensemble: LSTM + XGBoost for wind energy forecasting.
-Loads trained models from final_delivery and runs ensemble inference.
+Loads trained models from backend/models/wind/ (copied from final_delivery).
 """
 
 import os
 import json
 import joblib
 import numpy as np
+import pandas as pd
+import xgboost as xgb
+import onnxruntime as ort
+from pathlib import Path
+import logging
 import pandas as pd
 import xgboost as xgb
 import onnxruntime as ort
@@ -35,8 +40,8 @@ class WindEnergyPredictor:
     
     def load_models(self):
         """Load scaler, XGBoost, and LSTM models."""
-        # Get model paths from config (point to final_delivery/models)
-        model_dir = config.MODEL_DIR / 'wind'  # backend/models/wind/
+        # Models are now in backend/models/wind/ (copied from final_delivery)
+        model_dir = Path(__file__).parent.parent / 'models' / 'wind'
         
         scaler_path = model_dir / 'scaler.pkl'
         xgb_path = model_dir / 'energy_xgboost_pure_forecast.json'
@@ -183,7 +188,7 @@ class WindEnergyPredictor:
         # Error margin: 15% of prediction or minimum 0.2 kWh
         error_margin = max(0.2, ensemble_pred * 0.15)
         
-        logger.info(f"[Wind Model] Predicted {ensemble_pred:.2f} ± {error_margin:.2f} kWh")
+        logger.info(f"[Wind Model] Predicted {ensemble_pred:.2f} +/- {error_margin:.2f} kWh")
         
         return {
             'value': float(ensemble_pred),
