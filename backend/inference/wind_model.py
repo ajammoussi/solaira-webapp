@@ -1,6 +1,10 @@
 """
 Wind-tree generation prediction model.
 Hybrid ensemble: LSTM + XGBoost for wind energy forecasting.
+Implements exact specifications from final_delivery:
+  - Physics-based cut-in (2.5 m/s) and cut-out (25 m/s) speeds
+  - Optimized ensemble weights: XGBoost 0.53 + LSTM 0.47
+  - Validation error: MAE 0.038 kWh, RMSE 0.079 kWh
 Loads trained models from backend/models/wind/ (copied from final_delivery).
 """
 
@@ -13,20 +17,22 @@ import xgboost as xgb
 import onnxruntime as ort
 from pathlib import Path
 import logging
-import pandas as pd
-import xgboost as xgb
-import onnxruntime as ort
-from backend.config import config
-import logging
 
 logger = logging.getLogger(__name__)
 
-# Ensemble weights (optimized for daily total energy accuracy)
-WEIGHT_XGB = 0.53
-WEIGHT_LSTM = 0.47
+# === ENSEMBLE CONFIGURATION (from final_delivery) ===
+WEIGHT_XGB = 0.53      # 53% XGBoost (more accurate on pure forecast)
+WEIGHT_LSTM = 0.47     # 47% LSTM (more stable and robust)
 
-# Physics constraint
-CUT_IN_SPEED = 2.5  # Wind turbine cut-in speed (m/s)
+# === PHYSICS CONSTRAINTS (from physics_formula.py) ===
+CUT_IN_SPEED = 2.5     # No rotation below 2.5 m/s
+CUT_OUT_SPEED = 25.0   # Emergency brake above 25 m/s
+RATED_SPEED = 11.0     # Nominal operating point
+
+# === VALIDATION ERROR MARGINS ===
+# From final_delivery test results: MAE=0.038 kWh, RMSE=0.079 kWh
+# Use RMSE as error margin (conservative, accounts for outliers)
+BASE_ERROR_MARGIN = 0.079  # kWh
 
 
 class WindEnergyPredictor:
@@ -78,11 +84,12 @@ class WindEnergyPredictor:
     def preprocess_xgboost(self, df_history):
         """
         Prepare data for XGBoost (tabular with lags).
-        Expected columns: Energy_kWh, WS_Hub (wind speed at hub), temperature, pressure.
+        Expected columns: Energy_kWh, WS_Hub, temperature, pressure.
+        Must match training feature order exactly.
         """
         df = df_history.copy()
         
-        # Create lags (must match training exactly)
+        # Create lags (MUST match training exactly: [1, 2, 3, 6, 12, 24, 48])
         lags = [1, 2, 3, 6, 12, 24, 48]
         for lag in lags:
             df[f'Energy_lag_{lag}'] = df['Energy_kWh'].shift(lag)
@@ -96,7 +103,7 @@ class WindEnergyPredictor:
         # Use last row for prediction
         last_row = df.iloc[[-1]].copy()
         
-        # Features in exact order expected by XGBoost
+        # Features in exact order expected by XGBoost (from final_delivery)
         features = [
             'hour', 'month', 'dayofweek',
             'Energy_lag_1', 'WS_lag_1',
@@ -138,14 +145,17 @@ class WindEnergyPredictor:
     
     def predict_next_hour(self, df_history, ws_hub_forecast=None):
         """
-        Main inference: returns ensemble prediction.
+        Main inference: returns ensemble prediction with error margin.
         
         Args:
-            df_history: Pandas DataFrame with past data (index=datetime, columns include Energy_kWh, WS_Hub, temp, pressure).
-            ws_hub_forecast: (Optional) Forecasted wind speed. If < CUT_IN_SPEED, prediction = 0.
+            df_history: Pandas DataFrame with past data (index=datetime, 
+                       columns include Energy_kWh, WS_Hub, temp, pressure).
+            ws_hub_forecast: (Optional) Forecasted wind speed for next hour.
+                            Used to apply physics cut-in/cut-out constraints.
         
         Returns:
-            Dict: {value: prediction_kwh, error_margin: margin_kwh, components: {xgb, lstm, ensemble}}
+            Dict: {value: prediction_kwh, error_margin: margin_kwh, 
+                   components: {xgb, lstm, ensemble}}
         """
         
         # 1. XGBoost Prediction
@@ -171,24 +181,32 @@ class WindEnergyPredictor:
             logger.error(f"[Wind Model] LSTM inference failed: {e}")
             lstm_pred = 0.0
         
-        # 3. Ensemble
+        # 3. Ensemble (weighted average)
         if xgb_pred is not None:
             ensemble_pred = (xgb_pred * WEIGHT_XGB) + (lstm_pred * WEIGHT_LSTM)
         else:
             ensemble_pred = lstm_pred
         
-        # 4. Physics constraint: cut-in speed
-        if ws_hub_forecast is not None and ws_hub_forecast < CUT_IN_SPEED:
-            ensemble_pred = 0.0
-            logger.info(f"[Wind Model] Wind speed {ws_hub_forecast:.1f} m/s < cut-in {CUT_IN_SPEED} m/s → Prediction = 0")
+        # 4. Physics constraint: cut-in and cut-out speeds
+        if ws_hub_forecast is not None:
+            if ws_hub_forecast < CUT_IN_SPEED or ws_hub_forecast > CUT_OUT_SPEED:
+                ensemble_pred = 0.0
+                logger.info(
+                    f"[Wind Model] Wind speed {ws_hub_forecast:.1f} m/s outside operating range "
+                    f"[{CUT_IN_SPEED}, {CUT_OUT_SPEED}] -> Prediction = 0"
+                )
         
-        # Ensure non-negative
+        # 5. Ensure non-negative
         ensemble_pred = max(0.0, ensemble_pred)
         
-        # Error margin: 15% of prediction or minimum 0.2 kWh
-        error_margin = max(0.2, ensemble_pred * 0.15)
+        # 6. Error margin (based on validation RMSE: 0.079 kWh)
+        # Conservative: use fixed RMSE from validation
+        error_margin = BASE_ERROR_MARGIN
         
-        logger.info(f"[Wind Model] Predicted {ensemble_pred:.2f} +/- {error_margin:.2f} kWh")
+        logger.info(
+            f"[Wind Model] Predicted {ensemble_pred:.2f} +/- {error_margin:.2f} kWh "
+            f"(XGB: {max(0, xgb_pred) if xgb_pred else 'N/A':.2f}, LSTM: {max(0, lstm_pred):.2f})"
+        )
         
         return {
             'value': float(ensemble_pred),
