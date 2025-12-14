@@ -19,8 +19,8 @@ LSTM_PATH = os.path.join(MODEL_DIR, 'best_energy_lstm_model.onnx')
 
 # Ensemble Weights (The Strategy)
 # TODO: Optimize these weights using inference_test.py
-WEIGHT_XGB = 0.50
-WEIGHT_LSTM = 0.50
+WEIGHT_XGB = 0.45
+WEIGHT_LSTM = 0.55
 
 
 # ============================================================================

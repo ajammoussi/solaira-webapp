@@ -12,9 +12,11 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import * as LucideIcons from 'lucide-react';
 import PowerSourcesChart from '../../components/PowerSourcesChart';
+import EnergySimulationChart from '../../components/EnergySimulationChart';
 import Layout from '../../components/Layout';
 import { useAuth } from '../../lib/hooks/useAuth';
 import { useRecommendations } from '../../lib/hooks/useEnergyData';
+import { useEnergySimulation } from '../../lib/hooks/useEnergySimulation';
 import pythonApi from '../../lib/services/pythonApi';
 import styles from './styles.module.css';
 
@@ -22,6 +24,21 @@ const Predictions = () => {
   const router = useRouter();
   const { user, isGuest, loading: authLoading } = useAuth();
   const { data: recommendations, loading } = useRecommendations();
+  
+  // Time period state (in hours)
+  const [timePeriod, setTimePeriod] = useState(720); // Default: 30 days
+  
+  // New comprehensive energy simulation (PV + Wind + Battery)
+  const { 
+    data: energySimData, 
+    loading: energySimLoading, 
+    error: energySimError,
+    refetch: refetchEnergySim
+  } = useEnergySimulation({
+    hours: timePeriod,
+    initialSoc: 50,
+    autoFetch: true
+  });
   
   const [simulationResults, setSimulationResults] = useState(null);
   const [simLoading, setSimLoading] = useState(false);
@@ -47,7 +64,7 @@ const Predictions = () => {
         
         // Pass null for weather and consumption to trigger backend historical lookup
         const results = await pythonApi.runSimulation(null, 50.0, null, dateStr);
-        
+        print("Simulation results: ", results);
         // Transform backend data to match UI expectations
         const transformedResults = {
             summary: {
@@ -177,6 +194,60 @@ const Predictions = () => {
                   card={false}
                 />
               </div>
+            </section>
+
+            {/* Comprehensive Energy Simulation Chart (PV + Wind + Battery) */}
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <div className={styles.sectionIconWrapper}>
+                  <LucideIcons.BarChart3 size={20} />
+                </div>
+                <div className={styles.sectionHeaderContent}>
+                  <h2 className={styles.sectionTitle}>Comprehensive Energy Simulation</h2>
+                  <p className={styles.sectionDescription}>
+                    Detailed analysis of PV energy, wind energy, consumption patterns, and battery state of charge.
+                  </p>
+                </div>
+                <div className={styles.sectionActions}>
+                  <div className={styles.periodSelector}>
+                    <button 
+                      onClick={() => setTimePeriod(24)}
+                      className={`${styles.periodButton} ${timePeriod === 24 ? styles.active : ''}`}
+                      disabled={energySimLoading}
+                    >
+                      1 Day
+                    </button>
+                    <button 
+                      onClick={() => setTimePeriod(168)}
+                      className={`${styles.periodButton} ${timePeriod === 168 ? styles.active : ''}`}
+                      disabled={energySimLoading}
+                    >
+                      1 Week
+                    </button>
+                    <button 
+                      onClick={() => setTimePeriod(720)}
+                      className={`${styles.periodButton} ${timePeriod === 720 ? styles.active : ''}`}
+                      disabled={energySimLoading}
+                    >
+                      1 Month
+                    </button>
+                  </div>
+                  <button 
+                    onClick={refetchEnergySim}
+                    className={styles.refreshButton}
+                    disabled={energySimLoading}
+                  >
+                    <LucideIcons.RefreshCw size={16} />
+                    Refresh
+                  </button>
+                </div>
+              </div>
+              
+              <EnergySimulationChart 
+                data={energySimData}
+                loading={energySimLoading}
+                error={energySimError}
+              />
             </section>
 
             {/* AI Recommendations */}

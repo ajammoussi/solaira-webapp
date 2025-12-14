@@ -1,0 +1,271 @@
+/* Energy Simulation Chart Styles */
+
+.chartContainer {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+}
+
+/* Loading, Error, and Empty States */
+.loadingState,
+.errorState,
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #4A90E2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.errorIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.errorText {
+  color: #E74C3C;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.emptyState p {
+  color: #7f8c8d;
+  font-size: 16px;
+}
+
+/* Summary Statistics Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.statCard {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.statCard:nth-child(1) {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+}
+
+.statCard:nth-child(2) {
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+}
+
+.statCard:nth-child(3) {
+  background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+}
+
+.statCard:nth-child(4) {
+  background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
+}
+
+.statLabel {
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.9;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statValue {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.statValue.positive {
+  color: #2ECC71;
+}
+
+.statValue.negative {
+  color: #E74C3C;
+}
+
+/* Chart Wrapper */
+.chartWrapper {
+  margin: 32px 0;
+}
+
+.chartTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Battery Statistics */
+.batteryStats {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 24px;
+}
+
+.batteryStatsTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 16px;
+}
+
+.batteryStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.batteryStat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: white;
+  border-radius: 6px;
+  border-left: 4px solid #2ECC71;
+}
+
+.batteryLabel {
+  font-size: 14px;
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+.batteryValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+/* Energy Breakdown */
+.energyBreakdown {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 2px solid #ecf0f1;
+}
+
+.breakdownTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.breakdownBars {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.breakdownItem {
+  display: grid;
+  grid-template-columns: 150px 1fr 80px;
+  align-items: center;
+  gap: 16px;
+}
+
+.breakdownLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.breakdownDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.breakdownBar {
+  height: 24px;
+  background: #ecf0f1;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.breakdownFill {
+  height: 100%;
+  border-radius: 12px;
+  transition: width 0.6s ease;
+}
+
+.breakdownPercent {
+  text-align: right;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .statsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .batteryStatsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .breakdownItem {
+    grid-template-columns: 120px 1fr 60px;
+    gap: 8px;
+  }
+  
+  .breakdownLabel {
+    font-size: 12px;
+  }
+  
+  .breakdownPercent {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .chartContainer {
+    padding: 16px;
+  }
+  
+  .statValue {
+    font-size: 24px;
+  }
+}

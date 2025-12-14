@@ -21,6 +21,12 @@ const BarChart = ({
   useEffect(() => {
     const loadApexCharts = async () => {
       if (typeof window !== 'undefined') {
+        // Ensure ref exists before loading
+        if (!chartRef.current) {
+          console.warn('BarChart: chartRef not ready');
+          return;
+        }
+        
         const ApexCharts = (await import('apexcharts')).default;
 
         const options = {
