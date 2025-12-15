@@ -5,3 +5,4 @@
 /pes-challenge-solaira-webapp.backup
 /.vscode
 __pycache__/
+venv/

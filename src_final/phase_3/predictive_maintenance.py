@@ -13,10 +13,10 @@ if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 # Import phase 3 modules
-from src.phase_3.config_loader import load_config, get_data_paths
-from src.phase_3.performance_ratio import PerformanceRatioCalculator
-from src.phase_3.deviation_score import DeviationScoreCalculator
-from src.phase_3.visualization import MaintenanceVisualizer
+from src_final.phase_3.config_loader import load_config, get_data_paths
+from src_final.phase_3.performance_ratio import PerformanceRatioCalculator
+from src_final.phase_3.deviation_score import DeviationScoreCalculator
+# from src_final.phase_3.visualization import MaintenanceVisualizer  # Disabled - requires matplotlib
 
 
 class PredictiveMaintenancePipeline:
@@ -39,7 +39,7 @@ class PredictiveMaintenancePipeline:
         # Initialize modules
         self.pr_calculator = PerformanceRatioCalculator(self.config)
         self.deviation_calculator = DeviationScoreCalculator(self.config)
-        self.visualizer = MaintenanceVisualizer(self.config)
+        # self.visualizer = MaintenanceVisualizer(self.config)  # Disabled - requires matplotlib
         
         # Results storage
         self.results = {}
@@ -135,27 +135,14 @@ class PredictiveMaintenancePipeline:
                             output_dir: Path = None) -> dict:
 
         print("\n" + "=" * 80)
-        print("STEP 4: CREATING VISUALIZATIONS")
+        print("STEP 4: CREATING VISUALIZATIONS (DISABLED)")
         print("=" * 80)
         
-        if output_dir is None:
-            output_dir = project_root / 'results' / 'phase_3' / 'plots'
-        
-        output_dir.mkdir(parents=True, exist_ok=True)
+        # Visualization disabled - requires matplotlib
+        print("\n   ⚠️  Visualization disabled (matplotlib not installed)")
         
         figures = {}
-        
-        # Create pairwise deviation matrix visualization
-        if 'error' not in pairwise_matrix:
-            fig1 = self.visualizer.plot_pairwise_deviation_matrix(
-                pairwise_matrix,
-                save_path=output_dir / 'pairwise_deviation_matrix.png'
-            )
-            figures['pairwise_matrix'] = fig1
-        
         self.results['figures'] = figures
-        
-        print(f"\n   ✓ Plots saved to: {output_dir}")
         
         return figures
     

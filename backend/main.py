@@ -18,6 +18,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from backend.core.phase_1.data_processing import prepare_features_for_ml
 from backend.core.phase_2.simulator import EnergySimulator
 from backend.core.phase_3.maintenance import PerformanceRatioCalculator, MaintenanceAnalyzer
+from backend.core.phase_3.pv_monitor import get_monitoring_service
 from backend.chatbot.src import SupportAgent, MESSAGES, rate_limited
 
 # Load environment variables
@@ -176,6 +177,14 @@ class ChatResponse(BaseModel):
 class HealthResponse(BaseModel):
     status: str
     message: str
+
+class PVSystemConfigRequest(BaseModel):
+    num_systems: int
+    capacity_per_system: float = 5.0
+
+class MonitoringControlRequest(BaseModel):
+    action: str  # 'start' or 'stop'
+    interval_seconds: int = 60
 
 # --- Endpoints ---
 
@@ -408,6 +417,133 @@ async def health_check():
         "status": "healthy",
         "message": model_msg
     }
+
+# ============================================================================
+# PV MONITORING ENDPOINTS
+# ============================================================================
+
+@app.post("/api/pv-systems/configure")
+def configure_pv_systems(request: PVSystemConfigRequest):
+    """
+    Configure the number of PV systems to monitor
+    """
+    try:
+        if request.num_systems < 1 or request.num_systems > 20:
+            raise HTTPException(status_code=400, detail="Number of systems must be between 1 and 20")
+        
+        if request.capacity_per_system < 1.0 or request.capacity_per_system > 50.0:
+            raise HTTPException(status_code=400, detail="Capacity must be between 1.0 and 50.0 kW")
+        
+        service = get_monitoring_service()
+        result = service.configure_systems(request.num_systems, request.capacity_per_system)
+        
+        return result
+    except Exception as e:
+        logger.error(f"Error configuring PV systems: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/pv-systems/monitoring")
+def control_monitoring(request: MonitoringControlRequest):
+    """
+    Start or stop the monitoring service
+    """
+    try:
+        service = get_monitoring_service()
+        
+        if request.action == 'start':
+            result = service.start_monitoring(request.interval_seconds)
+        elif request.action == 'stop':
+            result = service.stop_monitoring()
+        else:
+            raise HTTPException(status_code=400, detail="Action must be 'start' or 'stop'")
+        
+        return result
+    except Exception as e:
+        logger.error(f"Error controlling monitoring: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/pv-systems/status")
+def get_systems_status():
+    """
+    Get current status of all PV systems with anomaly detection
+    """
+    try:
+        service = get_monitoring_service()
+        statuses = service.get_all_systems_status()
+        
+        return {
+            'timestamp': datetime.now().isoformat(),
+            'systems': statuses,
+            'total_systems': len(statuses)
+        }
+    except Exception as e:
+        logger.error(f"Error getting systems status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/pv-systems/{system_id}/status")
+def get_system_status(system_id: int):
+    """
+    Get detailed status for a specific PV system
+    """
+    try:
+        service = get_monitoring_service()
+        status = service.analyze_system(system_id, hours=2)
+        
+        if 'error' in status:
+            raise HTTPException(status_code=404, detail=status['error'])
+        
+        return status
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting system status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/pv-systems/{system_id}/history")
+def get_system_history(system_id: int, hours: int = 24):
+    """
+    Get historical data for a specific PV system
+    """
+    try:
+        service = get_monitoring_service()
+        history = service.get_system_history(system_id, hours)
+        
+        return {
+            'system_id': system_id,
+            'hours': hours,
+            'data_points': len(history),
+            'history': history
+        }
+    except Exception as e:
+        logger.error(f"Error getting system history: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/pv-systems/config")
+def get_pv_config():
+    """
+    Get current PV systems configuration
+    """
+    try:
+        service = get_monitoring_service()
+        
+        return {
+            'num_systems': len(service.systems),
+            'monitoring_active': service.monitoring_active,
+            'systems': [
+                {
+                    'id': s.system_id,
+                    'name': s.name,
+                    'capacity_kw': s.capacity_kw,
+                    'has_anomaly': s.current_anomaly is not None,
+                    'anomaly_type': s.current_anomaly
+                }
+                for s in service.systems.values()
+            ]
+        }
+    except Exception as e:
+        logger.error(f"Error getting PV config: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 if __name__ == "__main__":
     import uvicorn

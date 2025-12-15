@@ -1,0 +1,37 @@
+config_version: 3.0.0
+system_name: Real-time PV Monitoring System
+pv_systems:
+  systems:
+  - name: PV_System_1
+    actual_data: backend/core/phase_3/monitoring_data/pv_system_1_actual.csv
+    predicted_data: backend/core/phase_3/monitoring_data/pv_system_1_predicted.csv
+  - name: PV_System_2
+    actual_data: backend/core/phase_3/monitoring_data/pv_system_2_actual.csv
+    predicted_data: backend/core/phase_3/monitoring_data/pv_system_2_predicted.csv
+  - name: PV_System_3
+    actual_data: backend/core/phase_3/monitoring_data/pv_system_3_actual.csv
+    predicted_data: backend/core/phase_3/monitoring_data/pv_system_3_predicted.csv
+  - name: PV_System_4
+    actual_data: backend/core/phase_3/monitoring_data/pv_system_4_actual.csv
+    predicted_data: backend/core/phase_3/monitoring_data/pv_system_4_predicted.csv
+  max_proximity_km: 5.0
+deviation_score:
+  warning_threshold: 0.2
+  critical_threshold: 0.3
+  moving_average_days: 3
+  consecutive_days_alert: 2
+  min_valid_pairs: 2
+performance_ratio:
+  expected_pr_min: 0.6
+  expected_pr_max: 0.9
+  optimal_pr: 0.8
+analysis:
+  analysis_level: daily
+  min_hours_for_daily_pr: 8
+  min_production_kwh: 0.1
+  short_term_window_days: 7
+  long_term_window_days: 30
+data_sources:
+  timestamp_column: date
+  actual_power_column: energy_kwh
+  predicted_power_column: energy_kwh
