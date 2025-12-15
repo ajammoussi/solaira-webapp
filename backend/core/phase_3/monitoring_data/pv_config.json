@@ -3,25 +3,25 @@
   "systems": [
     {
       "system_id": 1,
-      "capacity_kw": 10.0,
+      "capacity_kw": 5.0,
       "name": "PV System 1",
       "anomaly_probability": 0.02
     },
     {
       "system_id": 2,
-      "capacity_kw": 10.0,
+      "capacity_kw": 5.0,
       "name": "PV System 2",
       "anomaly_probability": 0.02
     },
     {
       "system_id": 3,
-      "capacity_kw": 10.0,
+      "capacity_kw": 5.0,
       "name": "PV System 3",
       "anomaly_probability": 0.02
     },
     {
       "system_id": 4,
-      "capacity_kw": 10.0,
+      "capacity_kw": 5.0,
       "name": "PV System 4",
       "anomaly_probability": 0.02
     }

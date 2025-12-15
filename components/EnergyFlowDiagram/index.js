@@ -198,6 +198,14 @@ const EnergyFlowDiagram = ({ data, card = true }) => {
       if (resizeListener) {
         window.removeEventListener('resize', resizeListener);
       }
+      // Attempt to destroy chart instance if method exists
+      if (chartRef.current && typeof chartRef.current.destroy === 'function') {
+        try {
+          chartRef.current.destroy();
+        } catch (e) {
+          console.warn('Failed to destroy Sankey chart:', e);
+        }
+      }
       if (containerRef.current) {
         containerRef.current.innerHTML = '';
       }

@@ -128,28 +128,50 @@ export default function Account() {
     setProfileSuccess('');
 
     try {
-      // Update user metadata
-      const { error: metaError } = await supabase.auth.updateUser({
-        data: { full_name: profileData.display_name },
-      });
+      const withTimeout = (promise, ms, label) =>
+        Promise.race([
+          promise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timed out`)), ms)),
+        ]);
 
-      if (metaError) throw metaError;
+      // Get access token for calling our protected API route
+      const { data: sessionData, error: sessionError } = await withTimeout(
+        supabase.auth.getSession(),
+        5000,
+        'Session fetch'
+      );
 
-      // Update profile in database
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          display_name: profileData.display_name,
-          phone_number: profileData.phone_number,
-          timezone: profileData.timezone,
-          updated_at: new Date().toISOString(),
-        });
+      if (sessionError) throw sessionError;
 
-      if (updateError) throw updateError;
+      const accessToken = sessionData?.session?.access_token;
+      if (!accessToken) throw new Error('Missing access token');
 
+      // Update profile via server API (bypasses RLS with service role)
+      const response = await withTimeout(
+        fetch('/api/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            display_name: profileData.display_name,
+            phone_number: profileData.phone_number,
+            timezone: profileData.timezone,
+          }),
+        }),
+        8000,
+        'Profile update'
+      );
+
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result?.error || 'Failed to update profile');
+      }
+
+      // Refresh profile explicitly just in case
       if (refreshProfile) {
-        await refreshProfile();
+        await withTimeout(Promise.resolve(refreshProfile()), 5000, 'Profile refresh');
       }
       setProfileSuccess('Profile updated successfully!');
     } catch (error) {

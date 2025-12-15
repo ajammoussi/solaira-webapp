@@ -289,6 +289,7 @@ const EnergySimulationChart = ({ data, loading, error }) => {
               strokeWidth={2.5}
               name="PV Energy"
               dot={false}
+              isAnimationActive={false}
             />
             
             <Line
@@ -299,6 +300,7 @@ const EnergySimulationChart = ({ data, loading, error }) => {
               strokeWidth={2.5}
               name="Wind Energy"
               dot={false}
+              isAnimationActive={false}
             />
             
             {/* Consumption Line */}
@@ -310,6 +312,7 @@ const EnergySimulationChart = ({ data, loading, error }) => {
               strokeWidth={2.5}
               name="Consumption"
               dot={false}
+              isAnimationActive={false}
             />
             
             {/* Battery SOC Line */}
@@ -321,6 +324,7 @@ const EnergySimulationChart = ({ data, loading, error }) => {
               strokeWidth={3}
               name="Battery SOC"
               dot={false}
+              isAnimationActive={false}
             />
             
             {/* 50% SOC Reference Line */}
@@ -333,6 +337,7 @@ const EnergySimulationChart = ({ data, loading, error }) => {
               strokeDasharray="5 5"
               name="50% SOC"
               dot={false}
+              isAnimationActive={false}
             />
           </ComposedChart>
         </ResponsiveContainer>
