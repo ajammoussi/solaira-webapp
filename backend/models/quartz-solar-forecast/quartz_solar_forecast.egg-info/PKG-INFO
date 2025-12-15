@@ -1,0 +1,24 @@
+Metadata-Version: 2.4
+Name: quartz_solar_forecast
+Version: 0.0.1
+Summary: Open Source Solar Forecasting for a Site
+Author-email: Peter Dudfield <info@openclimatefix.org>
+License: MIT
+Project-URL: Source Code, https://github.com/openclimatefix/Open-Source-Quartz-Solar-Forecast.git
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: xarray==2022.12.0
+Requires-Dist: pv-site-prediction==0.1.19
+Requires-Dist: pydantic==2.6.2
+Requires-Dist: python-dotenv==1.0.1
+Requires-Dist: openmeteo-requests==1.2.0
+Requires-Dist: requests-cache==1.2.0
+Requires-Dist: retry-requests==2.0.0
+Requires-Dist: xgboost==2.0.3
+Requires-Dist: typer
+Requires-Dist: async_timeout
+Requires-Dist: uvicorn
+Requires-Dist: pydantic_settings
+Requires-Dist: httpx
+Requires-Dist: sentry_sdk
+Requires-Dist: huggingface_hub==0.17.3

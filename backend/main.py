@@ -17,6 +17,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from backend.core.phase_1.data_processing import prepare_features_for_ml
 from backend.core.phase_2.simulator import EnergySimulator
+from backend.core.phase_2.realtime_manager import RealtimeEnergyManager
 from backend.core.phase_3.maintenance import PerformanceRatioCalculator, MaintenanceAnalyzer
 from backend.core.phase_3.pv_monitor import get_monitoring_service
 from backend.chatbot.src import SupportAgent, MESSAGES, rate_limited
@@ -40,6 +41,7 @@ PV_DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'processed_pv_dat
 
 # Initialize Simulator
 simulator = None
+realtime_manager = None
 consumption_df = None
 pv_df = None
 
@@ -48,7 +50,7 @@ async def lifespan(app: FastAPI):
     """
     Lifespan context for FastAPI: initialize models and chatbot agent.
     """
-    global simulator, consumption_df, pv_df
+    global simulator, realtime_manager, consumption_df, pv_df
     
     # --- Load ML Models & Data ---
     print("Loading models...")
@@ -88,6 +90,18 @@ async def lifespan(app: FastAPI):
              print("SERVER STARTING NOW - VERSION CHECK")
         else:
              print(f"Warning: Config not found at {CONFIG_PATH}")
+        
+        # Initialize Realtime Manager (for new energy simulation endpoint)
+        try:
+            realtime_manager = RealtimeEnergyManager(
+                config_path=CONFIG_PATH if os.path.exists(CONFIG_PATH) else None,
+                battery_capacity_kwh=13.5,
+                initial_soc=50.0
+            )
+            print("✅ Realtime Energy Manager initialized.")
+        except Exception as e:
+            print(f"⚠️ Realtime Manager initialization failed: {e}")
+            realtime_manager = None
              
     except Exception as e:
         print(f"Error loading models: {e}")
@@ -159,6 +173,13 @@ class SimulationRequest(BaseModel):
     current_soc: float
     consumption_profile: Optional[List[float]] = None
     date: Optional[str] = None
+
+class EnergySimulationRequest(BaseModel):
+    """Request for multi-source energy simulation (PV + Wind)"""
+    start_time: Optional[str] = None  # ISO format, defaults to now
+    hours: int = 24
+    initial_soc: float = 50.0
+    consumption_profile: Optional[List[float]] = None
 
 class MaintenanceRequest(BaseModel):
     actual_production: List[float]
@@ -308,6 +329,53 @@ def simulate(request: SimulationRequest):
         )
         
         return result
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/energy-simulation")
+def run_energy_simulation(request: EnergySimulationRequest):
+    """
+    Run comprehensive energy simulation with PV + Wind + Battery
+    
+    This endpoint simulates energy flow including:
+    - PV energy production (XGBoost 0.45 + LSTM 0.55)
+    - Wind energy production (XGBoost 0.53 + LSTM 0.47)
+    - Consumption patterns
+    - Battery charge/discharge
+    
+    Returns hourly data suitable for visualization charts
+    """
+    if realtime_manager is None:
+        raise HTTPException(
+            status_code=503, 
+            detail="Realtime Energy Manager not initialized. Check backend logs."
+        )
+    
+    try:
+        # Parse start time or use default to a date with good data coverage
+        if request.start_time:
+            start_dt = datetime.fromisoformat(request.start_time.replace('Z', '+00:00'))
+        else:
+            # Default to Dec 1, 2023 - date where we have PV, Wind, and Consumption data
+            start_dt = datetime(2023, 12, 1, 0, 0, 0)
+        
+        # Reset battery to requested SOC
+        realtime_manager.reset_battery(request.initial_soc)
+        
+        # Run simulation
+        results = realtime_manager.simulate_period(
+            start_time=start_dt,
+            hours=request.hours,
+            consumption_profile=request.consumption_profile
+        )
+        
+        return {
+            "status": "success",
+            "simulation_data": results
+        }
         
     except Exception as e:
         import traceback

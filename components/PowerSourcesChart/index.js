@@ -23,6 +23,12 @@ const PowerSourcesChart = ({
     // Dynamically load ApexCharts
     const loadApexCharts = async () => {
       if (typeof window !== 'undefined') {
+        // Ensure ref exists before loading
+        if (!chartRef.current) {
+          console.warn('PowerSourcesChart: chartRef not ready');
+          return;
+        }
+        
         const ApexCharts = (await import('apexcharts')).default;
 
         const options = {

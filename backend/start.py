@@ -31,11 +31,20 @@ def start_services():
     processes.append(p1)
 
     print("Starting Solar Forecast API on port 8002...")
-    # Run uvicorn for the solar forecast API
-    # We change cwd to the solar forecast directory to make imports work easily
-    # We use 'api.v1.api:app' assuming 'api' is a package in that directory
+    # Prefer running the forecast API using the forecast-specific venv if present
+    venv_forecast_dir = os.path.join(backend_dir, ".venv-forecast")
+    if sys.platform.startswith("win"):
+        forecast_python = os.path.join(venv_forecast_dir, "Scripts", "python.exe")
+    else:
+        forecast_python = os.path.join(venv_forecast_dir, "bin", "python")
+
+    if not os.path.exists(forecast_python):
+        print(f"Forecast venv python not found at {forecast_python}. Falling back to current Python executable.")
+        forecast_python = sys.executable
+
+    # Run uvicorn using the selected python executable. We keep cwd pointed at the forecast package
     p2 = subprocess.Popen(
-        [sys.executable, "-m", "uvicorn", "api.v1.api:app", "--host", "0.0.0.0", "--port", "8002"],
+        [forecast_python, "-m", "uvicorn", "api.v1.api:app", "--host", "127.0.0.1", "--port", "8002"],
         cwd=solar_forecast_dir
     )
     processes.append(p2)

@@ -1,19 +1,26 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import * as LucideIcons from 'lucide-react'; // Import icons
+import { useRouter } from 'next/router'; // ADD THIS IMPORT
+import * as LucideIcons from 'lucide-react';
 import styles from './styles.module.css';
 import Button from '../Button';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter(); // ADD THIS HOOK
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
+  // Helper function to check if a link is active
+  const isActive = (path) => {
+    return router.pathname === path;
+  };
+
   return (
     <header className={styles.header}>
-      {/* Top Banner */}
+      {/* Top Banner (keep as is) */}
       <div className={styles.topBanner}>
         <div className={styles.topBannerContainer}>
           <div className={styles.topBannerLeft}>
@@ -51,23 +58,40 @@ const Header = () => {
             )}
           </button>
 
-          {/* Navigation Menu (Desktop + Mobile Wrapper) */}
+          {/* Navigation Menu */}
           <div className={`${styles.navWrapper} ${mobileMenuOpen ? styles.navWrapperOpen : ''}`}>
             <nav className={styles.navigation}>
-              <Link href="/about-us">
-                <a className={styles.navLink} onClick={() => setMobileMenuOpen(false)}>About Us</a>
+              <Link href="/about">
+                <a 
+                  className={`${styles.navLink} ${isActive('/about') ? styles.active : ''}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  About Us
+                </a>
               </Link>
               <Link href="/pricing">
-                <a className={styles.navLink} onClick={() => setMobileMenuOpen(false)}>Pricing</a>
-              </Link>
-              <Link href="/over-ons">
-                <a className={styles.navLink} onClick={() => setMobileMenuOpen(false)}>Over ons</a>
+                <a 
+                  className={`${styles.navLink} ${isActive('/pricing') ? styles.active : ''}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Pricing
+                </a>
               </Link>
               <Link href="/blog">
-                <a className={styles.navLink} onClick={() => setMobileMenuOpen(false)}>Blog</a>
+                <a 
+                  className={`${styles.navLink} ${isActive('/blog') ? styles.active : ''}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Blog
+                </a>
               </Link>
               <Link href="/contact">
-                <a className={styles.navLink} onClick={() => setMobileMenuOpen(false)}>Contact</a>
+                <a 
+                  className={`${styles.navLink} ${isActive('/contact') ? styles.active : ''}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Contact
+                </a>
               </Link>
             </nav>
 
