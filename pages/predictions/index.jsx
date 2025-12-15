@@ -17,6 +17,7 @@ import Layout from '../../components/Layout';
 import { useAuth } from '../../lib/hooks/useAuth';
 import { useRecommendations } from '../../lib/hooks/useEnergyData';
 import { useEnergySimulation } from '../../lib/hooks/useEnergySimulation';
+import { useDailyPrediction } from '../../lib/hooks/useDailyPrediction';
 import pythonApi from '../../lib/services/pythonApi';
 import styles from './styles.module.css';
 
@@ -40,9 +41,15 @@ const Predictions = () => {
     autoFetch: true
   });
   
-  const [simulationResults, setSimulationResults] = useState(null);
-  const [simLoading, setSimLoading] = useState(false);
-  const [simError, setSimError] = useState(null);
+  // Daily prediction with caching
+  const {
+    data: simulationResults,
+    loading: simLoading,
+    error: simError
+  } = useDailyPrediction({
+    initialSoc: 50.0,
+    autoFetch: !!(user || isGuest)
+  });
 
   // Protect this page
   useEffect(() => {
@@ -51,59 +58,13 @@ const Predictions = () => {
     }
   }, [user, isGuest, authLoading, router]);
 
-  // Run simulation on load
-  useEffect(() => {
-    const runSim = async () => {
-      if ((!user && !isGuest) || simulationResults) return;
-      
-      setSimLoading(true);
-      try {
-        // Use current date for simulation
-        const now = new Date();
-        const dateStr = now.toISOString().split('T')[0];
-        
-        // Pass null for weather and consumption to trigger backend historical lookup
-        const results = await pythonApi.runSimulation(null, 50.0, null, dateStr);
-        print("Simulation results: ", results);
-        // Transform backend data to match UI expectations
-        const transformedResults = {
-            summary: {
-                total_pv_generation: results.summary.total_production,
-                total_consumption: results.summary.total_consumption,
-                grid_import: results.summary.total_deficit,
-                grid_export: results.summary.total_wasted
-            },
-            hourly_details: results.hourly_results.map((h) => ({
-                hour: h.hour,
-                // Use backend hour for X-axis labels (e.g., "14:00")
-                displayTime: `${h.hour.toString().padStart(2, '0')}:00`,
-                // Round values to 3 decimal places for Y-axis
-                pv_generation: Number(h.production_kwh.toFixed(3)),
-                consumption: Number(h.consumption_kwh.toFixed(3)),
-                battery_soc: Number(h.battery_soc.toFixed(3)),
-                grid_import: Number(h.grid_import_kwh.toFixed(3)),
-                wasted: Number(h.wasted_kwh.toFixed(3))
-            })),
-            advice: results.advice.map(a => a.message)
-        };
-
-        setSimulationResults(transformedResults);
-      } catch (err) {
-        console.error("Simulation failed:", err);
-        setSimError("Failed to load simulation data. Is the backend running?");
-      } finally {
-        setSimLoading(false);
-      }
-    };
-    
-    runSim();
-  }, [user, isGuest]);
-
   if (authLoading || (!user && !isGuest)) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner} />
-      </div>
+      <Layout>
+        <div className={styles.contentLoader}>
+          <div className={styles.spinner} />
+        </div>
+      </Layout>
     );
   }
 
@@ -127,13 +88,13 @@ const Predictions = () => {
           </div>
         )}
 
-        {/* Loading State - Removed to match Settings page pattern */}
-        {/* {simLoading && (
-          <div className={styles.loadingState}>
+        {/* Loading State */}
+        {simLoading && !simulationResults && (
+          <div className={styles.contentLoader}>
             <div className={styles.spinner} />
-            <p>Running AI Simulation...</p>
+            <p style={{ marginTop: '1rem', color: '#666' }}>Generating predictions...</p>
           </div>
-        )} */}
+        )}
 
         {/* Simulation Results */}
         {!simLoading && simulationResults && (

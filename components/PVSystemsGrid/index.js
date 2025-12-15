@@ -8,7 +8,7 @@ import * as LucideIcons from 'lucide-react';
 import styles from './styles.module.css';
 import pvMonitoringService from '../../lib/services/pvMonitoring';
 
-const PVSystemsGrid = ({ refreshInterval = 30000 }) => {
+const PVSystemsGrid = ({ refreshInterval = 30000, noPadding = false }) => {
   const [systems, setSystems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -107,7 +107,7 @@ const PVSystemsGrid = ({ refreshInterval = 30000 }) => {
   }
 
   return (
-    <div className={styles.pvGridContainer}>
+    <div className={styles.pvGridContainer} style={noPadding ? { padding: 0 } : {}}>
       <div className={styles.gridHeader}>
         <div>
           <h2>PV Systems Monitoring</h2>

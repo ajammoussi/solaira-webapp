@@ -40,13 +40,10 @@ const Layout = ({ children }) => {
     .slice(0, 2);
 
   const handleSignOut = async () => {
-    console.log('Layout: handleSignOut called');
     setSignOutLoading(true);
     
     try {
-      console.log('Layout: Calling signOut...');
       await signOut();
-      console.log('Layout: signOut completed');
       
       // Signal other tabs to logout
       localStorage.setItem(LOGOUT_EVENT_KEY, Date.now().toString());
@@ -55,7 +52,6 @@ const Layout = ({ children }) => {
       await new Promise(resolve => setTimeout(resolve, 100));
       
       // Force reload to signin page (clears all React state)
-      console.log('Layout: Redirecting to signin...');
       window.location.replace('/');
     } catch (error) {
       console.error('Layout: signOut error:', error);
@@ -68,7 +64,6 @@ const Layout = ({ children }) => {
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === LOGOUT_EVENT_KEY && e.newValue) {
-        console.log('Layout: Logout detected from another tab, redirecting...');
         window.location.href = '/signin';
       }
     };

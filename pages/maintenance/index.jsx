@@ -161,15 +161,28 @@ const Maintenance = () => {
         </div>
 
         {showConfig && (
-          <PVSystemsConfig 
-            onConfigured={() => {
-              setShowConfig(false);
-              setConfigKey(prev => prev + 1);
-            }}
-          />
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <LucideIcons.Settings className={styles.sectionIcon} />
+              <div>
+                <h2 className={styles.sectionTitle}>System Configuration</h2>
+                <p className={styles.sectionDescription} style={{marginBottom: 0}}>
+                  Configure your PV system parameters.
+                </p>
+              </div>
+            </div>
+            <PVSystemsConfig 
+              onConfigured={() => {
+                setShowConfig(false);
+                setConfigKey(prev => prev + 1);
+              }}
+            />
+          </section>
         )}
 
-        <PVSystemsGrid key={configKey} refreshInterval={30000} />
+        <section className={styles.section}>
+          <PVSystemsGrid key={configKey} refreshInterval={30000} noPadding={true} />
+        </section>
 
         <SolarChatbot />
       </div>

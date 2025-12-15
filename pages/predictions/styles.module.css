@@ -302,6 +302,15 @@
   background: #f5f5f5;
 }
 
+.contentLoader {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh; /* Ensure it takes up enough space to minimize layout shift */
+  width: 100%;
+}
+
 .loadingState {
   text-align: center;
   padding: 3rem;

@@ -19,6 +19,9 @@ const BarChart = ({
   const chartInstanceRef = useRef(null);
 
   useEffect(() => {
+    let isMounted = true;
+    let observer = null;
+
     const loadApexCharts = async () => {
       if (typeof window !== 'undefined') {
         // Ensure ref exists before loading
@@ -28,6 +31,8 @@ const BarChart = ({
         }
         
         const ApexCharts = (await import('apexcharts')).default;
+
+        if (!isMounted) return;
 
         const options = {
           series: [{
@@ -108,25 +113,26 @@ const BarChart = ({
         };
 
         if (chartRef.current) {
+          if (chartInstanceRef.current) {
+            chartInstanceRef.current.destroy();
+          }
           chartInstanceRef.current = new ApexCharts(chartRef.current, options);
           chartInstanceRef.current.render();
 
           // Add hover effects
           setTimeout(() => {
-            attachHoverEffects();
+            if (isMounted) attachHoverEffects();
           }, 100);
 
           // Re-attach on mutations
-          const observer = new MutationObserver(() => {
-            attachHoverEffects();
+          observer = new MutationObserver(() => {
+            if (isMounted) attachHoverEffects();
           });
 
           observer.observe(chartRef.current, {
             childList: true,
             subtree: true
           });
-
-          return () => observer.disconnect();
         }
       }
     };
@@ -162,8 +168,11 @@ const BarChart = ({
     loadApexCharts();
 
     return () => {
+      isMounted = false;
+      if (observer) observer.disconnect();
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
+        chartInstanceRef.current = null;
       }
     };
   }, [data, categories, color, unit, yAxisTitle, title]);
