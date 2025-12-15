@@ -11,6 +11,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import * as LucideIcons from 'lucide-react';
+import { ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import PowerSourcesChart from '../../components/PowerSourcesChart';
 import EnergySimulationChart from '../../components/EnergySimulationChart';
 import Layout from '../../components/Layout';
@@ -19,15 +20,25 @@ import { useRecommendations } from '../../lib/hooks/useEnergyData';
 import { useEnergySimulation } from '../../lib/hooks/useEnergySimulation';
 import { useDailyPrediction } from '../../lib/hooks/useDailyPrediction';
 import pythonApi from '../../lib/services/pythonApi';
+import { useMaintenanceAlerts } from '../../lib/hooks/useEnergyData';
+import { PVForecastForm, PredictionChart, PredictionTable } from '../../components/solar-forecast';
 import styles from './styles.module.css';
 
 const Predictions = () => {
   const router = useRouter();
   const { user, profile, loading: authLoading } = useAuth();
   const { data: recommendations, loading } = useRecommendations();
+
+  const { alerts: staticAlerts, systemHealth, loading: staticLoading } = useMaintenanceAlerts();
   
   // Time period state (in hours)
   const [timePeriod, setTimePeriod] = useState(720); // Default: 30 days
+
+  // Maintenance cards state (moved from old Maintenance page)
+  const [maintenanceData, setMaintenanceData] = useState(null);
+  const [maintLoading, setMaintLoading] = useState(false);
+  const [maintError, setMaintError] = useState(null);
+  const [forecastPredictions, setForecastPredictions] = useState(null);
   
   // New comprehensive energy simulation (PV + Wind + Battery)
   const { 
@@ -51,6 +62,70 @@ const Predictions = () => {
     timezone: profile?.timezone,
     autoFetch: !!user
   });
+
+  // Run Maintenance Analysis (adds the old Maintenance cards to this page)
+  useEffect(() => {
+    const runAnalysis = async () => {
+      if (!user || maintenanceData || maintLoading) return;
+      setMaintLoading(true);
+      setMaintError(null);
+
+      try {
+        // Generate 30 days of mock data
+        const dates = [];
+        const actual = [];
+        const predicted = [];
+        const now = new Date();
+
+        for (let i = 29; i >= 0; i--) {
+          const d = new Date(now);
+          d.setDate(d.getDate() - i);
+          dates.push(d.toISOString().split('T')[0]);
+
+          const baseProd = 40 + Math.random() * 10; // 40-50 kWh
+          predicted.push(Number(baseProd.toFixed(2)));
+
+          // Simulate degradation in last 5 days to trigger alert
+          let efficiency = 0.95;
+          if (i < 5) efficiency = 0.65;
+
+          actual.push(Number((baseProd * efficiency * (0.95 + Math.random() * 0.1)).toFixed(2)));
+        }
+
+        const results = await pythonApi.analyzeMaintenance(dates, actual, predicted);
+
+        const alerts = (results.analysis?.issues || []).map((issue) => ({
+          issue: 'Performance Issue',
+          severity: results.analysis?.status === 'critical' ? 'Critical' : 'Warning',
+          description: issue,
+        }));
+
+        const prMap = {};
+        if (results.pr_history) {
+          results.pr_history.forEach((item) => {
+            const d = new Date(item.date).toISOString().split('T')[0];
+            prMap[d] = item.pr;
+          });
+        }
+
+        const chartData = dates.map((date, idx) => ({
+          date,
+          actual: actual[idx],
+          predicted: predicted[idx],
+          pr: (prMap[date] || 0) * 100,
+        }));
+
+        setMaintenanceData({ alerts, chartData });
+      } catch (err) {
+        console.error('Maintenance analysis failed:', err);
+        setMaintError('Failed to analyze maintenance data. Is the backend running?');
+      } finally {
+        setMaintLoading(false);
+      }
+    };
+
+    runAnalysis();
+  }, [user, maintenanceData, maintLoading]);
 
   // Protect this page
   useEffect(() => {
@@ -240,6 +315,130 @@ const Predictions = () => {
                 )}
               </div>
             </section>
+
+            {/* Maintenance & System Health (from old Maintenance page) */}
+            {maintError && (
+              <div className={styles.errorContainer}>
+                <LucideIcons.AlertCircle size={20} />
+                <span>{maintError}</span>
+              </div>
+            )}
+
+            {!maintLoading && maintenanceData && (
+              <>
+                {/* Overall Status Card */}
+                <section className={styles.section}>
+                  <div className={styles.sectionHeader}>
+                    <div className={styles.sectionIconWrapper}>
+                      <LucideIcons.Wrench size={20} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <h2 className={styles.sectionTitle}>System Health Status</h2>
+                      <p className={styles.sectionDescription}>Based on Performance Ratio (PR) analysis</p>
+                    </div>
+                    <span
+                      className={`${styles.trendBadge} ${maintenanceData.alerts.length > 0 ? styles.down : styles.up}`}
+                    >
+                      {maintenanceData.alerts.length > 0 ? (
+                        <>
+                          <LucideIcons.AlertTriangle size={14} /> Issues Detected
+                        </>
+                      ) : (
+                        <>
+                          <LucideIcons.CheckCircle size={14} /> System Healthy
+                        </>
+                      )}
+                    </span>
+                  </div>
+                </section>
+
+                {/* Performance Chart */}
+                <section className={styles.section}>
+                  <div className={styles.sectionHeader}>
+                    <div className={styles.sectionIconWrapper}>
+                      <LucideIcons.LineChart size={20} />
+                    </div>
+                    <div>
+                      <h2 className={styles.sectionTitle}>Performance Ratio & Production (30 Days)</h2>
+                      <p className={styles.sectionDescription}>Actual vs predicted production with PR percentage</p>
+                    </div>
+                  </div>
+
+                  <div style={{ height: 400, width: '100%' }}>
+                    <ResponsiveContainer>
+                      <ComposedChart data={maintenanceData.chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="date" tickFormatter={(d) => d.split('-').slice(1).join('/')} />
+                        <YAxis yAxisId="left" label={{ value: 'kWh', angle: -90, position: 'insideLeft' }} />
+                        <YAxis yAxisId="right" orientation="right" unit="%" domain={[0, 120]} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar yAxisId="left" dataKey="actual" fill="#3B82F6" name="Actual Production" radius={[4, 4, 0, 0]} />
+                        <Line yAxisId="left" type="monotone" dataKey="predicted" strokeDasharray="5 5" name="Predicted (Ideal)" dot={false} />
+                        <Line yAxisId="right" type="monotone" dataKey="pr" strokeWidth={2} name="Performance Ratio %" dot={false} />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </div>
+                </section>
+
+                {/* AI Detected Alerts */}
+                {maintenanceData.alerts.length > 0 && (
+                  <section className={styles.section}>
+                    <div className={styles.sectionHeader}>
+                      <div className={styles.sectionIconWrapper}>
+                        <LucideIcons.Siren size={20} />
+                      </div>
+                      <div>
+                        <h2 className={styles.sectionTitle}>AI Detected Issues</h2>
+                        <p className={styles.sectionDescription}>Potential performance problems found in the last 30 days</p>
+                      </div>
+                    </div>
+
+                    <div className={styles.recommendationsGrid}>
+                      {maintenanceData.alerts.map((alert, idx) => (
+                        <div key={idx} className={styles.recommendationCard}>
+                          <div className={styles.recommendationIcon}>
+                            <LucideIcons.AlertTriangle size={24} />
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <p className={styles.recommendationText} style={{ marginBottom: 6 }}>
+                              <strong>{alert.issue}</strong> — {alert.severity}
+                            </p>
+                            <p className={styles.recommendationText} style={{ margin: 0 }}>
+                              {alert.description}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {/* Solar Forecast Section */}
+                <section className={styles.section}>
+                  <div className={styles.sectionHeader}>
+                    <div className={styles.sectionIconWrapper}>
+                      <LucideIcons.Sun size={20} />
+                    </div>
+                    <div>
+                      <h2 className={styles.sectionTitle}>Solar Generation Forecast</h2>
+                      <p className={styles.sectionDescription}>
+                        Predict future solar generation based on your system configuration and weather data.
+                      </p>
+                    </div>
+                  </div>
+
+                  <PVForecastForm updatePredictions={setForecastPredictions} />
+
+                  {forecastPredictions && (
+                    <>
+                      <PredictionChart predictions={forecastPredictions} />
+                      <PredictionTable predictions={forecastPredictions} />
+                    </>
+                  )}
+                </section>
+              </>
+            )}
 
           </div>
         )}
