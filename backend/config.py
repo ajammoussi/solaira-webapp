@@ -30,7 +30,9 @@ class Config:
     LOCATION_NAME = os.getenv('LOCATION_NAME', 'Tunisia')
     
     # Weather API
+    # Weather API keys (OpenWeather primary). Support both OPENWEATHER_API_KEY and WEATHER_API_KEY for backward compatibility.
     WEATHER_API_KEY = os.getenv('WEATHER_API_KEY', '')
+    OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY', WEATHER_API_KEY)
     WEATHER_API_PROVIDER = os.getenv('WEATHER_API_PROVIDER', 'auto')  # 'openweather', 'nasa', 'mock', 'auto'
     WEATHER_API_URL = os.getenv('WEATHER_API_URL', 'https://api.nasa.gov/planetary/earth/assets')
     

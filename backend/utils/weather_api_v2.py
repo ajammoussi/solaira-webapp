@@ -189,48 +189,106 @@ class NASAPowerProvider(WeatherProvider):
         return forecast
 
 
+class OpenMeteoProvider(WeatherProvider):
+    """Open-Meteo API (free, no key, hourly forecast)."""
+
+    def __init__(self):
+        self.base_url = "https://api.open-meteo.com/v1/forecast"
+
+    def fetch_forecast(self, latitude: float, longitude: float, date: str) -> Dict:
+        try:
+            params = {
+                'latitude': latitude,
+                'longitude': longitude,
+                'hourly': 'temperature_2m,wind_speed_10m,shortwave_radiation,cloud_cover,pressure_msl',
+                'timezone': 'auto'
+            }
+            response = requests.get(self.base_url, params=params, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+
+            times = data.get('hourly', {}).get('time', [])
+            temp = data.get('hourly', {}).get('temperature_2m', [])
+            wind = data.get('hourly', {}).get('wind_speed_10m', [])
+            swr = data.get('hourly', {}).get('shortwave_radiation', [])
+            cloud = data.get('hourly', {}).get('cloud_cover', [])
+            press = data.get('hourly', {}).get('pressure_msl', [])
+
+            # Filter to target date; compute simple average
+            day_mask = [t.startswith(date) for t in times]
+            def avg(series):
+                vals = [v for v, m in zip(series, day_mask) if m and v is not None]
+                return float(sum(vals) / len(vals)) if vals else None
+
+            temp_avg = avg(temp) or 15.0
+            wind_avg = avg(wind) or 3.5
+            swr_avg = avg(swr) or 400.0
+            cloud_avg = avg(cloud) or 40.0
+            press_avg = avg(press) or 1013.0
+
+            return {
+                'temperature_c': temp_avg,
+                'irradiance_w_m2': swr_avg,
+                'wind_speed_m_s': wind_avg,
+                'cloud_cover_percent': cloud_avg,
+                'humidity_percent': 60,  # Not provided; fallback
+                'pressure_hpa': press_avg,
+                'source': 'openmeteo',
+                'latitude': latitude,
+                'longitude': longitude,
+                'date': date
+            }
+        except Exception as e:
+            logger.error(f"[Weather API] Open-Meteo error: {e}. Falling back to mock data.")
+            return MockWeatherProvider().fetch_forecast(latitude, longitude, date)
+
+    def fetch_current(self, latitude: float, longitude: float) -> Dict:
+        # Use the first hour as current-ish
+        today = datetime.now().strftime('%Y-%m-%d')
+        forecast = self.fetch_forecast(latitude, longitude, today)
+        forecast['source'] = 'openmeteo'
+        return forecast
+
+
 # Global provider instance
 _provider: Optional[WeatherProvider] = None
 
 
 def initialize_weather_provider(api_key: Optional[str] = None, provider_type: str = 'auto'):
-    """
-    Initialize global weather provider.
-    
-    Args:
-        api_key: OpenWeather API key (optional)
-        provider_type: 'openweather', 'nasa', 'mock', or 'auto' (auto-detect)
-    """
+    """Initialize global weather provider with fallback cascade."""
     global _provider
-    
-    if provider_type == 'auto':
-        # Auto-select based on available API key
-        if api_key:
-            _provider = OpenWeatherProvider(api_key)
-            logger.info("[Weather API] Using OpenWeather provider")
-        else:
-            _provider = NASAPowerProvider()
-            logger.info("[Weather API] Using NASA POWER provider (no API key needed)")
+
+    if provider_type == 'mock':
+        _provider = MockWeatherProvider()
     elif provider_type == 'openweather':
         if not api_key:
-            logger.warning("[Weather API] OpenWeather requires API key. Falling back to NASA POWER.")
-            _provider = NASAPowerProvider()
-        else:
-            _provider = OpenWeatherProvider(api_key)
-            logger.info("[Weather API] Using OpenWeather provider")
+            raise ValueError("OpenWeather API key is required for OpenWeather provider")
+        _provider = OpenWeatherProvider(api_key)
+    elif provider_type == 'openmeteo':
+        _provider = OpenMeteoProvider()
     elif provider_type == 'nasa':
         _provider = NASAPowerProvider()
-        logger.info("[Weather API] Using NASA POWER provider")
-    else:  # mock
-        _provider = MockWeatherProvider()
-        logger.info("[Weather API] Using mock provider (testing only)")
+    elif provider_type == 'auto':
+        # Auto: OpenWeather (if key) -> OpenMeteo -> NASA -> Mock
+        if api_key:
+            _provider = OpenWeatherProvider(api_key)
+            logger.info("[Weather API] Using OpenWeather provider (auto)")
+        else:
+            try:
+                _provider = OpenMeteoProvider()
+                logger.info("[Weather API] Using Open-Meteo provider (auto)")
+            except Exception:
+                _provider = NASAPowerProvider()
+                logger.info("[Weather API] Using NASA POWER provider (auto)")
+    else:
+        raise ValueError(f"Unknown provider type: {provider_type}")
+
+    logger.info(f"[Weather API] Initialized provider: {_provider.__class__.__name__}")
 
 
 def get_provider() -> WeatherProvider:
-    """Get or initialize the global weather provider."""
-    global _provider
     if _provider is None:
-        initialize_weather_provider()
+        raise RuntimeError("Weather provider not initialized. Call initialize_weather_provider first.")
     return _provider
 
 
@@ -239,29 +297,19 @@ def fetch_weather_forecast(
     latitude: float = DEFAULT_LATITUDE,
     longitude: float = DEFAULT_LONGITUDE
 ) -> Dict:
-    """
-    Fetch weather forecast for a location.
-    
-    Args:
-        forecast_date: Date string (YYYY-MM-DD). If None, uses tomorrow.
-        latitude: Location latitude (default: Tunisia)
-        longitude: Location longitude (default: Tunisia)
-    
-    Returns:
-        Dict with {temperature_c, irradiance_w_m2, wind_speed_m_s, cloud_cover_percent, ...}
-    """
+    """Fetch weather forecast for a location."""
     if forecast_date is None:
         forecast_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
-    
+
     provider = get_provider()
     forecast = provider.fetch_forecast(latitude, longitude, forecast_date)
-    
+
     logger.info(
         f"[Weather API] Forecast for {forecast_date} @ ({latitude}, {longitude}): "
         f"Temp={forecast['temperature_c']}°C, Wind={forecast['wind_speed_m_s']}m/s, "
         f"Irradiance={forecast['irradiance_w_m2']}W/m² [source: {forecast['source']}]"
     )
-    
+
     return forecast
 
 

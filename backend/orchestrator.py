@@ -65,7 +65,7 @@ def run_daily_pipeline():
         
         # Initialize weather provider
         initialize_weather_provider(
-            api_key=config.WEATHER_API_KEY,
+            api_key=config.OPENWEATHER_API_KEY,
             provider_type=config.WEATHER_API_PROVIDER
         )
         
