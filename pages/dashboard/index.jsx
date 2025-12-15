@@ -24,19 +24,19 @@ import styles from './styles.module.css';
 
 const Dashboard = () => {
   const router = useRouter();
-  const { user, isGuest, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { realtime, stats, loading, error, lastUpdated } = useAllEnergyData();
 
   // Protect this page - redirect to signin if not authenticated
   useEffect(() => {
-    if (!authLoading && !user && !isGuest) {
+    if (!authLoading && !user) {
       console.log('Dashboard: No auth, redirecting to signin');
       router.replace('/signin');
     }
-  }, [user, isGuest, authLoading, router]);
+  }, [user, authLoading, router]);
 
   // Show loading while checking auth
-  if (authLoading || (!user && !isGuest)) {
+  if (authLoading || !user) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f5f5f5' }}>
         <div className="spinner" />

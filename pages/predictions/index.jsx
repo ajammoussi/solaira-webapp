@@ -23,7 +23,7 @@ import styles from './styles.module.css';
 
 const Predictions = () => {
   const router = useRouter();
-  const { user, isGuest, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const { data: recommendations, loading } = useRecommendations();
   
   // Time period state (in hours)
@@ -48,17 +48,18 @@ const Predictions = () => {
     error: simError
   } = useDailyPrediction({
     initialSoc: 50.0,
-    autoFetch: !!(user || isGuest)
+    timezone: profile?.timezone,
+    autoFetch: !!user
   });
 
   // Protect this page
   useEffect(() => {
-    if (!authLoading && !user && !isGuest) {
+    if (!authLoading && !user) {
       router.replace('/signin');
     }
-  }, [user, isGuest, authLoading, router]);
+  }, [user, authLoading, router]);
 
-  if (authLoading || (!user && !isGuest)) {
+  if (authLoading || !user) {
     return (
       <Layout>
         <div className={styles.contentLoader}>

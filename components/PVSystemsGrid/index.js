@@ -8,7 +8,7 @@ import * as LucideIcons from 'lucide-react';
 import styles from './styles.module.css';
 import pvMonitoringService from '../../lib/services/pvMonitoring';
 
-const PVSystemsGrid = ({ refreshInterval = 30000, noPadding = false }) => {
+const PVSystemsGrid = ({ refreshInterval = 30000, noPadding = false, onUpdate }) => {
   const [systems, setSystems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,7 +19,14 @@ const PVSystemsGrid = ({ refreshInterval = 30000, noPadding = false }) => {
     try {
       const data = await pvMonitoringService.getAllSystemsStatus();
       setSystems(data.systems || []);
-      setLastUpdated(new Date(data.timestamp));
+      const timestamp = new Date(data.timestamp);
+      setLastUpdated(timestamp);
+      if (onUpdate) {
+        onUpdate({
+          lastUpdated: timestamp,
+          systemCount: (data.systems || []).length
+        });
+      }
       setError(null);
     } catch (err) {
       console.error('Error fetching systems status:', err);
@@ -110,8 +117,7 @@ const PVSystemsGrid = ({ refreshInterval = 30000, noPadding = false }) => {
     <div className={styles.pvGridContainer} style={noPadding ? { padding: 0 } : {}}>
       <div className={styles.gridHeader}>
         <div>
-          <h2>PV Systems Monitoring</h2>
-          <p className={styles.subtitle}>
+          <p className={styles.subtitle} style={{ marginTop: 0 }}>
             {systems.length} system{systems.length !== 1 ? 's' : ''} • 
             Last updated: {lastUpdated ? lastUpdated.toLocaleTimeString() : 'Never'}
           </p>

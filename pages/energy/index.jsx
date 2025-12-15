@@ -21,17 +21,17 @@ import PowerSourcesChart from '../../components/PowerSourcesChart';
 
 const Energy = () => {
   const router = useRouter();
-  const { user, isGuest, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [timeRange, setTimeRange] = useState('day');
 
   // Protect this page
   useEffect(() => {
-    if (!authLoading && !user && !isGuest) {
+    if (!authLoading && !user) {
       router.replace('/signin');
     }
-  }, [user, isGuest, authLoading, router]);
+  }, [user, authLoading, router]);
 
-  if (authLoading || (!user && !isGuest)) {
+  if (authLoading || !user) {
     return (
       <Layout>
         <div className={styles.pageContainer}>

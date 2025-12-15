@@ -16,7 +16,7 @@ const LOGOUT_EVENT_KEY = 'solaira_logout_event';
 
 const Layout = ({ children }) => {
   const router = useRouter();
-  const { user, profile, isGuest, signOut } = useAuth();
+  const { user, profile, signOut, loading } = useAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,7 +29,7 @@ const Layout = ({ children }) => {
     || user?.user_metadata?.full_name 
     || user?.user_metadata?.name
     || user?.email?.split('@')[0] 
-    || (isGuest ? 'Guest' : 'User');
+    || 'User';
   
   // Get initials for avatar
   const initials = displayName
@@ -43,20 +43,17 @@ const Layout = ({ children }) => {
     setSignOutLoading(true);
     
     try {
-      await signOut();
+      // Trigger sign out immediately without waiting for network
+      signOut();
       
       // Signal other tabs to logout
       localStorage.setItem(LOGOUT_EVENT_KEY, Date.now().toString());
       
-      // Small delay to ensure state is fully cleared
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Force reload to signin page (clears all React state)
-      window.location.replace('/');
+      // Navigate immediately to home
+      router.push('/');
     } catch (error) {
       console.error('Layout: signOut error:', error);
-      // Still redirect even on error
-      window.location.replace('/signin');
+      router.push('/');
     }
   };
 
@@ -64,7 +61,7 @@ const Layout = ({ children }) => {
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === LOGOUT_EVENT_KEY && e.newValue) {
-        window.location.href = '/signin';
+        router.push('/');
       }
     };
 
@@ -232,27 +229,43 @@ const Layout = ({ children }) => {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F3F4F6'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             >
-              <div style={{
-                width: '40px',
-                height: '40px',
-                minWidth: '40px',
-                minHeight: '40px',
-                borderRadius: '50%',
-                backgroundColor: '#00D9A3',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#FFFFFF',
-                fontSize: '15px',
-                fontWeight: '600',
-                flexShrink: 0
-              }}>
-                {initials}
-              </div>
+              {loading ? (
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  minWidth: '40px',
+                  minHeight: '40px',
+                  borderRadius: '50%',
+                  backgroundColor: '#E5E7EB',
+                  flexShrink: 0
+                }} />
+              ) : (
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  minWidth: '40px',
+                  minHeight: '40px',
+                  borderRadius: '50%',
+                  backgroundColor: '#00D9A3',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#FFFFFF',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  flexShrink: 0
+                }}>
+                  {initials}
+                </div>
+              )}
               {!sidebarCollapsed && (
-                <span style={{ flex: 1, textAlign: 'left', fontSize: '14px', color: '#374151', fontWeight: '500' }}>
-                  {displayName}
-                </span>
+                loading ? (
+                  <div style={{ flex: 1, height: '16px', backgroundColor: '#E5E7EB', borderRadius: '4px' }} />
+                ) : (
+                  <span style={{ flex: 1, textAlign: 'left', fontSize: '14px', color: '#374151', fontWeight: '500' }}>
+                    {displayName}
+                  </span>
+                )
               )}
               {!sidebarCollapsed && (
                 <LucideIcons.ChevronUp 
