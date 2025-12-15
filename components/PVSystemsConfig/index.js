@@ -54,7 +54,7 @@ const PVSystemsConfig = ({ onConfigured }) => {
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error('Error configuring systems:', err);
-      setError(err.response?.data?.detail || 'Failed to configure systems');
+      setError(err.response?.data?.detail || err.message || 'Failed to configure systems');
     } finally {
       setLoading(false);
     }

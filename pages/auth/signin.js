@@ -99,9 +99,9 @@ export default function SignIn() {
           ? 'Invalid email or password. Please try again.'
           : error.message || 'Failed to sign in. Please try again.'
       );
-    } finally {
       setLoading(false);
     }
+    // Removed finally block to avoid state update on unmount if redirect happens
   };
 
   const handleOAuthSignIn = async (provider) => {

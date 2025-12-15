@@ -326,53 +326,81 @@ class PVMonitoringService:
             raise
     
     def _generate_initial_historical_data(self):
-        """Generate 7 days of historical data for immediate analysis"""
+        """Generate 7 days of historical data for immediate analysis (Optimized)"""
         
         print("Generating initial historical data...")
         
+        # Create hourly timestamps for the last 7 days
+        end_date = datetime.now().replace(minute=0, second=0, microsecond=0)
+        start_date = end_date - timedelta(days=7)
+        timestamps = pd.date_range(start=start_date, end=end_date, freq='H')[:-1] # Exclude last one to match 7*24
+        
+        if len(timestamps) == 0:
+            return
+
+        hours = timestamps.hour.values
+        months = timestamps.month.values
+        
+        # Vectorized solar multiplier calculation
+        # Night time mask
+        is_day = (hours >= 6) & (hours <= 20)
+        
+        # Seasonal adjustment
+        seasonal_factor = 0.7 + 0.3 * np.sin((months - 3) * np.pi / 6)
+        
+        # Bell curve
+        peak_hour = 13
+        std_dev = 4
+        gaussian = np.exp(-((hours - peak_hour) ** 2) / (2 * std_dev ** 2))
+        
+        base_multipliers = np.where(is_day, gaussian * seasonal_factor, 0.0)
+        
         for system_id, generator in self.generators.items():
-            # Generate data for last 7 days
-            for days_ago in range(7, 0, -1):
-                date = datetime.now() - timedelta(days=days_ago)
-                
-                # Generate daily total (sum of hourly production)
-                daily_actual = 0
-                daily_predicted = 0
-                
-                for hour in range(24):
-                    timestamp = date.replace(hour=hour, minute=0, second=0)
-                    month = timestamp.month
-                    
-                    # Calculate production for this hour
-                    solar_multiplier = generator._get_solar_multiplier(hour, month)
-                    base_production = generator.config.capacity_kw * solar_multiplier
-                    
-                    # Add weather variability
-                    weather_factor = np.random.uniform(0.85, 0.95)
-                    base_production *= weather_factor
-                    
-                    # For some systems, inject performance issues
-                    degradation = 1.0
-                    if system_id % 3 == 0 and days_ago < 3:  # Every 3rd system has recent issues
-                        degradation = np.random.uniform(0.75, 0.85)
-                    elif system_id % 5 == 0 and days_ago < 2:  # Every 5th system has critical issues
-                        degradation = np.random.uniform(0.60, 0.70)
-                    
-                    actual_production = base_production * degradation
-                    
-                    daily_actual += actual_production
-                    daily_predicted += base_production
-                
-                # Store as fake history entry
+            # Base production
+            production = generator.config.capacity_kw * base_multipliers
+            
+            # Weather variability (random factor per hour)
+            weather_factors = np.random.uniform(0.85, 0.95, size=len(timestamps))
+            production *= weather_factors
+            
+            # Degradation (simplified for vectorization)
+            degradation = np.ones(len(timestamps))
+            if system_id % 3 == 0: # Recent issues
+                 # Apply to last 3 days
+                 mask = timestamps >= (end_date - timedelta(days=3))
+                 degradation[mask] = np.random.uniform(0.75, 0.85, size=mask.sum())
+            elif system_id % 5 == 0: # Critical issues
+                 # Apply to last 2 days
+                 mask = timestamps >= (end_date - timedelta(days=2))
+                 degradation[mask] = np.random.uniform(0.60, 0.70, size=mask.sum())
+                 
+            actual_production = production * degradation
+            
+            # Create DataFrame for aggregation
+            df = pd.DataFrame({
+                'timestamp': timestamps,
+                'actual_kwh': actual_production,
+                'predicted_kwh': production
+            })
+            
+            df['date'] = df['timestamp'].dt.date
+            daily_df = df.groupby('date').agg({
+                'actual_kwh': 'sum',
+                'predicted_kwh': 'sum'
+            }).reset_index()
+            
+            # Convert to list of dicts for generator.history
+            generator.history = [] # Clear existing history just in case
+            for _, row in daily_df.iterrows():
                 generator.history.append({
-                    'timestamp': date.isoformat(),
+                    'timestamp': datetime.combine(row['date'], datetime.min.time()).isoformat(),
                     'system_id': system_id,
-                    'actual_kwh': daily_actual,
-                    'predicted_kwh': daily_predicted,
+                    'actual_kwh': float(row['actual_kwh']),
+                    'predicted_kwh': float(row['predicted_kwh']),
                     'anomaly': None
                 })
             
-            # Save to CSV immediately
+            # Save to CSV
             self._save_readings_to_csv(system_id)
         
         print(f"Generated 7 days of historical data for {len(self.generators)} systems")
