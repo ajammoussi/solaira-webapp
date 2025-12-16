@@ -3,6 +3,7 @@ Main orchestration script - runs daily to predict, decide, and store.
 Schedule as cron job: 0 6 * * * python -m backend.orchestrator
 """
 
+import os
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -106,8 +107,13 @@ def run_daily_pipeline():
         vacation_flag = is_tomorrow_vacation()
         consumption_prediction = predict_consumption(historic_data, forecast)
         if vacation_flag:
-            consumption_prediction['value'] = round(consumption_prediction['value'] * 0.6, 2)
-            logger.info("    Vacation mode: applied 0.6 coefficient")
+            consumption_prediction['value'] = round(
+                consumption_prediction['value'] * config.VACATION_COEFFICIENT,
+                2,
+            )
+            logger.info(
+                "    Vacation mode: applied %.2f coefficient", config.VACATION_COEFFICIENT
+            )
         logger.info(f"    Consumption: {consumption_prediction['value']:.2f} kWh")
         
         predictions = {
@@ -122,13 +128,15 @@ def run_daily_pipeline():
         
         # === STEP 5: COMPUTE DECISIONS (PHASE 2) ===
         logger.info("Step 5: Computing Phase 2 decisions...")
-        # Fetch user appliances & weekly planned actions (mocked for prototype)
-        # Load appliances and weekly actions from DB
+        # Fetch user appliances & weekly planned actions
         user_appliances = fetch_user_appliances()
         weekly_actions = fetch_weekly_actions(today)
 
-        # Current battery SOC (prototype: assume 50%)
-        current_battery_soc = 50.0
+        # Current battery SOC (allow override via env CURRENT_BATTERY_SOC)
+        try:
+            current_battery_soc = float(os.getenv("CURRENT_BATTERY_SOC", 50.0))
+        except Exception:
+            current_battery_soc = 50.0
 
         decisions = compute_decisions(
             predictions,

@@ -67,6 +67,9 @@ class Config:
     BATTERY_MAX_CHARGE_KW = 5.0  # Max charging rate
     BATTERY_MAX_DISCHARGE_KW = 5.0  # Max discharge rate
 
+    # Vacation consumption coefficient (applied when tomorrow is vacation)
+    VACATION_COEFFICIENT = float(os.getenv('VACATION_COEFFICIENT', 0.6))
+
     # Minimal operational energy thresholds (kWh)
     PV_MIN_OPERATE_KWH = float(os.getenv('PV_MIN_OPERATE_KWH', 0.5))
     WIND_MIN_OPERATE_KWH = float(os.getenv('WIND_MIN_OPERATE_KWH', 0.3))

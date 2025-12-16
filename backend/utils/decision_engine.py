@@ -97,6 +97,12 @@ def compute_decisions(predictions, user_appliances=None, current_battery_soc=50.
     # === APPLIANCE SCHEDULING (Weekly actions prioritized, then export surplus) ===
     appliances = []
     available_surplus = max(0, battery_bilan_kwh)
+    # Allow using high-SOC headroom even without immediate surplus
+    headroom_kwh = 0
+    if soc_estimate >= config.BATTERY_EXPORT_THRESHOLD_SOC:
+        headroom_kwh = ((soc_estimate - config.BATTERY_EXPORT_THRESHOLD_SOC) / 100) * config.BATTERY_CAPACITY_KWH
+        headroom_kwh = max(0, headroom_kwh)
+    available_energy = available_surplus + headroom_kwh
 
     # Prioritize weekly planned actions (if provided)
     planned_actions = weekly_actions or []
@@ -104,7 +110,7 @@ def compute_decisions(predictions, user_appliances=None, current_battery_soc=50.
         # Each action: {id, name, power_kwh, preferred_time}
         for action in planned_actions:
             power_needed = action.get('power_kwh', 0)
-            if available_surplus >= power_needed and soc_estimate > 50:
+            if available_energy >= power_needed and (soc_estimate > 50 or soc_estimate >= config.BATTERY_EXPORT_THRESHOLD_SOC):
                 appliances.append({
                     'id': action.get('id'),
                     'name': action.get('name', 'Planned action'),
@@ -113,13 +119,13 @@ def compute_decisions(predictions, user_appliances=None, current_battery_soc=50.
                     'reason': 'Weekly planned action prioritized with available surplus',
                     'action': 'schedule'
                 })
-                available_surplus -= power_needed
+                available_energy -= power_needed
 
     # Then schedule user appliances opportunistically
     if user_appliances:
         for appliance in user_appliances:
             power_needed = appliance.get('power_kwh', 0)
-            if available_surplus >= power_needed and soc_estimate > 50:
+            if available_energy >= power_needed and (soc_estimate > 50 or soc_estimate >= config.BATTERY_EXPORT_THRESHOLD_SOC):
                 appliances.append({
                     'id': appliance.get('id'),
                     'name': appliance.get('name', 'Appliance'),
@@ -128,7 +134,7 @@ def compute_decisions(predictions, user_appliances=None, current_battery_soc=50.
                     'reason': 'Surplus available; scheduling user appliance',
                     'action': 'schedule'
                 })
-                available_surplus -= power_needed
+                available_energy -= power_needed
             elif soc_estimate < config.BATTERY_IMPORT_THRESHOLD_SOC and power_needed > 1.0:
                 appliances.append({
                     'id': appliance.get('id'),
@@ -141,12 +147,12 @@ def compute_decisions(predictions, user_appliances=None, current_battery_soc=50.
     
     # If no user appliances or none scheduled, add generic guidance
     if len(appliances) == 0:
-        if battery_bilan_kwh > 2.0:
+        if available_energy > 0.5:
             appliances.append({
                 'id': 'generic',
                 'name': 'Heavy loads (washing, dishwasher)',
                 'scheduled_time': 'optimal_window',
-                'reason': f'Surplus available ({battery_bilan_kwh:.1f} kWh), good time for heavy appliances',
+                'reason': f'Surplus/headroom available ({available_energy:.1f} kWh), good time for heavy appliances',
                 'action': 'schedule'
             })
         elif soc_estimate < 30:
