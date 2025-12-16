@@ -25,7 +25,7 @@ import {
 
 export default function SignIn() {
   const router = useRouter();
-  const { user, isGuest, loading: authLoading, signIn, signInWithOAuth, enterGuestMode } = useAuth();
+  const { user, loading: authLoading, signIn, signInWithOAuth } = useAuth();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -34,20 +34,19 @@ export default function SignIn() {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [guestLoading, setGuestLoading] = useState(false);
   const [generalError, setGeneralError] = useState('');
 
   // Redirect if already logged in
   useEffect(() => {
-    console.log('SignIn: Auth state check', { authLoading, user: !!user, isGuest });
+    console.log('SignIn: Auth state check', { authLoading, user: !!user });
     if (!authLoading) {
-      if (user || isGuest) {
+      if (user) {
         console.log('SignIn: User already authenticated, redirecting to dashboard');
         const redirectTo = router.query.redirect || '/dashboard';
         router.replace(redirectTo);
       }
     }
-  }, [user, isGuest, authLoading, router]);
+  }, [user, authLoading, router]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -100,9 +99,9 @@ export default function SignIn() {
           ? 'Invalid email or password. Please try again.'
           : error.message || 'Failed to sign in. Please try again.'
       );
-    } finally {
       setLoading(false);
     }
+    // Removed finally block to avoid state update on unmount if redirect happens
   };
 
   const handleOAuthSignIn = async (provider) => {
@@ -118,12 +117,6 @@ export default function SignIn() {
       setGeneralError(`Failed to sign in with ${provider}. Please try again.`);
       setLoading(false);
     }
-  };
-
-  const handleGuestAccess = () => {
-    setGuestLoading(true);
-    enterGuestMode();
-    router.push('/dashboard');
   };
 
   // Show loading while checking auth
@@ -190,7 +183,7 @@ export default function SignIn() {
             <TextLink href="/forgot-password">Forgot password?</TextLink>
           </LinkRow>
 
-          <PrimaryButton loading={loading} disabled={guestLoading}>
+          <PrimaryButton loading={loading}>
             Sign In
           </PrimaryButton>
         </form>
@@ -199,18 +192,8 @@ export default function SignIn() {
 
         <OAuthButtons
           onGoogleClick={() => handleOAuthSignIn('google')}
-          onGitHubClick={() => handleOAuthSignIn('github')}
           loading={loading}
-          disabled={guestLoading}
         />
-
-        <div style={{ marginTop: '16px' }}>
-          <GuestButton
-            onClick={handleGuestAccess}
-            loading={guestLoading}
-            disabled={loading}
-          />
-        </div>
 
         <AuthFooter
           text="Don't have an account?"

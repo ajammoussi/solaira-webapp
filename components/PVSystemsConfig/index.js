@@ -54,7 +54,7 @@ const PVSystemsConfig = ({ onConfigured }) => {
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error('Error configuring systems:', err);
-      setError(err.response?.data?.detail || 'Failed to configure systems');
+      setError(err.response?.data?.detail || err.message || 'Failed to configure systems');
     } finally {
       setLoading(false);
     }
@@ -81,17 +81,7 @@ const PVSystemsConfig = ({ onConfigured }) => {
   };
 
   return (
-    <div className={styles.configContainer}>
-      <div className={styles.configHeader}>
-        <div className={styles.headerIcon}>
-          <LucideIcons.Settings size={24} />
-        </div>
-        <div>
-          <h3>PV Systems Configuration</h3>
-          <p>Configure the number of PV systems to monitor</p>
-        </div>
-      </div>
-
+    <div>
       {currentConfig && (
         <div className={styles.currentStatus}>
           <div className={styles.statusItem}>

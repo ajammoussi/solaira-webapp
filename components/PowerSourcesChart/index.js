@@ -20,6 +20,8 @@ const PowerSourcesChart = ({
   const chartInstanceRef = useRef(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     // Dynamically load ApexCharts
     const loadApexCharts = async () => {
       if (typeof window !== 'undefined') {
@@ -30,6 +32,8 @@ const PowerSourcesChart = ({
         }
         
         const ApexCharts = (await import('apexcharts')).default;
+
+        if (!isMounted) return;
 
         const options = {
           series: [{
@@ -107,6 +111,9 @@ const PowerSourcesChart = ({
         };
 
         if (chartRef.current) {
+          if (chartInstanceRef.current) {
+            chartInstanceRef.current.destroy();
+          }
           chartInstanceRef.current = new ApexCharts(chartRef.current, options);
           chartInstanceRef.current.render();
         }
@@ -116,8 +123,10 @@ const PowerSourcesChart = ({
     loadApexCharts();
 
     return () => {
+      isMounted = false;
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
+        chartInstanceRef.current = null;
       }
     };
   }, [solarData, gridData, labels]);

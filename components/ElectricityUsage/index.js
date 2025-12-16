@@ -18,6 +18,8 @@ const ElectricityUsage = ({
   const chartInstanceRef = useRef(null);
 
   useEffect(() => {
+    let observer = null;
+
     const loadApexCharts = async () => {
       if (typeof window !== 'undefined') {
         const ApexCharts = (await import('apexcharts')).default;
@@ -128,6 +130,11 @@ const ElectricityUsage = ({
         };
 
         if (chartRef.current) {
+          // Destroy existing instance if any
+          if (chartInstanceRef.current) {
+            chartInstanceRef.current.destroy();
+          }
+          
           chartInstanceRef.current = new ApexCharts(chartRef.current, electricityOptions);
           chartInstanceRef.current.render();
 
@@ -137,7 +144,7 @@ const ElectricityUsage = ({
           }, 100);
 
           // Re-attach on mutations
-          const observer = new MutationObserver(() => {
+          observer = new MutationObserver(() => {
             attachHoverEffects();
           });
 
@@ -145,8 +152,6 @@ const ElectricityUsage = ({
             childList: true,
             subtree: true
           });
-
-          return () => observer.disconnect();
         }
       }
     };
@@ -178,8 +183,12 @@ const ElectricityUsage = ({
     loadApexCharts();
 
     return () => {
+      if (observer) {
+        observer.disconnect();
+      }
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
+        chartInstanceRef.current = null;
       }
     };
   }, [gridImportData, solarData, gridExportData, categories]);

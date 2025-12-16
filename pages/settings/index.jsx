@@ -18,17 +18,17 @@ import styles from '../energy/styles.module.css';
 
 const Settings = () => {
   const router = useRouter();
-  const { user, isGuest, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { config, loading } = useSystemConfig();
 
   // Protect this page
   useEffect(() => {
-    if (!authLoading && !user && !isGuest) {
+    if (!authLoading && !user) {
       router.replace('/signin');
     }
-  }, [user, isGuest, authLoading, router]);
+  }, [user, authLoading, router]);
 
-  if (authLoading || (!user && !isGuest)) {
+  if (authLoading || !user) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f5f5f5' }}>
         <div className="spinner" />

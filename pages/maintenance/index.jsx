@@ -33,18 +33,19 @@ const Maintenance = () => {
   const [forecastPredictions, setForecastPredictions] = useState(null);
   const [showConfig, setShowConfig] = useState(true);
   const [configKey, setConfigKey] = useState(0);
+  const [systemsLastUpdated, setSystemsLastUpdated] = useState(null);
 
   // Protect this page
   useEffect(() => {
-    if (!authLoading && !user && !isGuest) {
+    if (!authLoading && !user) {
       router.replace('/signin');
     }
-  }, [user, isGuest, authLoading, router]);
+  }, [user, authLoading, router]);
 
   // Run Maintenance Analysis
   useEffect(() => {
     const runAnalysis = async () => {
-      if ((!user && !isGuest) || maintenanceData) return;
+      if (!user || maintenanceData) return;
       setMaintLoading(true);
       try {
         // Generate 30 days of mock data
@@ -106,9 +107,9 @@ const Maintenance = () => {
     };
     
     runAnalysis();
-  }, [user, isGuest]);
+  }, [user]);
 
-  if (authLoading || (!user && !isGuest)) {
+  if (authLoading || !user) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f5f5f5' }}>
         <div className="spinner" />
@@ -161,15 +162,50 @@ const Maintenance = () => {
         </div>
 
         {showConfig && (
-          <PVSystemsConfig 
-            onConfigured={() => {
-              setShowConfig(false);
-              setConfigKey(prev => prev + 1);
-            }}
-          />
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <LucideIcons.Settings className={styles.sectionIcon} />
+              <div>
+                <h2 className={styles.sectionTitle}>System Configuration</h2>
+                <p className={styles.sectionDescription} style={{marginBottom: 0}}>
+                  Configure your PV system parameters.
+                </p>
+              </div>
+            </div>
+            <PVSystemsConfig 
+              onConfigured={() => {
+                setShowConfig(false);
+                setConfigKey(prev => prev + 1);
+              }}
+            />
+          </section>
         )}
 
-        <PVSystemsGrid key={configKey} refreshInterval={30000} />
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <LucideIcons.Activity className={styles.sectionIcon} />
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h2 className={styles.sectionTitle}>PV System Monitoring</h2>
+                <p className={styles.sectionDescription} style={{marginBottom: 0}}>
+                  Real-time status of all connected PV systems.
+                </p>
+              </div>
+              {systemsLastUpdated && (
+                <div style={{ fontSize: '0.9rem', color: '#666', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <LucideIcons.Clock size={16} />
+                  Last updated: {systemsLastUpdated.toLocaleTimeString()}
+                </div>
+              )}
+            </div>
+          </div>
+          <PVSystemsGrid 
+            key={configKey} 
+            refreshInterval={60000} 
+            noPadding={true} 
+            onUpdate={(data) => setSystemsLastUpdated(data.lastUpdated)}
+          />
+        </section>
 
         <SolarChatbot />
       </div>
