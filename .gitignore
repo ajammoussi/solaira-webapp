@@ -5,7 +5,7 @@
 /pes-challenge-solaira-webapp.backup
 /.vscode
 __pycache__/
-venv//backend/tf_env
+venv
 /backend/chatbot/__pycache__/
 /backend/.venv
 /backend/.venv-forecast
