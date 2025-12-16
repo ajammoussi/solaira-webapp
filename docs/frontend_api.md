@@ -1,6 +1,11 @@
 # Frontend API Guide (ready for calls)
 
 Use these JSON endpoints to show predictions, decisions, history, anomalies, and to trigger runs. Serve via FastAPI (`backend/api.py`) or mirror in Next.js API routes.
+## Quick start (fresh clone)
+- Create venv & install deps: `python -m venv backend/.venv && .\backend\.venv\Scripts\Activate.ps1 && pip install -r backend/requirements.txt`
+- Init SQLite DB (one time): `python backend/scripts/init_sqlite.py` (creates `database/energy.db` and tables)
+- Run API: `python -m uvicorn backend.api:app --port 8000`
+- Call endpoints below. For SOC/location overrides, use `POST /run-orchestrator` with JSON payload.
 
 ## Base URLs
 - FastAPI local: `http://localhost:8000`
