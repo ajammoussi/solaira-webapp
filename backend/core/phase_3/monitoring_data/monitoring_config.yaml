@@ -14,6 +14,9 @@ pv_systems:
   - name: PV_System_4
     actual_data: backend/core/phase_3/monitoring_data/pv_system_4_actual.csv
     predicted_data: backend/core/phase_3/monitoring_data/pv_system_4_predicted.csv
+  - name: PV_System_5
+    actual_data: backend/core/phase_3/monitoring_data/pv_system_5_actual.csv
+    predicted_data: backend/core/phase_3/monitoring_data/pv_system_5_predicted.csv
   max_proximity_km: 5.0
 deviation_score:
   warning_threshold: 0.2

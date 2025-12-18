@@ -30,7 +30,17 @@ const PVSystemsGrid = ({ refreshInterval = 30000, noPadding = false, onUpdate })
       setError(null);
     } catch (err) {
       console.error('Error fetching systems status:', err);
-      setError('Failed to fetch systems status');
+      // More specific error message
+      if (err.response) {
+        // Server responded with error
+        setError(`Backend error: ${err.response.data?.detail || err.response.statusText}`);
+      } else if (err.request) {
+        // Request made but no response
+        setError('Cannot connect to backend. Is it running on http://localhost:8001?');
+      } else {
+        // Something else happened
+        setError(`Error: ${err.message}`);
+      }
     } finally {
       setLoading(false);
     }

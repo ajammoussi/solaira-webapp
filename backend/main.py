@@ -18,7 +18,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from backend.core.phase_1.data_processing import prepare_features_for_ml
 from backend.core.phase_2.simulator import EnergySimulator
 from backend.core.phase_2.realtime_manager import RealtimeEnergyManager
-from backend.core.phase_3.maintenance import PerformanceRatioCalculator, MaintenanceAnalyzer
 from backend.core.phase_3.pv_monitor import get_monitoring_service
 from backend.chatbot.src import SupportAgent, MESSAGES, rate_limited
 
@@ -152,6 +151,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Health check endpoint
+@app.get("/")
+def health_check():
+    """Health check endpoint"""
+    return {
+        "status": "running",
+        "service": "Solaira Energy API",
+        "version": "2.0",
+        "endpoints": {
+            "docs": "/docs",
+            "pv_systems": "/api/pv-systems/status"
+        }
+    }
+
+@app.get("/health")
+def health():
+    """Alternative health check"""
+    return {"status": "ok"}
+
 # --- Pydantic Models ---
 
 class WeatherData(BaseModel):
@@ -180,11 +198,6 @@ class EnergySimulationRequest(BaseModel):
     hours: int = 24
     initial_soc: float = 50.0
     consumption_profile: Optional[List[float]] = None
-
-class MaintenanceRequest(BaseModel):
-    actual_production: List[float]
-    predicted_production: List[float]
-    dates: List[str]
 
 class ChatRequest(BaseModel):
     message: str
@@ -382,37 +395,6 @@ def run_energy_simulation(request: EnergySimulationRequest):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/maintenance")
-def analyze_maintenance(request: MaintenanceRequest):
-    """
-    Analyze performance ratio and detect maintenance issues
-    """
-    try:
-        df_actual = pd.DataFrame({
-            'date': pd.to_datetime(request.dates),
-            'energy_kwh': request.actual_production
-        })
-        
-        df_predicted = pd.DataFrame({
-            'date': pd.to_datetime(request.dates),
-            'energy_kwh': request.predicted_production
-        })
-        
-        pr_calc = PerformanceRatioCalculator()
-        pr_df = pr_calc.calculate_pr(df_actual, df_predicted)
-        
-        analyzer = MaintenanceAnalyzer()
-        analysis = analyzer.analyze(pr_df)
-        
-        pr_history = pr_df[['date', 'pr']].dropna().to_dict(orient='records')
-        
-        return {
-            "analysis": analysis,
-            "pr_history": pr_history
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     """
@@ -537,6 +519,16 @@ def get_systems_status():
     """
     try:
         service = get_monitoring_service()
+        
+        # Check if systems are configured
+        if not service.systems:
+            return {
+                'timestamp': datetime.now().isoformat(),
+                'systems': [],
+                'total_systems': 0,
+                'message': 'No systems configured. Please configure systems first.'
+            }
+        
         statuses = service.get_all_systems_status()
         
         return {
@@ -546,6 +538,8 @@ def get_systems_status():
         }
     except Exception as e:
         logger.error(f"Error getting systems status: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/pv-systems/{system_id}/status")

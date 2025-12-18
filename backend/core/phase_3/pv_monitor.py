@@ -37,22 +37,38 @@ class PVSystemConfig:
         system_id: int, 
         capacity_kw: float = 5.0,
         name: Optional[str] = None,
-        anomaly_probability: float = 0.05
+        anomaly_probability: float = 0.05,
+        health_status: str = 'healthy'  # 'healthy', 'warning', 'critical'
     ):
         self.system_id = system_id
         self.capacity_kw = capacity_kw
         self.name = name or f"PV System {system_id}"
         self.anomaly_probability = anomaly_probability
+        self.health_status = health_status
         self.current_anomaly = None
         self.anomaly_start = None
-        
+        self.degradation_factor = self._get_degradation_factor()
+    
+    def _get_degradation_factor(self) -> float:
+        """Get consistent degradation factor based on health status"""
+        if self.health_status == 'critical':
+            # Critical: 35-45% degradation (mean deviation > 30%)
+            return np.random.uniform(0.55, 0.65)
+        elif self.health_status == 'warning':
+            # Warning: 20-30% degradation (mean deviation 20-30%)
+            return np.random.uniform(0.70, 0.80)
+        else:  # healthy
+            # Healthy: 0-10% degradation (mean deviation < 20%)
+            return np.random.uniform(0.90, 1.00)
+
 
 class PVDataGenerator:
     """Generates realistic PV production data with anomalies"""
     
     def __init__(self, system_config: PVSystemConfig):
         self.config = system_config
-        self.history = []
+        self.history = []  # Stores daily data
+        self.current_day = 0  # Track which day we're on
         
     def _get_solar_multiplier(self, hour: int, month: int) -> float:
         """Calculate solar production multiplier based on time"""
@@ -108,43 +124,52 @@ class PVDataGenerator:
         
         return base_production, None
     
-    def generate_reading(self) -> Dict:
-        """Generate a single production reading"""
-        now = datetime.now()
-        hour = now.hour
-        month = now.month
+    def generate_daily_reading(self) -> Dict:
+        """Generate one day's worth of production data (called every minute for fast testing)"""
+        # Each call represents one new day
+        self.current_day += 1
         
-        # Base production
-        solar_multiplier = self._get_solar_multiplier(hour, month)
-        base_production = self.config.capacity_kw * solar_multiplier
+        # Calculate the date for this reading
+        base_date = datetime.now().date()
+        reading_date = base_date - timedelta(days=max(0, 30 - self.current_day))
+        
+        # Generate daily total energy (kWh for the full day)
+        # Typical daily production: capacity * sun hours * efficiency
+        # For 5kW system: ~25-35 kWh/day in good conditions
+        month = reading_date.month
+        seasonal_factor = 0.7 + 0.3 * np.sin((month - 3) * np.pi / 6)
+        
+        # Base daily production (assuming ~6 effective sun hours)
+        base_daily_kwh = self.config.capacity_kw * 6 * seasonal_factor
         
         # Add weather variability (±20%)
         weather_factor = np.random.uniform(0.80, 1.00)
-        base_production *= weather_factor
+        predicted_daily_kwh = base_daily_kwh * weather_factor
         
-        # Add small random noise (±5%)
-        noise = np.random.uniform(-0.05, 0.05)
-        base_production *= (1 + noise)
+        # Apply health-based degradation
+        degradation = self.config.degradation_factor * np.random.uniform(0.98, 1.02)
+        degradation = np.clip(degradation, 0.5, 1.0)
+        actual_daily_kwh = predicted_daily_kwh * degradation
         
-        # Inject anomalies
-        actual_production, anomaly = self._inject_anomaly(base_production)
-        
-        # Calculate predicted production (what it should be without anomalies)
-        predicted_production = base_production
+        # Determine anomaly status
+        anomaly = None
+        if degradation < 0.80:
+            anomaly = 'critical_degradation' if degradation < 0.65 else 'performance_degradation'
         
         reading = {
-            'timestamp': now.isoformat(),
+            'timestamp': datetime.combine(reading_date, datetime.min.time()).isoformat(),
+            'date': reading_date.strftime('%Y-%m-%d'),
             'system_id': self.config.system_id,
-            'actual_kwh': max(0, actual_production),
-            'predicted_kwh': max(0, predicted_production),
+            'actual_kwh': max(0, actual_daily_kwh),
+            'predicted_kwh': max(0, predicted_daily_kwh),
             'anomaly': anomaly
         }
         
         self.history.append(reading)
         
-        # Keep only last 24 hours
-        if len(self.history) > 1440:  # 24 hours * 60 minutes
-            self.history = self.history[-1440:]
+        # Keep only last 30 days
+        if len(self.history) > 30:
+            self.history = self.history[-30:]
         
         return reading
 
@@ -227,43 +252,29 @@ class PVMonitoringService:
         if not generator.history:
             return
         
-        # Group by date and aggregate
+        # Data is already daily - just extract and format
         df = pd.DataFrame(generator.history)
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
-        df['date'] = df['timestamp'].dt.date
         
-        # Daily aggregation
-        daily_actual = df.groupby('date')['actual_kwh'].sum().reset_index()
-        daily_actual.columns = ['date', 'energy_kwh']
+        # Create actual data CSV
+        actual_df = df[['date', 'actual_kwh']].copy()
+        actual_df.columns = ['date', 'energy_kwh']
         
-        daily_predicted = df.groupby('date')['predicted_kwh'].sum().reset_index()
-        daily_predicted.columns = ['date', 'energy_kwh']
+        # Create predicted data CSV
+        predicted_df = df[['date', 'predicted_kwh']].copy()
+        predicted_df.columns = ['date', 'energy_kwh']
         
         # Save to CSV
         actual_path = self.data_dir / f'pv_system_{system_id}_actual.csv'
         predicted_path = self.data_dir / f'pv_system_{system_id}_predicted.csv'
         
-        daily_actual.to_csv(actual_path, index=False)
-        daily_predicted.to_csv(predicted_path, index=False)
+        actual_df.to_csv(actual_path, index=False)
+        predicted_df.to_csv(predicted_path, index=False)
     
     def _load_config(self):
         """Load PV systems configuration"""
-        config_file = self.data_dir / "pv_config.json"
-        if config_file.exists():
-            with open(config_file, 'r') as f:
-                data = json.load(f)
-                num_systems = data.get('num_systems', 0)
-                if num_systems > 0:
-                    # Recreate systems
-                    for system_data in data.get('systems', []):
-                        config = PVSystemConfig(**system_data)
-                        self.systems[config.system_id] = config
-                        self.generators[config.system_id] = PVDataGenerator(config)
-                    
-                    # Create config file but don't initialize pipeline yet
-                    self.config_path = self._create_dynamic_config_file(num_systems)
-                    # Pipeline will be initialized on first analysis when data exists
-                    self.pipeline = None
+        # Don't auto-load from config file - require explicit user configuration
+        # This prevents phantom systems from appearing
+        pass
     
     def _save_config(self):
         """Save PV systems configuration"""
@@ -275,7 +286,8 @@ class PVMonitoringService:
                     'system_id': s.system_id,
                     'capacity_kw': s.capacity_kw,
                     'name': s.name,
-                    'anomaly_probability': s.anomaly_probability
+                    'anomaly_probability': s.anomaly_probability,
+                    'health_status': s.health_status
                 }
                 for s in self.systems.values()
             ]
@@ -286,18 +298,39 @@ class PVMonitoringService:
     def configure_systems(self, num_systems: int, capacity_per_system: float = 5.0) -> Dict:
         """Configure the number of PV systems to monitor"""
         try:
+            print("\n" + "="*80)
+            print(f"🔧 Configuring {num_systems} PV Systems")
+            print("="*80 + "\n")
+            
             self.systems.clear()
             self.generators.clear()
             
+            # Distribute health statuses to cover all scenarios
+            # At least 1 critical, 1 warning, rest healthy
+            health_statuses = []
+            if num_systems >= 3:
+                health_statuses.append('critical')
+                health_statuses.append('warning')
+                # Fill rest with healthy systems
+                health_statuses.extend(['healthy'] * (num_systems - 2))
+            elif num_systems == 2:
+                health_statuses = ['warning', 'healthy']
+            else:
+                health_statuses = ['healthy']
+            
+            print("📄 System Health Distribution:")
             for i in range(1, num_systems + 1):
                 config = PVSystemConfig(
                     system_id=i,
                     capacity_kw=capacity_per_system,
                     name=f"PV System {i}",
-                    anomaly_probability=0.02  # 2% chance per minute
+                    anomaly_probability=0.02,  # 2% chance per minute
+                    health_status=health_statuses[i-1]
                 )
                 self.systems[i] = config
                 self.generators[i] = PVDataGenerator(config)
+                print(f"   System {i}: {health_statuses[i-1].upper()} (degradation: {config.degradation_factor:.1%})")
+            print()
             
             # Generate initial historical data (last 7 days) for immediate analysis
             self._generate_initial_historical_data()
@@ -307,6 +340,10 @@ class PVMonitoringService:
             self.pipeline = None  # Will be initialized on first analysis when data exists
             
             self._save_config()
+            
+            print("="*80)
+            print(f"✅ Successfully configured {num_systems} PV systems")
+            print("="*80 + "\n")
             
             return {
                 'num_systems': num_systems,
@@ -320,7 +357,7 @@ class PVMonitoringService:
                 ]
             }
         except Exception as e:
-            print(f"Error in configure_systems: {e}")
+            print(f"❌ Error in configure_systems: {e}")
             import traceback
             traceback.print_exc()
             raise
@@ -356,23 +393,19 @@ class PVMonitoringService:
         base_multipliers = np.where(is_day, gaussian * seasonal_factor, 0.0)
         
         for system_id, generator in self.generators.items():
+            config = generator.config
             # Base production
-            production = generator.config.capacity_kw * base_multipliers
+            production = config.capacity_kw * base_multipliers
             
             # Weather variability (random factor per hour)
             weather_factors = np.random.uniform(0.85, 0.95, size=len(timestamps))
             production *= weather_factors
             
-            # Degradation (simplified for vectorization)
-            degradation = np.ones(len(timestamps))
-            if system_id % 3 == 0: # Recent issues
-                 # Apply to last 3 days
-                 mask = timestamps >= (end_date - timedelta(days=3))
-                 degradation[mask] = np.random.uniform(0.75, 0.85, size=mask.sum())
-            elif system_id % 5 == 0: # Critical issues
-                 # Apply to last 2 days
-                 mask = timestamps >= (end_date - timedelta(days=2))
-                 degradation[mask] = np.random.uniform(0.60, 0.70, size=mask.sum())
+            # Apply consistent degradation based on health status
+            degradation = np.full(len(timestamps), config.degradation_factor)
+            # Add small random variation (±5%)
+            degradation *= np.random.uniform(0.95, 1.05, size=len(timestamps))
+            degradation = np.clip(degradation, 0.5, 1.0)  # Keep reasonable bounds
                  
             actual_production = production * degradation
             
@@ -394,6 +427,7 @@ class PVMonitoringService:
             for _, row in daily_df.iterrows():
                 generator.history.append({
                     'timestamp': datetime.combine(row['date'], datetime.min.time()).isoformat(),
+                    'date': row['date'].strftime('%Y-%m-%d'),
                     'system_id': system_id,
                     'actual_kwh': float(row['actual_kwh']),
                     'predicted_kwh': float(row['predicted_kwh']),
@@ -406,20 +440,22 @@ class PVMonitoringService:
         print(f"Generated 7 days of historical data for {len(self.generators)} systems")
     
     def generate_readings(self) -> List[Dict]:
-        """Generate readings for all systems"""
+        """Generate one day of data for all systems (each minute = 1 day for fast testing)"""
         readings = []
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         print(f"\n{'='*80}")
-        print(f"⚡ Generating PV Data - {timestamp}")
+        print(f"⚡ Generating Daily PV Data - {timestamp}")
+        print(f"   (Each reading = 1 day for accelerated testing)")
         print(f"{'='*80}")
         
         for generator in self.generators.values():
-            reading = generator.generate_reading()
+            reading = generator.generate_daily_reading()
             readings.append(reading)
             
             # Display the reading
             system_id = reading['system_id']
+            date = reading['date']
             actual = reading['actual_kwh']
             predicted = reading['predicted_kwh']
             anomaly = reading.get('anomaly', None)
@@ -428,10 +464,13 @@ class PVMonitoringService:
             status_symbol = "🔴" if anomaly else "🟢"
             anomaly_text = f" [{anomaly.replace('_', ' ').title()}]" if anomaly else ""
             
-            print(f"{status_symbol} System {system_id}: "
-                  f"Actual={actual:.2f} kWh | "
-                  f"Predicted={predicted:.2f} kWh | "
+            print(f"{status_symbol} System {system_id} [{date}]: "
+                  f"Daily={actual:.1f} kWh | "
+                  f"Expected={predicted:.1f} kWh | "
                   f"PR={pr:.1f}%{anomaly_text}")
+            
+            # Save updated data to CSV immediately
+            self._save_readings_to_csv(system_id)
         
         print(f"{'='*80}\n")
         return readings
@@ -440,15 +479,18 @@ class PVMonitoringService:
         """Initialize pipeline lazily when first needed"""
         if self.pipeline is None and self.config_path and self.config_path.exists():
             try:
-                # Suppress the verbose output from pipeline initialization
-                import io
-                import contextlib
-                
-                # Capture stdout to suppress initialization messages
-                with contextlib.redirect_stdout(io.StringIO()):
-                    self.pipeline = PredictiveMaintenancePipeline(str(self.config_path))
+                print("\n" + "="*80)
+                print("🔧 Initializing Predictive Maintenance Pipeline")
+                print("="*80)
+                # Show full pipeline output for debugging
+                self.pipeline = PredictiveMaintenancePipeline(str(self.config_path))
+                print("="*80)
+                print("✅ Pipeline initialized")
+                print("="*80 + "\n")
             except Exception as e:
-                print(f"Warning: Could not initialize pipeline: {e}")
+                print(f"❌ Warning: Could not initialize pipeline: {e}")
+                import traceback
+                traceback.print_exc()
                 self.pipeline = None
     
     def analyze_system(self, system_id: int, hours: int = 24) -> Dict:
@@ -476,16 +518,13 @@ class PVMonitoringService:
         
         # Check if we have enough data
         generator = self.generators[system_id]
-        cutoff_time = datetime.now() - timedelta(hours=hours)
-        recent_data = [
-            r for r in generator.history 
-            if datetime.fromisoformat(r['timestamp']) > cutoff_time
-        ]
+        # Since we're generating daily data, just use all history (already capped at 30 days)
+        recent_data = generator.history
         
         print(f"   Data points in history: {len(generator.history)}")
-        print(f"   Recent data points (last {hours}h): {len(recent_data)}")
+        print(f"   Using all historical data for analysis")
         
-        if len(recent_data) < 10:
+        if len(recent_data) < 7:
             print(f"⚠️  Insufficient data for system {system_id}")
             return {
                 'system_id': system_id,
@@ -495,27 +534,30 @@ class PVMonitoringService:
             }
         
         try:
-            print(f"   📊 Running pipeline analysis...")
+            print(f"\n" + "="*80)
+            print(f"📊 Running Full Pipeline Analysis")
+            print("="*80 + "\n")
             
-            # Run the full pipeline
+            # Run the full pipeline - all output will be shown
             pv_data = self.pipeline.load_data()
-            print(f"   ✓ Loaded data for {len(pv_data)} systems")
             
             if len(pv_data) < 2:
-                print(f"   ⚠️  Need at least 2 systems for pairwise comparison, falling back")
+                print(f"\n⚠️  Need at least 2 systems for pairwise comparison, falling back")
                 # Need at least 2 systems for pairwise comparison
                 return self._analyze_single_system(system_id, recent_data)
             
             # Calculate PR for all systems
             pr_all_systems = self.pipeline.calculate_performance_ratios(pv_data)
-            print(f"   ✓ Calculated PR for all systems")
             
             # Calculate pairwise deviations
             deviation_analysis = self.pipeline.calculate_pairwise_deviations(pr_all_systems)
-            print(f"   ✓ Calculated pairwise deviations")
+            
+            print("\n" + "="*80)
+            print("✅ Pipeline Analysis Complete")
+            print("="*80 + "\n")
             
             if 'error' in deviation_analysis:
-                print(f"   ⚠️  Error in deviation analysis, falling back")
+                print(f"⚠️  Error in deviation analysis, falling back")
                 return self._analyze_single_system(system_id, recent_data)
             
             # Extract status for this specific system
@@ -540,7 +582,12 @@ class PVMonitoringService:
             system_pr_col = f'{system_name}_pr'
             recent_pr = pr_all_systems[system_pr_col].iloc[-1] if system_pr_col in pr_all_systems.columns else None
             
-            print(f"   ✅ System {system_id}: Category={category}, Deviation={mean_deviation:.1%}, Status={status}")
+            print(f"\n📈 Results for System {system_id}:")
+            print(f"   Status: {status.upper()}")
+            print(f"   Category: {category}")
+            print(f"   Mean Deviation: {mean_deviation:.1%}")
+            print(f"   Recent PR: {recent_pr:.1%}" if recent_pr else "   Recent PR: N/A")
+            print()
             
             # Determine issues based on analysis (without mentioning anomaly types)
             issues = []
@@ -606,10 +653,25 @@ class PVMonitoringService:
     
     def get_all_systems_status(self) -> List[Dict]:
         """Get status for all systems"""
+        if not self.systems:
+            # No systems configured yet
+            return []
+        
         statuses = []
         for system_id in self.systems.keys():
-            status = self.analyze_system(system_id)
-            statuses.append(status)
+            try:
+                status = self.analyze_system(system_id)
+                statuses.append(status)
+            except Exception as e:
+                print(f"Error analyzing system {system_id}: {e}")
+                # Return a basic error status for this system
+                statuses.append({
+                    'system_id': system_id,
+                    'system_name': self.systems[system_id].name,
+                    'status': 'error',
+                    'severity': 'normal',
+                    'error': str(e)
+                })
         return statuses
     
     def start_monitoring(self, interval_seconds: int = 60):
