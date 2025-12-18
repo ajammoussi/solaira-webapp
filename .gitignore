@@ -9,3 +9,7 @@ venv
 /backend/chatbot/__pycache__/
 /backend/.venv
 /backend/.venv-forecast
+
+# PV Monitoring generated data
+/backend/core/phase_3/monitoring_data/
+*.csv
