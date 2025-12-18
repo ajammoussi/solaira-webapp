@@ -1,29 +1,40 @@
 {
-  "num_systems": 4,
+  "num_systems": 5,
   "systems": [
     {
       "system_id": 1,
       "capacity_kw": 5.0,
       "name": "PV System 1",
-      "anomaly_probability": 0.02
+      "anomaly_probability": 0.02,
+      "health_status": "critical"
     },
     {
       "system_id": 2,
       "capacity_kw": 5.0,
       "name": "PV System 2",
-      "anomaly_probability": 0.02
+      "anomaly_probability": 0.02,
+      "health_status": "warning"
     },
     {
       "system_id": 3,
       "capacity_kw": 5.0,
       "name": "PV System 3",
-      "anomaly_probability": 0.02
+      "anomaly_probability": 0.02,
+      "health_status": "healthy"
     },
     {
       "system_id": 4,
       "capacity_kw": 5.0,
       "name": "PV System 4",
-      "anomaly_probability": 0.02
+      "anomaly_probability": 0.02,
+      "health_status": "healthy"
+    },
+    {
+      "system_id": 5,
+      "capacity_kw": 5.0,
+      "name": "PV System 5",
+      "anomaly_probability": 0.02,
+      "health_status": "healthy"
     }
   ]
 }
