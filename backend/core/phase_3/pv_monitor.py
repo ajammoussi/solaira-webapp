@@ -29,6 +29,19 @@ if str(src_final_path) not in sys.path:
 from src_final.phase_3.predictive_maintenance import PredictiveMaintenancePipeline
 
 
+def sanitize_for_json(value):
+    """Convert NaN/Inf values to None for JSON serialization"""
+    if value is None:
+        return None
+    if isinstance(value, (int, str, bool)):
+        return value
+    if isinstance(value, float):
+        if np.isnan(value) or np.isinf(value):
+            return None
+        return value
+    return value
+
+
 class PVSystemConfig:
     """Configuration for a single PV system"""
     
@@ -129,8 +142,8 @@ class PVDataGenerator:
         # Each call represents one new day
         self.current_day += 1
         
-        # Calculate the date for this reading
-        base_date = datetime.now().date()
+        # Calculate the date for this reading (always in the past, never today)
+        base_date = datetime.now().date() - timedelta(days=1)  # Start from yesterday
         reading_date = base_date - timedelta(days=max(0, 30 - self.current_day))
         
         # Generate daily total energy (kWh for the full day)
@@ -367,10 +380,10 @@ class PVMonitoringService:
         
         print("Generating initial historical data...")
         
-        # Create hourly timestamps for the last 7 days
-        end_date = datetime.now().replace(minute=0, second=0, microsecond=0)
+        # Create hourly timestamps for the last 7 COMPLETE days (exclude today)
+        end_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)  # Start of today
         start_date = end_date - timedelta(days=7)
-        timestamps = pd.date_range(start=start_date, end=end_date, freq='H')[:-1] # Exclude last one to match 7*24
+        timestamps = pd.date_range(start=start_date, end=end_date, freq='H', inclusive='left')
         
         if len(timestamps) == 0:
             return
@@ -580,13 +593,29 @@ class PVMonitoringService:
             
             # Get current PR from latest data
             system_pr_col = f'{system_name}_pr'
-            recent_pr = pr_all_systems[system_pr_col].iloc[-1] if system_pr_col in pr_all_systems.columns else None
+            recent_pr = None
+            if system_pr_col in pr_all_systems.columns:
+                pr_value = pr_all_systems[system_pr_col].iloc[-1]
+                print(f"   DEBUG: PR column '{system_pr_col}' found")
+                print(f"   DEBUG: Raw PR value: {pr_value}, type: {type(pr_value)}")
+                print(f"   DEBUG: Is NaN: {pd.isna(pr_value)}")
+                # Check if it's a valid number
+                if pd.notna(pr_value):
+                    recent_pr = float(pr_value)
+                    print(f"   DEBUG: Converted PR: {recent_pr}")
+                else:
+                    print(f"   DEBUG: PR is NaN - checking data...")
+                    # Debug: show actual and predicted values
+                    print(f"   DEBUG: Last 3 rows of PR data:")
+                    print(pr_all_systems[[system_pr_col, f'{system_name}_actual_kwh', f'{system_name}_predicted_kwh']].tail(3))
+            else:
+                print(f"   DEBUG: PR column '{system_pr_col}' NOT found in columns: {pr_all_systems.columns.tolist()}")
             
             print(f"\n📈 Results for System {system_id}:")
             print(f"   Status: {status.upper()}")
             print(f"   Category: {category}")
             print(f"   Mean Deviation: {mean_deviation:.1%}")
-            print(f"   Recent PR: {recent_pr:.1%}" if recent_pr else "   Recent PR: N/A")
+            print(f"   Recent PR: {recent_pr:.1%}" if recent_pr is not None else "   Recent PR: N/A")
             print()
             
             # Determine issues based on analysis (without mentioning anomaly types)
@@ -601,8 +630,8 @@ class PVMonitoringService:
                 'system_name': self.systems[system_id].name,
                 'status': status,
                 'severity': severity,
-                'recent_pr': recent_pr,
-                'mean_deviation': mean_deviation,
+                'recent_pr': sanitize_for_json(recent_pr),
+                'mean_deviation': sanitize_for_json(mean_deviation),
                 'category': category,
                 'issues_detected': issues,
                 'data_points': len(recent_data),
@@ -644,7 +673,7 @@ class PVMonitoringService:
             'system_name': self.systems[system_id].name,
             'status': status,
             'severity': severity,
-            'recent_pr': pr,
+            'recent_pr': sanitize_for_json(pr),
             'mean_deviation': 0.0,
             'issues_detected': issues,
             'data_points': len(recent_data),

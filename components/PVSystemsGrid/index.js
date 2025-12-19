@@ -253,7 +253,9 @@ const SystemDetailModal = ({ system, onClose }) => {
             <div className={styles.detailGrid}>
               <div>
                 <span className={styles.label}>Performance Ratio:</span>
-                <span className={styles.value}>{(system.recent_pr * 100).toFixed(1)}%</span>
+                <span className={styles.value}>
+                  {system.recent_pr != null ? (system.recent_pr * 100).toFixed(1) + '%' : 'N/A'}
+                </span>
               </div>
               <div>
                 <span className={styles.label}>Status:</span>
