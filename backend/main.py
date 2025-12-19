@@ -19,6 +19,7 @@ from backend.core.phase_1.data_processing import prepare_features_for_ml
 from backend.core.phase_2.simulator import EnergySimulator
 from backend.core.phase_2.realtime_manager import RealtimeEnergyManager
 from backend.core.phase_3.pv_monitor import get_monitoring_service
+from src_final.phase_3.predictive_maintenance import PredictiveMaintenancePipeline
 from backend.chatbot.src import SupportAgent, MESSAGES, rate_limited
 
 # Load environment variables
@@ -220,6 +221,22 @@ class MonitoringControlRequest(BaseModel):
     action: str  # 'start' or 'stop'
     interval_seconds: int = 60
 
+
+class MaintenanceRequest(BaseModel):
+        """Request payload for /maintenance endpoint.
+
+        Matches frontend pythonApi.analyzeMaintenance:
+            - dates: list of ISO date strings
+            - actual_production: list of floats
+            - predicted_production: list of floats
+        """
+        dates: List[str]
+        actual_production: List[float]
+        predicted_production: List[float]
+
+        # Allow field names without alias protection
+        model_config = {'protected_namespaces': ()}
+
 # --- Endpoints ---
 
 @app.get("/", response_model=HealthResponse)
@@ -346,6 +363,88 @@ def simulate(request: SimulationRequest):
     except Exception as e:
         import traceback
         traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/maintenance")
+def run_maintenance_analysis(request: MaintenanceRequest):
+    """Run predictive maintenance analysis on a single PV system time series.
+
+    The frontend sends mock (or real) daily totals for one system and expects:
+      - analysis: high-level status and issues list
+      - pr_history: list of {date, pr} entries for charting
+    We reuse the Phase 3 performance ratio logic on this small dataset.
+    """
+    try:
+        if not (len(request.dates) == len(request.actual_production) == len(request.predicted_production)):
+            raise HTTPException(
+                status_code=400,
+                detail="dates, actual_production, and predicted_production must have the same length",
+            )
+
+        # Build DataFrame similar to Phase 3 expected structure (single PV system)
+        df = pd.DataFrame(
+            {
+                "date": pd.to_datetime(request.dates).date,
+                "actual_kwh": request.actual_production,
+                "predicted_kwh": request.predicted_production,
+            }
+        )
+
+        # Compute a simple performance ratio per day
+        # PR = actual / predicted (capped to finite, non-negative values)
+        df["pr"] = df.apply(
+            lambda row: (
+                float(row["actual_kwh"]) / float(row["predicted_kwh"]) if row["predicted_kwh"] > 0 else np.nan
+            ),
+            axis=1,
+        )
+
+        # Clean PR for JSON safety
+        df["pr"] = df["pr"].replace([np.inf, -np.inf], np.nan)
+
+        # Overall average PR (ignoring NaN)
+        mean_pr = float(df["pr"].dropna().mean()) if not df["pr"].dropna().empty else None
+
+        # Determine simple health status based on average PR
+        status = "normal"
+        issues: List[str] = []
+
+        if mean_pr is None:
+            status = "unknown"
+            issues.append("Insufficient data to evaluate performance")
+        else:
+            if mean_pr < 0.7:
+                status = "critical"
+                issues.append("Performance significantly below expected (PR < 0.70)")
+            elif mean_pr < 0.8:
+                status = "warning"
+                issues.append("Performance below normal range (0.70 ≤ PR < 0.80)")
+            else:
+                status = "normal"
+
+        # Build PR history for charts
+        pr_history = [
+            {
+                "date": d.isoformat() if isinstance(d, datetime) else str(d),
+                "pr": (float(p) if pd.notna(p) and np.isfinite(float(p)) else None),
+            }
+            for d, p in zip(df["date"], df["pr"])
+        ]
+
+        return {
+            "analysis": {
+                "status": status,
+                "issues": issues,
+                "mean_pr": mean_pr,
+            },
+            "pr_history": pr_history,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in /maintenance analysis: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/energy-simulation")
