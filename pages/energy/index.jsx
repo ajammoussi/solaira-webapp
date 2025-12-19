@@ -17,7 +17,7 @@ import styles from './styles.module.css';
 import EnergyDistributionCard from '../../components/EnergyDistributionCard';
 import BarChart from '../../components/BarChart';
 import SolarChatbot from '../../components/SolarChatbot';
-import PowerSourcesChart from '../../components/PowerSourcesChart';
+
 
 const Energy = () => {
   const router = useRouter();
@@ -70,17 +70,6 @@ const Energy = () => {
           />
         </section>
 
-        {/* Power Sources Chart Section */}
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <LucideIcons.Activity className={styles.sectionIcon} />
-            <h2 className={styles.sectionTitle}>Power Sources</h2>
-          </div>
-          <p className={styles.sectionDescription}>
-            Breakdown of power sources over the last 24 hours
-          </p>
-          <PowerSourcesChart card={false} />
-        </section>
 
         {/* Consumption Patterns Section */}
         <section className={styles.section}>
