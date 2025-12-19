@@ -1,0 +1,184 @@
+config_version: '3.0.0'
+system_name: 'Multi-PV Comparative Monitoring System'
+
+# ============================================================================
+# PV SYSTEM IDENTIFICATION (N Systems)
+# ============================================================================
+# List all PV systems to monitor
+# Systems should be nearby (similar weather/irradiance conditions)
+# ============================================================================
+pv_systems:
+  # Array of PV system configurations
+  systems:
+    - name: 'PV_System_1'
+      actual_data: 'test_randomized_data/pv_system_1_actual.csv'
+      predicted_data: 'test_randomized_data/pv_system_1_predicted.csv'
+      
+    - name: 'PV_System_2'
+      actual_data: 'test_randomized_data/pv_system_2_actual.csv'
+      predicted_data: 'test_randomized_data/pv_system_2_predicted.csv'
+      
+    - name: 'PV_System_3'
+      actual_data: 'test_randomized_data/pv_system_3_actual.csv'
+      predicted_data: 'test_randomized_data/pv_system_3_predicted.csv'
+      
+    - name: 'PV_System_4'
+      actual_data: 'test_randomized_data/pv_system_4_actual.csv'
+      predicted_data: 'test_randomized_data/pv_system_4_predicted.csv'
+  
+  # Optional: Maximum distance between systems (km) for validation
+  max_proximity_km: 5.0
+
+# ============================================================================
+# COMPARATIVE DEVIATION SCORE THRESHOLDS
+# ============================================================================
+# Pairwise deviation between all PV systems
+# Formula: deviation_ij = |PR_i - PR_j| / max(PR_i, PR_j) for all pairs
+# Mean deviation for PV_i = average of all deviations involving PV_i
+# 
+# Interpretation:
+# - Healthy (≤20%): System performing normally
+# - Warning (20-30%): Minor discrepancy, monitor closely
+# - Critical (>30%): Major fault, immediate action required
+# ============================================================================
+deviation_score:
+  # Thresholds for MEAN deviation (average across all pairwise comparisons)
+  warning_threshold: 0.20      # ≤20% mean deviation: System healthy
+  critical_threshold: 0.30     # 20-30% mean deviation: Warning level
+                               # >30% mean deviation: Critical fault
+  
+  # Temporal smoothing (to avoid false alarms from single-day variations)
+  moving_average_days: 3       # Use 3-day rolling average
+  consecutive_days_alert: 2    # Alert if deviation exceeds threshold for 2+ consecutive days
+  
+  # Pairwise comparison matrix settings
+  min_valid_pairs: 2           # Minimum number of valid pairwise comparisons needed
+
+# ============================================================================
+# PERFORMANCE RATIO (PR) CONFIGURATION
+# ============================================================================
+# PR = Actual Production / Predicted Production
+# Used for calculating system efficiency
+# ============================================================================
+performance_ratio:
+  expected_pr_min: 0.60        # Minimum acceptable PR (60%)
+  expected_pr_max: 0.90        # Maximum typical PR (90%)
+  optimal_pr: 0.80             # Target PR for healthy system (80%)
+
+# ============================================================================
+# ANALYSIS PARAMETERS
+# ============================================================================
+analysis:
+  # Daily comparison analysis
+  analysis_level: 'daily'      # Perform analysis at daily granularity
+  
+  # Minimum data requirements
+  min_hours_for_daily_pr: 8    # Need at least 8 daylight hours for valid PR
+  min_production_kwh: 0.1      # Ignore hours with < 0.1 kWh
+  
+  # Trend analysis windows for deviation tracking
+  short_term_window_days: 7    # 1-week deviation trend
+  medium_term_window_days: 30  # 1-month deviation trend
+  long_term_window_days: 90    # 3-month deviation trend
+
+# ============================================================================
+# MAINTENANCE ALERT RULES
+# ============================================================================
+# Alerts based ONLY on comparative deviation between PV1 and PV2
+# No individual PR threshold checks
+# ============================================================================
+maintenance_alerts:
+  # Alert triggers (based on deviation between PV1 and PV2)
+  consecutive_days_critical: 2     # Alert if critical deviation (>20%) for 2+ days
+  consecutive_days_alert: 3        # Alert if high deviation (10-20%) for 3+ days
+  consecutive_days_warning: 5      # Alert if medium deviation (5-10%) for 5+ days
+  
+  # Alert priorities
+  priority_critical: "CRITICAL"    # One PV has major fault (>20% deviation)
+  priority_high: "HIGH"            # Significant performance gap (10-20% deviation)
+  priority_medium: "MEDIUM"        # Moderate discrepancy (5-10% deviation)
+  priority_low: "LOW"              # Minor variation (<5% deviation)
+  
+  # Fault identification (which PV has the issue)
+  underperformance_detection:
+    method: 'relative_comparison'  # Compare PV1 vs PV2 only (no absolute thresholds)
+    confidence_threshold: 0.7      # Require 70% confidence to identify faulty PV
+
+# ============================================================================
+# REPORTING AND VISUALIZATION
+# ============================================================================
+reporting:
+  # Report generation
+  generate_daily_report: true
+  generate_weekly_summary: true
+  generate_monthly_analysis: true
+  
+  # Visualization settings
+  plot_pr_trends: true
+  plot_deviation_scores: true
+  plot_comparative_analysis: true
+  plot_maintenance_timeline: true
+  
+  # Export formats
+  export_csv: true
+  export_json: true
+  save_plots: true
+  
+  # Output directories (relative to results/phase_3/)
+  reports_dir: 'reports'
+  plots_dir: 'plots'
+  data_dir: 'data'
+
+# ============================================================================
+# DIAGNOSTIC PATTERNS (Based on PV1 vs PV2 deviation patterns)
+# ============================================================================
+# Identify failure types by analyzing deviation patterns between PV1 and PV2
+# ============================================================================
+diagnostics:
+  patterns:
+    soiling:
+      description: "Gradual deviation increase, one PV accumulates dirt"
+      deviation_range: [0.05, 0.15]
+      trend: "gradual_increase"
+      duration_days: 7
+      
+    inverter_failure:
+      description: "Sudden large deviation, persistent"
+      deviation_range: [0.20, 0.50]
+      trend: "sudden_jump"
+      persistence_days: 2
+      
+    panel_failure:
+      description: "Sudden deviation followed by new stable state"
+      deviation_range: [0.15, 0.40]
+      trend: "step_change"
+      recovery: false
+      
+    shading_obstruction:
+      description: "Consistent daily deviation pattern"
+      deviation_range: [0.10, 0.30]
+      time_dependent: true
+      variability: "low"
+      
+    connection_issue:
+      description: "Intermittent high deviation"
+      deviation_range: [0.20, 1.0]
+      pattern: "intermittent"
+      frequency: "irregular"
+
+# ============================================================================
+# DATA SOURCES
+# ============================================================================
+# Note: Individual PV data paths are now defined in pv_systems.systems above
+# This section only contains column mappings and output paths
+# ============================================================================
+data_sources:
+  # Column mappings (must be consistent across all PV system files)
+  timestamp_column: 'timestamp'
+  actual_power_column: 'energy_kwh'
+  predicted_power_column: 'energy_kwh'
+  
+  # Output directories
+  results_dir: 'results/phase_3'
+  plots_dir: 'results/phase_3/plots'
+  reports_dir: 'results/phase_3/reports'
