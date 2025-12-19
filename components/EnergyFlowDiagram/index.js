@@ -42,8 +42,8 @@ const EnergyFlowDiagram = ({ data, card = true }) => {
 
         // --- DUMMY DATA CONFIGURATION ---
         // Change these values to adjust the dummy data when real data is missing
-        const DUMMY_SOLAR_VALUE = .5; 
-        const DUMMY_OTHER_VALUE = 0.2;
+        const DUMMY_SOLAR_VALUE = 0; 
+        const DUMMY_OTHER_VALUE = 0.0;
         // --------------------------------
 
         let solar = energyData.solar || 0;

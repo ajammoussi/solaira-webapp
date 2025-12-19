@@ -581,28 +581,44 @@ class PVMonitoringService:
             # Get current PR from latest data
             system_pr_col = f'{system_name}_pr'
             recent_pr = pr_all_systems[system_pr_col].iloc[-1] if system_pr_col in pr_all_systems.columns else None
+
+            # Ensure numeric fields are JSON-serializable (no NaN/inf)
+            def _safe_float(value):
+                if value is None:
+                    return None
+                try:
+                    val = float(value)
+                except (TypeError, ValueError):
+                    return None
+                # Replace NaN/inf with None so FastAPI JSON encoding doesn't fail
+                if not np.isfinite(val):
+                    return None
+                return val
+
+            recent_pr_safe = _safe_float(recent_pr)
+            mean_deviation_safe = _safe_float(mean_deviation)
             
             print(f"\n📈 Results for System {system_id}:")
             print(f"   Status: {status.upper()}")
             print(f"   Category: {category}")
-            print(f"   Mean Deviation: {mean_deviation:.1%}")
-            print(f"   Recent PR: {recent_pr:.1%}" if recent_pr else "   Recent PR: N/A")
+            print(f"   Mean Deviation: {mean_deviation_safe:.1%}" if mean_deviation_safe is not None else "   Mean Deviation: N/A")
+            print(f"   Recent PR: {recent_pr_safe:.1%}" if recent_pr_safe is not None else "   Recent PR: N/A")
             print()
             
             # Determine issues based on analysis (without mentioning anomaly types)
             issues = []
-            if category == 'CRITICAL':
-                issues.append(f'Critical deviation: {mean_deviation:.1%} from peer systems')
-            elif category == 'MEDIUM':
-                issues.append(f'Performance deviation: {mean_deviation:.1%} from peer systems')
+            if category == 'CRITICAL' and mean_deviation_safe is not None:
+                issues.append(f'Critical deviation: {mean_deviation_safe:.1%} from peer systems')
+            elif category == 'MEDIUM' and mean_deviation_safe is not None:
+                issues.append(f'Performance deviation: {mean_deviation_safe:.1%} from peer systems')
             
             return {
                 'system_id': system_id,
                 'system_name': self.systems[system_id].name,
                 'status': status,
                 'severity': severity,
-                'recent_pr': recent_pr,
-                'mean_deviation': mean_deviation,
+                'recent_pr': recent_pr_safe,
+                'mean_deviation': mean_deviation_safe,
                 'category': category,
                 'issues_detected': issues,
                 'data_points': len(recent_data),
