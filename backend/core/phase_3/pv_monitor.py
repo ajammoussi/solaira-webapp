@@ -706,10 +706,28 @@ class PVMonitoringService:
         cutoff_time = datetime.now() - timedelta(hours=hours)
         generator = self.generators[system_id]
         
-        return [
-            r for r in generator.history 
-            if datetime.fromisoformat(r['timestamp']) > cutoff_time
-        ]
+        result = []
+        for r in generator.history:
+            try:
+                # Handle both ISO format strings and datetime objects
+                ts = r['timestamp']
+                if isinstance(ts, str):
+                    # Try parsing with fromisoformat, fallback to strptime
+                    try:
+                        timestamp = datetime.fromisoformat(ts.replace('Z', '+00:00'))
+                    except:
+                        # Fallback for other formats
+                        timestamp = datetime.strptime(ts.split('.')[0], '%Y-%m-%dT%H:%M:%S')
+                else:
+                    timestamp = ts
+                    
+                if timestamp > cutoff_time:
+                    result.append(r)
+            except Exception as e:
+                # Skip records with invalid timestamps
+                continue
+                
+        return result
 
 
 # Global instance
