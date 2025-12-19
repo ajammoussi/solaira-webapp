@@ -16,7 +16,6 @@ import PowerSourcesChart from '../../components/PowerSourcesChart';
 import EnergySimulationChart from '../../components/EnergySimulationChart';
 import Layout from '../../components/Layout';
 import { useAuth } from '../../lib/hooks/useAuth';
-import { useRecommendations } from '../../lib/hooks/useEnergyData';
 import { useEnergySimulation } from '../../lib/hooks/useEnergySimulation';
 import { useDailyPrediction } from '../../lib/hooks/useDailyPrediction';
 import pythonApi from '../../lib/services/pythonApi';
@@ -27,7 +26,6 @@ import styles from './styles.module.css';
 const Predictions = () => {
   const router = useRouter();
   const { user, profile, loading: authLoading } = useAuth();
-  const { data: recommendations, loading } = useRecommendations();
 
   const { alerts: staticAlerts, systemHealth, loading: staticLoading } = useMaintenanceAlerts();
   
@@ -287,34 +285,7 @@ const Predictions = () => {
               />
             </section>
 
-            {/* AI Recommendations */}
-            <section className={styles.section}>
-              <div className={styles.sectionHeader}>
-                <div className={styles.sectionIconWrapper}>
-                  <LucideIcons.BrainCircuit size={20} />
-                </div>
-                <div>
-                  <h2 className={styles.sectionTitle}>AI Optimization Advice</h2>
-                  <p className={styles.sectionDescription}>
-                    Smart recommendations to optimize your energy usage and reduce costs.
-                  </p>
-                </div>
-              </div>
-              
-              <div className={styles.recommendationsGrid}>
-                {simulationResults.advice.map((tip, idx) => (
-                  <div key={idx} className={styles.recommendationCard}>
-                    <div className={styles.recommendationIcon}>
-                      <LucideIcons.Lightbulb size={24} />
-                    </div>
-                    <p className={styles.recommendationText}>{tip}</p>
-                  </div>
-                ))}
-                {simulationResults.advice.length === 0 && (
-                  <p className={styles.emptyState}>System is running optimally. No specific actions required at this time.</p>
-                )}
-              </div>
-            </section>
+
 
             {/* Maintenance & System Health (from old Maintenance page) */}
             {maintError && (
