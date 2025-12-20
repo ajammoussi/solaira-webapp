@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { useTranslations } from 'next-intl';
+import * as LucideIcons from 'lucide-react';
 import styles from './styles.module.css';
 
 const AboutPage = () => {
@@ -53,27 +54,31 @@ const AboutPage = () => {
     {
       title: 'Innovation',
       description: 'We continuously develop cutting-edge energy solutions that push the boundaries of what\'s possible.',
+      icon: <LucideIcons.Lightbulb size={24} />
     },
     {
       title: 'Sustainability',
       description: 'Our commitment to the environment drives every decision we make, ensuring a cleaner future.',
+      icon: <LucideIcons.Leaf size={24} />
     },
     {
       title: 'Reliability',
       description: 'We deliver consistent, dependable energy solutions that you can trust 24/7.',
+      icon: <LucideIcons.Shield size={24} />
     },
     {
       title: 'Customer Focus',
       description: 'Your energy independence and satisfaction are at the heart of everything we do.',
+      icon: <LucideIcons.Users size={24} />
     }
   ];
 
   const vision = [
-    { year: '2026', goal: 'Regional Expansion', description: 'Establish operations in 3 additional North African countries' },
-    { year: '2027', goal: 'Smart Grid Integration', description: 'Launch vehicle-to-grid technology for electric vehicles' },
-    { year: '2028', goal: '10,000 Homes Powered', description: 'Reach 10,000+ households with clean energy solutions' },
-    { year: '2029', goal: 'Carbon Neutral Operations', description: 'Achieve 100% carbon-neutral manufacturing and operations' },
-    { year: '2030', goal: 'Energy Independence', description: 'Help 50,000 families achieve complete energy independence' }
+    { year: '2026', goal: 'Regional Expansion', description: 'Establish operations in 3 additional North African countries', icon: <LucideIcons.Globe size={32} /> },
+    { year: '2027', goal: 'Smart Grid Integration', description: 'Launch vehicle-to-grid technology for electric vehicles', icon: <LucideIcons.Zap size={32} /> },
+    { year: '2028', goal: '10,000 Homes Powered', description: 'Reach 10,000+ households with clean energy solutions', icon: <LucideIcons.Home size={32} /> },
+    { year: '2029', goal: 'Carbon Neutral Operations', description: 'Achieve 100% carbon-neutral manufacturing and operations', icon: <LucideIcons.TreeDeciduous size={32} /> },
+    { year: '2030', goal: 'Energy Independence', description: 'Help 50,000 families achieve complete energy independence', icon: <LucideIcons.Flag size={32} /> }
   ];
 
   return (
@@ -150,6 +155,7 @@ const AboutPage = () => {
           <div className={styles['values-grid']}>
             {values.map((value, idx) => (
               <div key={idx} className={styles['value-card']}>
+                <div className={styles['value-icon']}>{value.icon}</div>
                 <h3 className={styles['value-title']}>{value.title}</h3>
                 <p className={styles['value-description']}>{value.description}</p>
               </div>
@@ -170,7 +176,7 @@ const AboutPage = () => {
             {vision.map((item, idx) => (
               <div key={idx} className={styles['vision-card']}>
                 <div className={styles['vision-year']}>{item.year}</div>
-                <div className={styles['vision-icon']}>🎯</div>
+                <div className={styles['vision-icon']}>{item.icon}</div>
                 <h3 className={styles['vision-goal']}>{item.goal}</h3>
                 <p className={styles['vision-description']}>{item.description}</p>
               </div>
@@ -194,7 +200,6 @@ const AboutPage = () => {
         </section>
 
         <Footer
-          logoImage="https://play.teleporthq.io/static/svg/default-img.svg"
           logoAlt="Solaira Logo"
           phone="(+216) 99-999-999"
           email="info@solaira.tn"

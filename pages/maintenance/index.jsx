@@ -243,7 +243,7 @@ const Maintenance = () => {
           />
         </section>
 
-        <SolarChatbot />
+        {/* SolarChatbot handled in _app.js */}
 
         {/* Help Modal */}
         {showHelp && (

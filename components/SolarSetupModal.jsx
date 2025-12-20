@@ -45,6 +45,8 @@ export default function SolarSetupModal({ onComplete }) {
   const [raspberryDeviceId, setRaspberryDeviceId] = useState('');
   const [raspberryError, setRaspberryError] = useState('');
 
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
   const handleBatteryChange = (value) => {
     if (value === 'link-raspberry') {
       setRaspberryModalType('battery');
@@ -135,9 +137,7 @@ export default function SolarSetupModal({ onComplete }) {
         throw new Error(result.error || 'Failed to save configuration');
       }
 
-      if (onComplete) {
-        onComplete();
-      }
+      setShowSuccessModal(true);
     } catch (err) {
       console.error('Setup error:', err);
       setError(err.message || 'Failed to save configuration. Please try again.');
@@ -146,51 +146,59 @@ export default function SolarSetupModal({ onComplete }) {
     }
   };
 
+  const handleSuccessClose = () => {
+    setShowSuccessModal(false);
+    if (onComplete) {
+      onComplete();
+    }
+  };
+
   const selectedSystem = SOLAR_SYSTEMS.find(s => s.value === pvSystem.current_system);
 
   return (
     <>
-      <div style={{
-        position: 'fixed',
-        inset: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'rgba(0, 0, 0, 0.55)',
-        zIndex: 10000,
-        padding: '20px',
-      }}>
+      {!showSuccessModal && (
         <div style={{
-          width: '100%',
-          maxWidth: step === 1 ? '920px' : '520px',
-          background: 'white',
-          borderRadius: '12px',
-          padding: '32px',
-          position: 'relative',
-          maxHeight: '90vh',
-          overflowY: 'auto',
+          position: 'fixed',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(0, 0, 0, 0.55)',
+          zIndex: 10000,
+          padding: '20px',
         }}>
-          <div style={{ marginBottom: '28px' }}>
-            <h2 style={{ fontSize: '26px', fontWeight: '600', color: '#191818', marginBottom: '8px' }}>
-              Configure Your Solar System
-            </h2>
-            <p style={{ color: '#696e78', fontSize: '14px' }}>
-              Step {step} of 3: {step === 1 ? 'Solar Panels' : step === 2 ? 'Battery' : 'Consumption Profile'}
-            </p>
-            <div style={{
-              marginTop: '16px',
-              height: '4px',
-              background: '#e2e2e2',
-              borderRadius: '2px',
-              overflow: 'hidden',
-            }}>
+          <div style={{
+            width: '100%',
+            maxWidth: step === 1 ? '920px' : '520px',
+            background: 'white',
+            borderRadius: '12px',
+            padding: '32px',
+            position: 'relative',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+          }}>
+            <div style={{ marginBottom: '28px' }}>
+              <h2 style={{ fontSize: '26px', fontWeight: '600', color: '#191818', marginBottom: '8px' }}>
+                Configure Your Solar System
+              </h2>
+              <p style={{ color: '#696e78', fontSize: '14px' }}>
+                Step {step} of 3: {step === 1 ? 'Solar Panels' : step === 2 ? 'Battery' : 'Consumption Profile'}
+              </p>
               <div style={{
-                width: `${(step / 3) * 100}%`,
-                height: '100%',
-                background: '#00D9A3',
-                transition: 'width 0.3s ease',
-              }} />
-            </div>
+                marginTop: '16px',
+                height: '4px',
+                background: '#e2e2e2',
+                borderRadius: '2px',
+                overflow: 'hidden',
+              }}>
+                <div style={{
+                  width: `${(step / 3) * 100}%`,
+                  height: '100%',
+                  background: '#00D9A3',
+                  transition: 'width 0.3s ease',
+                }} />
+              </div>
           </div>
 
           {error && (
@@ -560,6 +568,7 @@ export default function SolarSetupModal({ onComplete }) {
           </div>
         </div>
       </div>
+      )}
 
       {/* Raspberry Pi Link Modal */}
       {showRaspberryModal && (
@@ -653,6 +662,96 @@ export default function SolarSetupModal({ onComplete }) {
                 Link Device
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '32px',
+            width: '100%',
+            maxWidth: '480px',
+            textAlign: 'center',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+          }}>
+            <div style={{ 
+              width: '64px', 
+              height: '64px', 
+              background: '#ECFDF5', 
+              borderRadius: '50%', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              margin: '0 auto 24px auto'
+            }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            
+            <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', marginBottom: '12px' }}>
+              You're all set!
+            </h3>
+            
+            <p style={{ color: '#374151', fontSize: '16px', marginBottom: '8px', lineHeight: '1.5' }}>
+              Welcome to Solaira.
+            </p>
+            
+            <p style={{ color: '#059669', fontSize: '16px', fontWeight: '600', marginBottom: '24px', lineHeight: '1.5' }}>
+              The solar panels you are using now are 450W Hi-MO 7 LR7-54HGBB installed by Spectra. You can change the number of panels from settings.
+            </p>
+
+            <div style={{ 
+              background: '#F3F4F6', 
+              padding: '16px', 
+              borderRadius: '8px', 
+              marginBottom: '24px',
+              textAlign: 'left',
+              display: 'flex',
+              gap: '12px',
+              alignItems: 'flex-start'
+            }}>
+              <div style={{ 
+                minWidth: '24px', 
+                height: '24px', 
+                background: '#E5E7EB', 
+                borderRadius: '50%', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#6B7280'
+              }}>?</div>
+              <p style={{ fontSize: '14px', color: '#4B5563', margin: 0, lineHeight: '1.5' }}>
+                <strong>Tip:</strong> You can always click on the '?' button if a visual or a card isn't really obvious for you what it does.
+              </p>
+            </div>
+
+            <button
+              onClick={handleSuccessClose}
+              className={styles.primaryButton}
+              style={{ width: '100%' }}
+            >
+              Get Started
+            </button>
           </div>
         </div>
       )}

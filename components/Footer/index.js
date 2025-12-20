@@ -17,6 +17,25 @@ const Footer = ({
 }) => {
   const currentYear = new Date().getFullYear()
 
+  // Helper to get correct href
+  const getHref = (linkText) => {
+    const map = {
+      'About Us': '/about',
+      'Blog': '/blog',
+      'Contact': '/contact',
+      'Pricing': '/pricing',
+      'Product': '/pricing', // Assuming Product maps to Pricing or similar, or # if not exists
+      'Home': '/',
+      'Sign In': '/signin'
+    };
+    
+    // If it's in the map, return it
+    if (map[linkText]) return map[linkText];
+    
+    // Otherwise return # to prevent 404
+    return '#';
+  };
+
   return (
     <>
       <div className={styles.footer}>
@@ -74,7 +93,7 @@ const Footer = ({
                   <div key={index} className={styles[`linkmargin${16 + index}`]}>
                     <div className={styles[`component${216 + index}`]}>
                       <Link 
-                        href={`/${link.toLowerCase().replace(/\s+/g, '-')}`}
+                        href={getHref(link)}
                         className={styles[`text${386 + index}`]}
                       >
                         {link}
@@ -95,7 +114,7 @@ const Footer = ({
                   <div key={index} className={styles[`linkmargin${21 + index}`]}>
                     <div className={styles[`component${221 + index}`]}>
                       <Link 
-                        href={`/${link.toLowerCase().replace(/\s+/g, '-')}`}
+                        href={getHref(link)}
                         className={styles[`text${392 + index}`]}
                       >
                         {link}

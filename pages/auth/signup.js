@@ -245,13 +245,13 @@ export default function SignUp() {
               label={
                 <>
                   I agree to the{' '}
-                  <a href="/terms" target="_blank" style={{ color: '#00D9A3' }}>
+                  <span style={{ color: '#00D9A3' }}>
                     Terms of Service
-                  </a>{' '}
+                  </span>{' '}
                   and{' '}
-                  <a href="/privacy" target="_blank" style={{ color: '#00D9A3' }}>
+                  <span style={{ color: '#00D9A3' }}>
                     Privacy Policy
-                  </a>
+                  </span>
                 </>
               }
             />
@@ -275,14 +275,6 @@ export default function SignUp() {
           loading={loading}
           disabled={guestLoading}
         />
-
-        <div style={{ marginTop: '16px' }}>
-          <GuestButton
-            onClick={handleGuestAccess}
-            loading={guestLoading}
-            disabled={loading}
-          />
-        </div>
 
         <AuthFooter
           text="Already have an account?"

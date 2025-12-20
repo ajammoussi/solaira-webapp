@@ -96,7 +96,7 @@
   align-items: center;
   text-decoration: none;
   cursor: pointer;
-  z-index: 1002; /* Ensure logo stays above mobile menu */
+  /* z-index removed to allow mobile menu to cover it */
 }
 
 .logoLink:hover {
@@ -114,6 +114,12 @@
   color: #1a1a1a;
   line-height: 1.2;
   letter-spacing: -0.3px;
+}
+
+.logoImage {
+  height: 60px;
+  width: auto;
+  display: block;
 }
 
 /* Navigation Wrapper (Menu + Button) */
@@ -173,6 +179,15 @@
 @media (max-width: 992px) {
   .mobileMenuBtn {
     display: block; /* Show hamburger */
+  }
+
+  /* Match Layout component mobile styles */
+  .navContainer {
+    padding: 16px 20px;
+    gap: 16px;
+    min-height: 64px;
+    justify-content: space-between;
+    position: relative;
   }
 
   .navWrapper {
@@ -241,8 +256,17 @@
     font-size: 12px;
   }
 
-  .navContainer {
+  /* Remove specific padding override to keep consistency with tablet view */
+  /* .navContainer {
     padding: 15px 20px;
+  } */
+  
+  .logoText {
+    font-size: clamp(22px, 6vw, 28px); /* Match Layout component */
+  }
+  
+  .logoImage {
+    height: clamp(40px, 10vw, 50px); /* Match Layout component */
   }
 }
 

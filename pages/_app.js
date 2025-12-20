@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from '../lib/hooks/useAuth'
 import SolarChatbot from '../components/SolarChatbot'
 import SolarSetupModal from '../components/SolarSetupModal'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 
 function SetupEnforcer() {
   const { user, profile, loading, refreshProfile, isGuest } = useAuth()
@@ -34,6 +35,7 @@ function SetupEnforcer() {
 
 function ChatbotWrapper() {
   const { user, isGuest } = useAuth()
+  const router = useRouter()
   
   // Render chatbot for everyone, passing user ID if available or 'guest'
   const userId = user?.email || user?.id || 'guest';

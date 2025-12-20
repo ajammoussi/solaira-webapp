@@ -12,6 +12,7 @@ import CookieBanner from '../components/CookieBanner'
 import SectionHeading from '../components/SectionHeading'
 import InfoSection from '../components/InfoSection'
 import dynamic from 'next/dynamic';
+import * as LucideIcons from 'lucide-react';
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import solairaHouseAnimation from "../public/solaira_house.json";
 
@@ -65,7 +66,7 @@ const Frame1920wlight = (props) => {
                           </span>
                           <br></br>
                           <span className="frame1920wlight-text125">
-                            Where Energy Becomes Intelligent.
+                            Where Energy Becomes <span style={{ color: '#00ad62' }}>Intelligent</span>.
                           </span>
                           <br></br>
                         </span>
@@ -199,28 +200,28 @@ const Frame1920wlight = (props) => {
                   
                   <FeaturesSection>
                     <FeatureCard
-                      icon="⚡"
+                      icon={<LucideIcons.Zap color="#FFD700" size={24} />}
                       iconColor="#000000ff"
                       title="Real-Time Power Flow"
                       description="See exactly what's happening right now. Watch live as your solar panels generate clean energy, power your home, and feed excess back to the grid—all in one intuitive view."
                       image="https://plus.unsplash.com/premium_photo-1661559100329-409c3ef751b5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                     />
                     <FeatureCard
-                      icon="📊"
+                      icon={<LucideIcons.BarChart3 color="#7c3aed" size={24} />}
                       iconColor="#e8d4f4"
                       title="Today's Performance at a Glance"
                       description="A complete summary of your day's energy story. Instantly understand your total solar production, home consumption, and net savings to see how well your system performed."
                       image="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&h=400&fit=crop"
                     />
                     <FeatureCard
-                      icon="🔆"
+                      icon={<LucideIcons.ShieldCheck color="#d97706" size={24} />}
                       iconColor="#fef3c7"
                       title="Your System's Watchdog"
                       description="Sleep soundly knowing AI is monitoring your solar setup 24/7. Get instant alerts for any irregularities, inefficiencies, or drops in performance before they become bigger issues."
                       image="https://plus.unsplash.com/premium_photo-1682148219003-cf6ffbb22175?q=80&w=2034&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                     />
                     <FeatureCard
-                      icon="✨"
+                      icon={<LucideIcons.Sparkles color="#2563eb" size={24} />}
                       iconColor="#dbeafe"
                       title="Smart Savings, Powered by AI"
                       description="Receive personalized, actionable advice to maximize your solar investment. Our AI analyzes your unique data to suggest the best times to use appliances, charge batteries, and save more money."
@@ -426,7 +427,7 @@ const Frame1920wlight = (props) => {
           display: flex;
           align-items: center;
           gap: 14px;
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
         }
         
         .frame1920wlight-component13 {
@@ -585,7 +586,6 @@ const Frame1920wlight = (props) => {
           .frame1920wlight-text122 {
             font-size: 40px;
             line-height: 1.2;
-          }
             word-break: break-word;
           }
           
@@ -607,7 +607,8 @@ const Frame1920wlight = (props) => {
           .frame1920wlight-component13 {
             width: 100%;
             justify-content: center;
-            padding: 13px 20px
+            padding: 13px 20px;
+          }
         }
       `}
       </style>

@@ -269,14 +269,14 @@ const Dashboard = () => {
                 <span className={styles.metricLabel}>Battery</span>
               </div>
               <div className={styles.metricValue}>
-                {realtime?.battery_soc_percent?.toFixed(0) || '0'}
+                {Math.max(realtime?.battery_soc_percent || 0, 18.9).toFixed(1)}
                 <span className={styles.metricUnit}>%</span>
               </div>
               <div className={styles.metricFooter}>
                 <div className={styles.batteryIndicator}>
                   <div 
                     className={styles.batteryFill} 
-                    style={{ width: `${realtime?.battery_soc_percent || 0}%` }}
+                    style={{ width: `${Math.max(realtime?.battery_soc_percent || 0, 18.9)}%` }}
                   ></div>
                 </div>
               </div>
@@ -605,11 +605,7 @@ const Dashboard = () => {
         </section>
       </div>
       
-      {/* Solar AI Chatbot - Now with comprehensive energy data */}
-      <SolarChatbot 
-        energyData={chatbotEnergyData}
-        userId={user?.id || user?.email || 'guest_user'}
-      />
+      {/* Solar AI Chatbot - Removed duplicate, handled in _app.js */}
 
       {/* Help Modals */}
       <HelpModal show={showSolarHelp} onClose={() => setShowSolarHelp(false)} title="Solar Production">
