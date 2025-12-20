@@ -8,7 +8,7 @@
  * - Optimal usage windows
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import * as LucideIcons from 'lucide-react';
 import { ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -20,6 +20,7 @@ import { useEnergySimulation } from '../../lib/hooks/useEnergySimulation';
 import { useDailyPrediction } from '../../lib/hooks/useDailyPrediction';
 import pythonApi from '../../lib/services/pythonApi';
 import { useMaintenanceAlerts } from '../../lib/hooks/useEnergyData';
+import { useCSVData } from '../../lib/hooks/useCSVData';
 import { PVForecastForm, PredictionChart, PredictionTable } from '../../components/solar-forecast';
 import styles from './styles.module.css';
 
@@ -29,6 +30,9 @@ const Predictions = () => {
 
   const { alerts: staticAlerts, systemHealth, loading: staticLoading } = useMaintenanceAlerts();
   
+  // Get CSV data for trend calculations
+  const { historical, loading: csvLoading } = useCSVData();
+  
   // Time period state (in hours)
   const [timePeriod, setTimePeriod] = useState(720); // Default: 30 days
 
@@ -37,6 +41,45 @@ const Predictions = () => {
   const [maintLoading, setMaintLoading] = useState(false);
   const [maintError, setMaintError] = useState(null);
   const [forecastPredictions, setForecastPredictions] = useState(null);
+  
+  // Calculate trends from historical CSV data
+  const trends = useMemo(() => {
+    if (!historical || historical.length < 14) {
+      return {
+        pvTrend: { value: '+0%', direction: 'neutral' },
+        consumptionTrend: { value: '0%', direction: 'neutral' },
+        gridImportTrend: { value: '0%', direction: 'neutral' },
+        gridExportTrend: { value: '0%', direction: 'neutral' }
+      };
+    }
+    
+    // Compare last 7 days vs previous 7 days
+    const last7 = historical.slice(-7);
+    const prev7 = historical.slice(-14, -7);
+    
+    const calcTrend = (field) => {
+      const lastSum = last7.reduce((sum, d) => sum + (Number(d[field]) || 0), 0);
+      const prevSum = prev7.reduce((sum, d) => sum + (Number(d[field]) || 0), 0);
+      
+      if (prevSum === 0) return { value: '+0%', direction: 'neutral' };
+      
+      const change = ((lastSum - prevSum) / prevSum) * 100;
+      const direction = change > 2 ? 'up' : change < -2 ? 'down' : 'neutral';
+      const prefix = change >= 0 ? '+' : '';
+      
+      return {
+        value: `${prefix}${Math.round(change)}%`,
+        direction
+      };
+    };
+    
+    return {
+      pvTrend: calcTrend('actual_pv_kwh'),
+      consumptionTrend: calcTrend('consumption_kwh'),
+      gridImportTrend: calcTrend('grid_import_kwh'),
+      gridExportTrend: calcTrend('grid_export_kwh')
+    };
+  }, [historical]);
   
   // New comprehensive energy simulation (PV + Wind + Battery)
   const { 
@@ -180,29 +223,29 @@ const Predictions = () => {
                 title="Total PV Generation" 
                 value={`${simulationResults.summary.total_pv_generation.toFixed(2)} kWh`}
                 icon={<LucideIcons.Sun size={24} />}
-                trend="up"
-                trendValue="+12%"
+                trend={trends.pvTrend.direction}
+                trendValue={trends.pvTrend.value}
               />
               <SummaryCard 
                 title="Total Consumption" 
                 value={`${simulationResults.summary.total_consumption.toFixed(2)} kWh`}
                 icon={<LucideIcons.Zap size={24} />}
-                trend="down"
-                trendValue="-5%"
+                trend={trends.consumptionTrend.direction}
+                trendValue={trends.consumptionTrend.value}
               />
               <SummaryCard 
                 title="Grid Import" 
                 value={`${simulationResults.summary.grid_import.toFixed(2)} kWh`}
                 icon={<LucideIcons.ArrowDownFromLine size={24} />}
-                trend="neutral"
-                trendValue="0%"
+                trend={trends.gridImportTrend.direction}
+                trendValue={trends.gridImportTrend.value}
               />
               <SummaryCard 
                 title="Grid Export" 
                 value={`${simulationResults.summary.grid_export.toFixed(2)} kWh`}
                 icon={<LucideIcons.ArrowUpFromLine size={24} />}
-                trend="up"
-                trendValue="+8%"
+                trend={trends.gridExportTrend.direction}
+                trendValue={trends.gridExportTrend.value}
               />
             </div>
 

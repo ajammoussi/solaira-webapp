@@ -15,25 +15,31 @@ const mdiLeaf = "M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.
 const mdiFire = "M17.66 11.2C17.43 10.9 17.15 10.64 16.89 10.38C16.22 9.78 15.46 9.35 14.82 8.72C13.33 7.26 13 4.85 13.95 3C13 3.23 12.17 3.75 11.46 4.32C8.87 6.4 7.85 10.07 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C6.87 12.33 6.69 10.28 7.45 8.64C5.78 10 4.87 12.3 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C18.86 17.66 19.5 15 18.56 12.72L18.43 12.46C18.22 12 17.66 11.2 17.66 11.2M14.5 17.5C14.22 17.74 13.76 18 13.4 18.1C12.28 18.5 11.16 17.94 10.5 17.28C11.69 17 12.4 16.12 12.61 15.23C12.78 14.43 12.46 13.77 12.33 13C12.21 12.26 12.23 11.63 12.5 10.94C12.69 11.32 12.89 11.7 13.13 12C13.9 13 15.11 13.44 15.37 14.8C15.41 14.94 15.43 15.08 15.43 15.23C15.46 16.05 15.1 16.95 14.5 17.5H14.5Z";
 const mdiWater = "M12,20A6,6 0 0,1 6,14C6,10 12,3.25 12,3.25C12,3.25 18,10 18,14A6,6 0 0,1 12,20Z";
 
-const EnergyDistributionCard = () => {
+const EnergyDistributionCard = ({ 
+  energyData = null, 
+  loading = false 
+}) => {
   const [animate] = useState(true);
   
-  // Sample data - replace with your actual data
-  const data = {
-    solar: 45.8,
-    totalFromGrid: 12.3,
-    returnedToGrid: 8.5,
-    totalHomeConsumption: 49.6,
-    batteryIn: 10.2,
-    batteryOut: 15.4,
-    solarConsumption: 25.3,
-    gridConsumption: 8.9,
-    batteryConsumption: 15.4,
-    solarToGrid: 8.5,
-    solarToBattery: 10.2,
+  // Default data for when no props are provided
+  const defaultData = {
+    solar: 0,
+    totalFromGrid: 0,
+    returnedToGrid: 0,
+    totalHomeConsumption: 0,
+    batteryIn: 0,
+    batteryOut: 0,
+    solarConsumption: 0,
+    gridConsumption: 0,
+    batteryConsumption: 0,
+    solarToGrid: 0,
+    solarToBattery: 0,
     batteryFromGrid: 0,
     batteryToGrid: 0,
   };
+
+  // Use provided energyData or default
+  const data = energyData || defaultData;
 
   const {
     solar,
@@ -51,10 +57,10 @@ const EnergyDistributionCard = () => {
     batteryToGrid,
   } = data;
 
-  const hasSolar = solar > 0;
-  const hasGrid = totalFromGrid > 0 || returnedToGrid > 0;
-  const hasBattery = batteryIn > 0 || batteryOut > 0;
-  const hasReturn = returnedToGrid > 0;
+  const hasSolar = true;
+  const hasGrid = true;
+  const hasBattery = true;
+  const hasReturn = true;
 
   // Calculate circle segments for home consumption
   const homeSolarCircumference = hasSolar 
@@ -78,7 +84,7 @@ const EnergyDistributionCard = () => {
     (batteryFromGrid || 0) +
     (batteryToGrid || 0);
 
-  const formatValue = (val) => val?.toFixed(1) + ' kWh';
+  const formatValue = (val) => val?.toFixed(2) + ' kWh';
 
   return (
     <div style={{
@@ -351,7 +357,7 @@ const EnergyDistributionCard = () => {
             )}
 
             {/* Animated dots */}
-            {animate && solarToGrid > 0 && (
+            {animate && solarToGrid > 0.01 && (
               <circle r="1" fill="#a280db" strokeWidth="4">
                 <animateMotion dur={`${6 - (solarToGrid / totalLines) * 6}s`} repeatCount="indefinite" calcMode="linear">
                   <mpath href="#return" />
@@ -359,7 +365,7 @@ const EnergyDistributionCard = () => {
               </circle>
             )}
             
-            {animate && solarConsumption > 0 && (
+            {animate && solarConsumption > 0.01 && (
               <circle r="1" fill="#ff9800" strokeWidth="4">
                 <animateMotion dur={`${6 - (solarConsumption / totalLines) * 5}s`} repeatCount="indefinite" calcMode="linear">
                   <mpath href="#solar" />
@@ -367,7 +373,7 @@ const EnergyDistributionCard = () => {
               </circle>
             )}
             
-            {animate && gridConsumption > 0 && (
+            {animate && gridConsumption > 0.01 && (
               <circle r="1" fill="#488fc2" strokeWidth="4">
                 <animateMotion dur={`${6 - (gridConsumption / totalLines) * 5}s`} repeatCount="indefinite" calcMode="linear">
                   <mpath href="#grid" />
@@ -375,7 +381,7 @@ const EnergyDistributionCard = () => {
               </circle>
             )}
             
-            {animate && hasBattery && solarToBattery > 0 && (
+            {animate && hasBattery && solarToBattery > 0.01 && (
               <circle r="1" fill="#00acc1" strokeWidth="4">
                 <animateMotion dur={`${6 - (solarToBattery / totalLines) * 5}s`} repeatCount="indefinite" calcMode="linear">
                   <mpath href="#battery-solar" />
@@ -383,7 +389,7 @@ const EnergyDistributionCard = () => {
               </circle>
             )}
             
-            {animate && hasBattery && batteryConsumption > 0 && (
+            {animate && hasBattery && batteryConsumption > 0.01 && (
               <circle r="1" fill="#4db6ac" strokeWidth="4">
                 <animateMotion dur={`${6 - (batteryConsumption / totalLines) * 5}s`} repeatCount="indefinite" calcMode="linear">
                   <mpath href="#battery-house" />

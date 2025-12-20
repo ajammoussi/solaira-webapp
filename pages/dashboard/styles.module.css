@@ -243,6 +243,12 @@
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border-left: 4px solid #00D9A3; /* Teal accent border */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summaryCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .summaryPeriod {
@@ -501,6 +507,9 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   border-left: 4px solid;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .co2Card:hover {
@@ -559,19 +568,23 @@
   font-size: 14px;
   color: #6B7280;
   margin: 0 0 16px 0;
+  min-height: 20px; /* Reduced from 21px */
 }
 
 .co2Details {
   display: grid;
-  gap: 12px;
+  gap: 8px; /* Reduced from 12px */
+  margin-top: auto; /* Push details to bottom */
+  flex-grow: 1;
 }
 
 .co2DetailItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 8px;
+  padding-bottom: 6px; /* Reduced from 8px */
   border-bottom: 1px solid #E5E7EB;
+  min-height: 32px; /* Reduced from 37px */
 }
 
 .co2DetailLabel {
@@ -591,6 +604,7 @@
   gap: 8px;
   font-size: 13px;
   margin-top: 12px;
+  min-height: 20px;
 }
 
 .co2Trend {
@@ -611,7 +625,7 @@
   background-color: #E5E7EB;
   border-radius: 3px;
   overflow: hidden;
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .co2ProgressFill {

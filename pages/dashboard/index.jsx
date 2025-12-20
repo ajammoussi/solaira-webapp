@@ -27,7 +27,7 @@ import styles from './styles.module.css';
 const Dashboard = () => {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const { realtime, stats, loading, error, lastUpdated } = useAllEnergyData();
+  const { realtime, stats, forecast, loading, error, lastUpdated } = useAllEnergyData();
   const [predictedProduction, setPredictedProduction] = useState(null);
 
   // Protect this page - redirect to signin if not authenticated
@@ -147,22 +147,22 @@ const Dashboard = () => {
     // Summary statistics for context
     stats: {
       today: {
-        production: stats?.today?.total_production_kwh || 0,
-        consumption: stats?.today?.total_consumption_kwh || 0,
-        self_consumption: stats?.today?.self_consumption_percent || 0,
-        savings: stats?.today?.cost_savings_eur || 0
+        production: stats?.today?.production || 0,
+        consumption: stats?.today?.consumption || 0,
+        self_consumption: stats?.today?.selfConsumption || 0,
+        savings: stats?.today?.savings || 0
       },
       month: {
-        production: stats?.month?.total_production_kwh || 0,
-        consumption: stats?.month?.total_consumption_kwh || 0,
-        self_consumption: stats?.month?.self_consumption_percent || 0,
-        savings: stats?.month?.cost_savings_eur || 0
+        production: stats?.month?.production || 0,
+        consumption: stats?.month?.consumption || 0,
+        self_consumption: stats?.month?.selfConsumption || 0,
+        savings: stats?.month?.savings || 0
       },
       year: {
-        production: stats?.year?.total_production_kwh || 0,
-        consumption: stats?.year?.total_consumption_kwh || 0,
-        self_consumption: stats?.year?.self_consumption_percent || 0,
-        savings: stats?.year?.cost_savings_eur || 0
+        production: stats?.year?.production || 0,
+        consumption: stats?.year?.consumption || 0,
+        self_consumption: stats?.year?.selfConsumption || 0,
+        savings: stats?.year?.savings || 0
       }
     },
     
@@ -198,7 +198,9 @@ const Dashboard = () => {
                 <span className={styles.metricUnit}>kW</span>
               </div>
               <div className={styles.metricFooter}>
-                <span className={styles.metricTrend}>↑ 12%</span>
+                <span className={styles.metricTrend}>
+                  {realtime?.pv_trend_pct >= 0 ? '↑' : '↓'} {Math.abs(realtime?.pv_trend_pct || 0).toFixed(0)}%
+                </span>
                 <span className={styles.metricCompare}>vs yesterday</span>
               </div>
             </div>
@@ -214,7 +216,9 @@ const Dashboard = () => {
                 <span className={styles.metricUnit}>kW</span>
               </div>
               <div className={styles.metricFooter}>
-                <span className={styles.metricTrend}>↓ 5%</span>
+                <span className={styles.metricTrend}>
+                  {realtime?.consumption_trend_pct >= 0 ? '↑' : '↓'} {Math.abs(realtime?.consumption_trend_pct || 0).toFixed(0)}%
+                </span>
                 <span className={styles.metricCompare}>vs yesterday</span>
               </div>
             </div>
@@ -270,7 +274,16 @@ const Dashboard = () => {
             Hourly breakdown of energy import, export, and solar production
           </p>
           <div className={styles.chartContainer}>
-            <ElectricityUsage card={false} />
+            <ElectricityUsage 
+              card={false}
+              gridImportData={forecast?.raw?.slice(0, 24).map(f => Number(f.grid_import_kwh) || 0) || []}
+              solarData={forecast?.raw?.slice(0, 24).map(f => Number(f.pv_generation_kwh) || 0) || []}
+              gridExportData={forecast?.raw?.slice(0, 24).map(f => -(Number(f.grid_export_kwh) || 0)) || []}
+              categories={forecast?.raw?.slice(0, 24).map(f => {
+                const d = new Date(f.datetime);
+                return d.getHours() + ':00';
+              }) || ['0:00', '4:00', '8:00', '12:00', '16:00', '20:00']}
+            />
           </div>
         </section>
 
@@ -412,7 +425,7 @@ const Dashboard = () => {
                   {Math.abs(parseFloat(co2Data.daily.netCO2))}
                   <span className={styles.co2Unit}>kg</span>
                   <span style={{ 
-                    color: parseFloat(co2Data.daily.netCO2) >= 0 ? '#F44336' : '#00A86B',
+                    color: parseFloat(co2Data.daily.netCO2) < 0 ? '#F44336' : '#00A86B',
                     fontSize: '14px',
                     marginLeft: '8px',
                     fontWeight: 600
@@ -460,99 +473,6 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-
-            {/* ML Model Prediction Section */}
-            {predictedProduction && (
-              <div className={styles.co2Visualization}>
-                <div className={styles.sectionHeader} style={{ marginBottom: '20px' }}>
-                  <LucideIcons.Brain className={styles.sectionIcon} />
-                  <h3 className={styles.sectionTitle} style={{ fontSize: '18px', margin: 0 }}>
-                    AI-Powered CO₂ Prediction
-                  </h3>
-                  <span style={{ 
-                    fontSize: '12px', 
-                    backgroundColor: '#00D9A3', 
-                    color: 'white',
-                    padding: '2px 8px',
-                    borderRadius: '12px',
-                    fontWeight: 600
-                  }}>
-                    Powered by ML Models
-                  </span>
-                </div>
-                <p className={styles.sectionDescription} style={{ marginBottom: '20px' }}>
-                  Using trained XGBoost/LSTM models to predict future emissions impact
-                </p>
-                
-                <div className={styles.co2ChartContainer}>
-                  <div className={styles.co2Bar} style={{ 
-                    height: `${Math.min(100, (parseFloat(co2Data.monthly.co2Produced) / 500) * 100)}%`,
-                    backgroundColor: '#F44336'
-                  }}>
-                    <div className={styles.co2BarValue}>
-                      {co2Data.monthly.co2Produced} kg
-                    </div>
-                    <div className={styles.co2BarLabel}>Current</div>
-                  </div>
-                  <div className={styles.co2Bar} style={{ 
-                    height: `${Math.min(100, (parseFloat(co2Data.monthly.co2Avoided) / 500) * 100)}%`,
-                    backgroundColor: '#00D9A3'
-                  }}>
-                    <div className={styles.co2BarValue}>
-                      {co2Data.monthly.co2Avoided} kg
-                    </div>
-                    <div className={styles.co2BarLabel}>Avoided</div>
-                  </div>
-                  <div className={styles.co2Bar} style={{ 
-                    height: `${Math.min(100, (Math.abs(parseFloat(futureCO2.monthly.avoided)) / 500) * 100)}%`,
-                    backgroundColor: '#4CAF50'
-                  }}>
-                    <div className={styles.co2BarValue}>
-                      {futureCO2.monthly.avoided} kg
-                    </div>
-                    <div className={styles.co2BarLabel}>
-                      Predicted*
-                    </div>
-                  </div>
-                  <div className={styles.co2Bar} style={{ 
-                    height: `${Math.min(100, (Math.abs(parseFloat(co2Data.monthly.netCO2)) / 500) * 100)}%`,
-                    backgroundColor: parseFloat(co2Data.monthly.netCO2) >= 0 ? '#FF9800' : '#2196F3'
-                  }}>
-                    <div className={styles.co2BarValue}>
-                      {co2Data.monthly.netCO2} kg
-                    </div>
-                    <div className={styles.co2BarLabel}>Net</div>
-                  </div>
-                </div>
-                
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  marginTop: '40px',
-                  fontSize: '13px',
-                  color: '#6B7280'
-                }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <div style={{ width: '12px', height: '12px', backgroundColor: '#F44336', borderRadius: '2px' }}></div>
-                      <span>Current Production: {realtime?.pv_production_kw?.toFixed(2) || '0.00'} kW</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
-                      <div style={{ width: '12px', height: '12px', backgroundColor: '#4CAF50', borderRadius: '2px' }}></div>
-                      <span>ML Prediction: {predictedProduction?.toFixed(2) || '0.00'} kW</span>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '11px', fontStyle: 'italic' }}>
-                      *Based on XGBoost/LSTM models (85% confidence)
-                    </div>
-                    <div style={{ fontSize: '11px', marginTop: '4px' }}>
-                      Grid intensity: {co2Data.intensity.grid.toFixed(3)} kg CO₂/kWh
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </section>
 
@@ -567,25 +487,25 @@ const Dashboard = () => {
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Production</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.today?.total_production_kwh?.toFixed(1) || '0.0'} kWh
+                    {stats?.today?.production?.toFixed(1) || '0.0'} kWh
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Consumption</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.today?.total_consumption_kwh?.toFixed(1) || '0.0'} kWh
+                    {stats?.today?.consumption?.toFixed(1) || '0.0'} kWh
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Self-Consumption</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.today?.self_consumption_percent?.toFixed(0) || '0'}%
+                    {stats?.today?.selfConsumption || '0'}%
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Savings</span>
                   <span className={styles.summaryStatValue}>
-                    €{stats?.today?.cost_savings_eur?.toFixed(2) || '0.00'}
+                    €{stats?.today?.savings?.toFixed(2) || '0.00'}
                   </span>
                 </div>
               </div>
@@ -598,25 +518,25 @@ const Dashboard = () => {
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Production</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.month?.total_production_kwh?.toFixed(1) || '0.0'} kWh
+                    {stats?.month?.production?.toFixed(1) || '0.0'} kWh
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Consumption</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.month?.total_consumption_kwh?.toFixed(1) || '0.0'} kWh
+                    {stats?.month?.consumption?.toFixed(1) || '0.0'} kWh
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Self-Consumption</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.month?.self_consumption_percent?.toFixed(0) || '0'}%
+                    {stats?.month?.selfConsumption || '0'}%
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Savings</span>
                   <span className={styles.summaryStatValue}>
-                    €{stats?.month?.cost_savings_eur?.toFixed(2) || '0.00'}
+                    €{stats?.month?.savings?.toFixed(2) || '0.00'}
                   </span>
                 </div>
               </div>
@@ -629,25 +549,25 @@ const Dashboard = () => {
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Production</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.year?.total_production_kwh?.toFixed(1) || '0.0'} kWh
+                    {stats?.year?.production?.toFixed(1) || '0.0'} kWh
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Consumption</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.year?.total_consumption_kwh?.toFixed(1) || '0.0'} kWh
+                    {stats?.year?.consumption?.toFixed(1) || '0.0'} kWh
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Self-Consumption</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.year?.self_consumption_percent?.toFixed(0) || '0'}%
+                    {stats?.year?.selfConsumption || '0'}%
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Savings</span>
                   <span className={styles.summaryStatValue}>
-                    €{stats?.year?.cost_savings_eur?.toFixed(2) || '0.00'}
+                    €{stats?.year?.savings?.toFixed(2) || '0.00'}
                   </span>
                 </div>
               </div>
