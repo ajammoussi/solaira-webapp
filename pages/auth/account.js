@@ -57,15 +57,16 @@ const TIMEZONE_OPTIONS = [
 
 const CONSUMPTION_PROFILES = [
   { value: 'home', label: 'Home PV System - 20.1 kWh avg consumption' },
+  { value: 'raspberry_pi', label: '+ Add via Raspberry Pi' },
 ];
 
 const SOLAR_SYSTEMS = [
-  { value: '2', label: '2 Panels - 0.9 kWp (Small Setup)', capacity: 0.9 },
-  { value: '4', label: '4 Panels - 1.8 kWp (Compact System)', capacity: 1.8 },
-  { value: '8', label: '8 Panels - 3.5 kWp (Medium System)', capacity: 3.5 },
-  { value: '10', label: '10 Panels - 4.4 kWp (Standard System)', capacity: 4.4 },
-  { value: '12', label: '12 Panels - 5.3 kWp (Reference System)', capacity: 5.3 },
-  { value: '16', label: '16 Panels - 7.1 kWp (Extended System)', capacity: 7.1 },
+  { value: '2', panelCount: 2, capacity: '~0.9 kWp', capacity_kw: 0.9, avgDailyYield: '5.5 kWh', pctCovered: '27%', verdict: 'Too Small. Minimal impact on bills.' },
+  { value: '4', panelCount: 4, capacity: '~1.8 kWp', capacity_kw: 1.8, avgDailyYield: '11.1 kWh', pctCovered: '55%', verdict: 'Entry Level. Good for day usage.' },
+  { value: '8', panelCount: 8, capacity: '~3.5 kWp', capacity_kw: 3.5, avgDailyYield: '22.1 kWh', pctCovered: '110%', verdict: 'Economic. Neutral over a year, but winter-dependent.' },
+  { value: '10', panelCount: 10, capacity: '~4.4 kWp', capacity_kw: 4.4, avgDailyYield: '27.7 kWh', pctCovered: '138%', verdict: 'High Performance. Great for large families.' },
+  { value: '12', panelCount: 12, capacity: '~5.3 kWp', capacity_kw: 5.3, avgDailyYield: '33.2 kWh', pctCovered: '165%', verdict: 'Off-Grid Choice. Recommended for 90%+ independence.' },
+  { value: '16', panelCount: 16, capacity: '~7.0 kWp', capacity_kw: 7.0, avgDailyYield: '44.2 kWh', pctCovered: '220%', verdict: 'EV Ready. Best for those with electric vehicles.' },
 ];
 
 const BATTERY_SIZE_KWH = 13.5; // Default battery size (kWh)
@@ -98,10 +99,11 @@ export default function Account() {
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
 
-  // Link device modal state
+  // Link device modal state (static placeholder)
   const [showLinkModal, setShowLinkModal] = useState(false);
-  const [linkCardId, setLinkCardId] = useState('');
-  const [linkPurpose, setLinkPurpose] = useState('system');
+  const [linkModalType, setLinkModalType] = useState('system'); // 'system' or 'battery'
+  const [linkModalDeviceId, setLinkModalDeviceId] = useState('');
+  const [linkModalError, setLinkModalError] = useState('');
 
   // Dynamic lists for systems and batteries (so linked devices can add items)
   const [solarSystems, setSolarSystems] = useState(SOLAR_SYSTEMS);
@@ -120,28 +122,21 @@ export default function Account() {
     }
   }, [user, isGuest, authLoading, router]);
 
-  // Populate profile data
+  // Populate profile data and solar config
   useEffect(() => {
     if (profile) {
       setProfileData({
-        display_name: profile.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || '',
+        display_name: profile.display_name || user?.user_metadata?.full_name || '',
         phone_number: profile.phone_number || '',
         timezone: profile.timezone || 'UTC+01:00',
       });
       
-      // Load solar configuration if exists
-      if (profile.consumption_profile || profile.current_system) {
-        setSolarConfig({
-          consumption_profile: profile.consumption_profile || 'default',
-          current_system: profile.current_system || '10',
-        });
-      }
-    } else if (user) {
-      setProfileData(prev => ({
-        ...prev,
-        display_name: user.user_metadata?.full_name || user.user_metadata?.name || '',
-        phone_number: user.phone || '',
-      }));
+      // Load solar configuration directly from profile columns
+      setSolarConfig({
+        consumption_profile: profile.consumption_profile || 'home',
+        current_system: profile.current_system ? String(profile.current_system) : '10',
+        battery_size: profile.battery_size ? String(profile.battery_size) : '13.5',
+      });
     }
   }, [profile, user]);
 
@@ -155,22 +150,34 @@ export default function Account() {
   const handleSolarChange = (e) => {
     const { name, value } = e.target;
 
-    // Open modal when user chooses to link a new system or link a battery
+    // If user selected the link option from a select, open a static modal and do not change selection
     if (name === 'current_system' && value === 'link-new') {
-      setLinkCardId('');
-      setLinkPurpose('system');
+      setLinkModalType('system');
+      setLinkModalDeviceId('');
+      setLinkModalError('');
       setShowLinkModal(true);
       return;
     }
 
     if (name === 'battery' && value === 'link-battery') {
-      setLinkCardId('');
-      setLinkPurpose('battery');
+      setLinkModalType('battery');
+      setLinkModalDeviceId('');
+      setLinkModalError('');
       setShowLinkModal(true);
       return;
     }
 
-    // For battery select, keep the selected option key (string)
+    if (name === 'consumption_profile' && value === 'raspberry_pi') {
+      // Open a small consumption-profile placeholder flow
+      setLinkModalType('consumption');
+      setLinkModalDeviceId('');
+      setLinkModalError('');
+      setShowLinkModal(true);
+      // Do not update state to 'raspberry_pi' so the dropdown doesn't change
+      return;
+    }
+
+    // Regular update
     if (name === 'battery') {
       setSolarConfig(prev => ({ ...prev, battery_size: value }));
     } else {
@@ -186,6 +193,21 @@ export default function Account() {
     setPasswordData(prev => ({ ...prev, [name]: value }));
     setPasswordError('');
     setPasswordSuccess('');
+  };
+
+  const handleLinkDevice = () => {
+    if (!linkModalDeviceId.trim()) {
+      setLinkModalError('Please enter a device ID');
+      return;
+    }
+    // Always show unrecognized ID error - don't close modal
+    setLinkModalError('Unrecognized device ID. Please check your device and try again.');
+  };
+
+  const closeLinkModal = () => {
+    setShowLinkModal(false);
+    setLinkModalDeviceId('');
+    setLinkModalError('');
   };
 
   const handleProfileSubmit = async (e) => {
@@ -253,52 +275,33 @@ export default function Account() {
     setSolarSuccess('');
 
     try {
-      const withTimeout = (promise, ms, label) =>
-        Promise.race([
-          promise,
-          new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timed out`)), ms)),
-        ]);
-
-      const { data: sessionData, error: sessionError } = await withTimeout(
-        supabase.auth.getSession(),
-        5000,
-        'Session fetch'
-      );
-
-      if (sessionError) throw sessionError;
-
-      const accessToken = sessionData?.session?.access_token;
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
       if (!accessToken) throw new Error('Missing access token');
 
-      // Determine numeric battery size to send (look up selected battery option)
-      const batteryOption = batteryOptions.find(b => b.value === solarConfig.battery_size);
-      const batterySizeToSend = batteryOption ? batteryOption.size : parseFloat(solarConfig.battery_size) || BATTERY_SIZE_KWH;
-
-      const response = await withTimeout(
-        fetch('/api/profile', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            consumption_profile: solarConfig.consumption_profile,
-            current_system: solarConfig.current_system,
-            battery_size: batterySizeToSend,
-          }),
+      // Simple update to the profile endpoint
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          consumption_profile: solarConfig.consumption_profile,
+          current_system: solarConfig.current_system,
+          battery_size: solarConfig.battery_size
         }),
-        8000,
-        'Solar config update'
-      );
+      });
 
-      const result = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(result?.error || 'Failed to update solar configuration');
+        const result = await response.json();
+        throw new Error(result.error || 'Failed to update solar configuration');
       }
 
       if (refreshProfile) {
-        await withTimeout(Promise.resolve(refreshProfile()), 5000, 'Profile refresh');
+        await refreshProfile();
       }
+
       setSolarSuccess('Solar configuration updated successfully!');
     } catch (error) {
       console.error('Solar config update error:', error);
@@ -357,45 +360,6 @@ export default function Account() {
     }
   };
 
-  // Confirm link: used by modal to add a new system or battery option
-  const handleConfirmLink = async () => {
-    setSolarError('');
-    if (!linkCardId) {
-      setSolarError('Please enter a device ID or click × to cancel.');
-      return;
-    }
-
-    try {
-      setSolarLoading(true);
-      // Simulate linking latency
-      await new Promise(res => setTimeout(res, 700));
-
-      if (linkPurpose === 'system') {
-        const newVal = `linked-${Date.now()}`;
-        const newSystem = { value: newVal, label: `Linked: ${linkCardId} - 5.0 kWp`, capacity: 5.0 };
-        setSolarSystems(prev => [...prev, newSystem]);
-        setSolarConfig(prev => ({ ...prev, current_system: newVal }));
-        setSolarSuccess('System linked successfully!');
-      } else {
-        // battery
-        const newVal = `bat-${Date.now()}`;
-        const newBat = { value: newVal, label: `Linked Battery - 13.5 kWh (${linkCardId})`, size: 13.5 };
-        setBatteryOptions(prev => [...prev, newBat]);
-        setSolarConfig(prev => ({ ...prev, battery_size: newVal }));
-        setSolarSuccess('Battery linked successfully!');
-      }
-
-      setShowLinkModal(false);
-      setLinkCardId('');
-      setTimeout(() => setSolarSuccess(''), 3000);
-    } catch (err) {
-      console.error('Link error', err);
-      setSolarError('Failed to link device');
-    } finally {
-      setSolarLoading(false);
-    }
-  };
-
   // Loading state
   if (authLoading || !user || isGuest) {
     return (
@@ -425,6 +389,14 @@ export default function Account() {
   
   const selectedSystem = solarSystems.find(s => s.value === solarConfig.current_system);
   const selectedBattery = batteryOptions.find(b => b.value === solarConfig.battery_size);
+  
+  // Helper to format estimated daily production when capacity_kw available
+  const estimateDaily = (sys) => {
+    if (!sys) return null;
+    const kw = sys.capacity_kw || null;
+    if (!kw) return null;
+    return `${(kw * 4.5).toFixed(1)} - ${(kw * 6.0).toFixed(1)} kWh`;
+  };
 
 
   return (
@@ -531,7 +503,7 @@ export default function Account() {
                     onChange={handleSolarChange}
                     disabled={solarLoading}
                     className={styles.input}
-                    style={{ height: '42px', backgroundColor: '#F9FAFB' }}
+                    style={{ height: '42px', backgroundColor: '#F9FAFB', width: '100%' }}
                   >
                     {CONSUMPTION_PROFILES.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -557,8 +529,8 @@ export default function Account() {
                     style={{ height: '42px', backgroundColor: '#F9FAFB' }}
                   >
                     {solarSystems.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
+                      <option key={option.value} value={option.value} title={`${option.panelCount} panels — ${option.capacity} — ${option.avgDailyYield} • ${option.pctCovered} — ${option.verdict}`}>
+                        {option.panelCount} panels — {option.capacity} — {option.verdict}
                       </option>
                     ))}
                     <option value="link-new">+ Add another system (Link Raspberry Pi)</option>
@@ -584,21 +556,100 @@ export default function Account() {
               </div>
 
               {showLinkModal && (
-                <div style={{ position:'fixed', inset:0, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.5)', zIndex:1000 }}>
-                  <div style={{ width: '420px', background:'white', padding:'20px', borderRadius:'8px', position:'relative' }}>
-                    <button onClick={() => { setShowLinkModal(false); setLinkCardId(''); }} style={{ position:'absolute', right: '12px', top: '12px', border:'none', background:'transparent', fontSize:'20px', cursor:'pointer' }}>×</button>
-                    <h3 style={{ marginTop:0 }}>{linkPurpose === 'battery' ? 'Link Battery (Raspberry Pi)' : 'Link Raspberry Pi'}</h3>
-                    <p style={{ color:'#666', fontSize:'13px' }}>{linkPurpose === 'battery' ? 'Enter your Raspberry Pi card ID to link a battery. If you do not have an ID, click × to close.' : 'Enter your Raspberry Pi card ID to link another system. If you don\'t have an ID, click × to close.'}</p>
-                    <input
-                      value={linkCardId}
-                      onChange={(e) => setLinkCardId(e.target.value)}
-                      className={styles.input}
-                      placeholder="Card ID (e.g., RP-123456)"
-                      style={{ marginTop:'12px' }}
-                    />
-                    <div style={{ display:'flex', justifyContent:'flex-end', gap:'8px', marginTop:'16px' }}>
-                      <button onClick={() => { setShowLinkModal(false); setLinkCardId(''); }} className={styles.secondaryButton}>Cancel</button>
-                      <button onClick={handleConfirmLink} className={styles.primaryButton}>Link Device</button>
+                <div style={{
+                  position: 'fixed',
+                  inset: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'rgba(0, 0, 0, 0.6)',
+                  zIndex: 1100,
+                  padding: '20px',
+                }}>
+                  <div style={{
+                    width: '100%',
+                    maxWidth: '440px',
+                    background: 'white',
+                    borderRadius: '12px',
+                    padding: '24px',
+                    position: 'relative',
+                  }}>
+                    <button
+                      onClick={closeLinkModal}
+                      style={{
+                        position: 'absolute',
+                        right: '16px',
+                        top: '16px',
+                        border: 'none',
+                        background: 'transparent',
+                        fontSize: '24px',
+                        cursor: 'pointer',
+                        color: '#6b7280',
+                        lineHeight: 1,
+                      }}
+                    >
+                      ×
+                    </button>
+
+                    <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#191818', marginBottom: '8px', marginTop: 0 }}>
+                      {linkModalType === 'battery' ? 'Link Battery via Raspberry Pi' :
+                       linkModalType === 'consumption' ? 'Add Consumption Profile' :
+                       'Link Another System'}
+                    </h3>
+
+                    <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '20px' }}>
+                      {linkModalType === 'battery'
+                        ? 'Enter your Raspberry Pi device ID to link a battery for real-time monitoring.'
+                        : linkModalType === 'consumption'
+                        ? 'Enter your Raspberry Pi device ID to add a consumption profile for accurate tracking.'
+                        : 'Enter your Raspberry Pi device ID to link another solar panel system.'}
+                    </p>
+
+                    {linkModalError && (
+                      <div style={{
+                        padding: '12px',
+                        background: '#FEE2E2',
+                        border: '1px solid #FCA5A5',
+                        borderRadius: '6px',
+                        marginBottom: '16px',
+                        color: '#DC2626',
+                        fontSize: '13px',
+                      }}>
+                        {linkModalError}
+                      </div>
+                    )}
+
+                    <div style={{ marginBottom: '20px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', marginBottom: '8px', color: '#374151' }}>
+                        Device ID
+                      </label>
+                      <input
+                        value={linkModalDeviceId}
+                        onChange={(e) => {
+                          setLinkModalDeviceId(e.target.value.toUpperCase());
+                          setLinkModalError('');
+                        }}
+                        className={styles.input}
+                        placeholder="RP-001"
+                        style={{ width: '100%', textTransform: 'uppercase' }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                      <button
+                        type="button"
+                        onClick={closeLinkModal}
+                        className={styles.secondaryButton}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleLinkDevice}
+                        className={styles.primaryButton}
+                      >
+                        Link Device
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -613,11 +664,17 @@ export default function Account() {
                   border: '1px solid #BAE6FD'
                 }}>
                   <p style={{ fontSize: '14px', color: '#0369A1', margin: 0 }}>
-                    <strong>Selected System:</strong> {selectedSystem.label}
+                    <strong>Selected:</strong> {selectedSystem.panelCount} panels — {selectedSystem.capacity}
                   </p>
                   <p style={{ fontSize: '13px', color: '#075985', margin: '4px 0 0 0' }}>
-                    Estimated daily production: {(selectedSystem.capacity * 4.5).toFixed(1)} - {(selectedSystem.capacity * 6.0).toFixed(1)} kWh
+                    <strong>Avg. daily yield:</strong> {selectedSystem.avgDailyYield} • <strong>% Covered:</strong> {selectedSystem.pctCovered}
                   </p>
+                  {estimateDaily(selectedSystem) && (
+                    <p style={{ fontSize: '13px', color: '#075985', margin: '4px 0 0 0' }}>
+                      Estimated daily production: {estimateDaily(selectedSystem)}
+                    </p>
+                  )}
+                  <p style={{ fontSize: '13px', color: '#333', marginTop: '8px' }}><strong>Verdict:</strong> {selectedSystem.verdict}</p>
                 </div>
               )}
 
