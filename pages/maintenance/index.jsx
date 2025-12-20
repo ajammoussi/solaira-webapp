@@ -24,12 +24,12 @@ import { PVForecastForm, PredictionChart, PredictionTable } from '../../componen
 import styles from '../energy/styles.module.css';
 
 const SOLAR_SYSTEMS = [
-  { value: '2', panelCount: 2, capacity: 0.9 },
-  { value: '4', panelCount: 4, capacity: 1.8 },
-  { value: '8', panelCount: 8, capacity: 3.5 },
-  { value: '10', panelCount: 10, capacity: 4.4 },
-  { value: '12', panelCount: 12, capacity: 5.3 },
-  { value: '16', panelCount: 16, capacity: 7.0 },
+  { value: '2', panelCount: 2, capacity_kw: 0.9 },
+  { value: '4', panelCount: 4, capacity_kw: 1.8 },
+  { value: '8', panelCount: 8, capacity_kw: 3.5 },
+  { value: '10', panelCount: 10, capacity_kw: 4.4 },
+  { value: '12', panelCount: 12, capacity_kw: 5.3 },
+  { value: '16', panelCount: 16, capacity_kw: 7.0 },
 ];
 
 const Maintenance = () => {
@@ -63,17 +63,52 @@ const Maintenance = () => {
             const status = await pvMonitoringService.getAllSystemsStatus();
             const currentCount = status.systems ? status.systems.length : 0;
             
+            // Calculate capacity per PV system (all systems have equal capacity)
+            const numSystems = systemConfig.panelCount;  // Number of PV systems user has
+            const capacityPerSystem = systemConfig.capacity_kw / numSystems;
+            
+            console.log(`User has ${numSystems} PV systems, ${capacityPerSystem.toFixed(2)} kW each`);
+            console.log(`Total capacity: ${systemConfig.capacity_kw} kW`);
+            
             // Only reconfigure if count doesn't match
-            if (currentCount !== systemConfig.panelCount) {
-              console.log(`Reconfiguring systems: Current ${currentCount}, Target ${systemConfig.panelCount}`);
-              await pvMonitoringService.configureSystems(systemConfig.panelCount, 5.0); // Default 5.0 capacity per system for simulation
+            if (currentCount !== numSystems) {
+              console.log(`Reconfiguring: Current ${currentCount} systems → Target ${numSystems} systems`);
+              
+              await pvMonitoringService.configureSystems(numSystems, capacityPerSystem);
+              
+              // Start monitoring after configuration
+              await pvMonitoringService.startMonitoring(60);
+              
+              // Wait a moment for data to be generated
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              
               setConfigKey(prev => prev + 1); // Refresh grid
+            } else {
+              // Systems already configured, ensure monitoring is active
+              console.log(`Systems already configured (${currentCount}), ensuring monitoring is active`);
+              try {
+                await pvMonitoringService.startMonitoring(60);
+              } catch (monitorErr) {
+                console.log('Monitoring already active or failed to start:', monitorErr.message);
+              }
             }
           } catch (err) {
             console.error("Failed to check/configure systems:", err);
             // If check fails (e.g. 404 or empty), try to configure
             try {
-               await pvMonitoringService.configureSystems(systemConfig.panelCount, 5.0);
+               const numSystems = systemConfig.panelCount;
+               const capacityPerSystem = systemConfig.capacity_kw / numSystems;
+               
+               console.log(`Configuring ${numSystems} PV systems, ${capacityPerSystem.toFixed(2)} kW each`);
+               
+               await pvMonitoringService.configureSystems(numSystems, capacityPerSystem);
+               
+               // Start monitoring after configuration
+               await pvMonitoringService.startMonitoring(60);
+               
+               // Wait a moment for data to be generated
+               await new Promise(resolve => setTimeout(resolve, 1000));
+               
                setConfigKey(prev => prev + 1);
             } catch (retryErr) {
                console.error("Retry configuration failed:", retryErr);
@@ -101,14 +136,6 @@ const Maintenance = () => {
         const now = new Date();
         
         for (let i = 29; i >= 0; i--) {
-          const d = new Date(now);
-          d.setDate(d.getDate() - i);
-          dates.push(d.toISOString().split('T')[0]);
-          
-          const baseProd = 40 + Math.random() * 10; // 40-50 kWh
-          predicted.push(parseFloat(baseProd.toFixed(2)));
-          
-          // Simulate degradation in last 5 days to trigger alert
           let efficiency = 0.95;
           if (i < 5) efficiency = 0.65; // Fault!
           

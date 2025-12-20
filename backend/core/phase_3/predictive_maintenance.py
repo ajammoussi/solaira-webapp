@@ -19,6 +19,28 @@ from backend.core.phase_3.deviation_score import DeviationScoreCalculator
 # from backend.core.phase_3.visualization import MaintenanceVisualizer  # Disabled - requires matplotlib
 
 
+def convert_numpy_types(obj):
+    """
+    Recursively convert numpy types to Python native types for JSON serialization.
+    """
+    if isinstance(obj, dict):
+        return {key: convert_numpy_types(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_numpy_types(item) for item in obj]
+    elif isinstance(obj, np.bool_):
+        return bool(obj)
+    elif isinstance(obj, (np.integer, np.int64, np.int32)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, np.float64, np.float32)):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif pd.isna(obj):
+        return None
+    else:
+        return obj
+
+
 class PredictiveMaintenancePipeline:
 
     def __init__(self, config_path: str = None):
@@ -26,12 +48,18 @@ class PredictiveMaintenancePipeline:
         Initialize pipeline
         
         Args:
-            config_path: Optional path to configuration file
+            config_path: Optional path to configuration file (uses defaults if None)
         """
         
-        # Load configuration
-        self.config = load_config(config_path)
-        self.data_paths = get_data_paths(self.config)
+        # Load configuration (or use defaults)
+        try:
+            self.config = load_config(config_path)
+            self.data_paths = get_data_paths(self.config)
+        except Exception as e:
+            print(f"Warning: Could not load config, using defaults: {e}")
+            # Create minimal default config
+            self.config = self._create_default_config()
+            self.data_paths = {}
         
         # Initialize modules
         self.pr_calculator = PerformanceRatioCalculator(self.config)
@@ -40,6 +68,44 @@ class PredictiveMaintenancePipeline:
         
         # Results storage
         self.results = {}
+    
+    def _create_default_config(self):
+        """Create default configuration when YAML not available"""
+        class DefaultConfig:
+            pass
+        
+        config = DefaultConfig()
+        config.system_name = 'Dynamic PV Monitoring'
+        config.config_version = 'dynamic'
+        
+        # Set default thresholds
+        deviation_score = DefaultConfig()
+        deviation_score.warning_threshold = 0.20
+        deviation_score.critical_threshold = 0.30
+        deviation_score.moving_average_days = 3
+        deviation_score.consecutive_days_alert = 2
+        deviation_score.min_valid_pairs = 2
+        config.deviation_score = deviation_score
+        
+        performance_ratio = DefaultConfig()
+        performance_ratio.expected_pr_min = 0.60
+        performance_ratio.expected_pr_max = 0.90
+        performance_ratio.optimal_pr = 0.80
+        config.performance_ratio = performance_ratio
+        
+        analysis = DefaultConfig()
+        analysis.analysis_level = 'daily'
+        analysis.min_hours_for_daily_pr = 8
+        analysis.min_production_kwh = 0.1
+        config.analysis = analysis
+        
+        # Empty systems list - will be dynamically discovered
+        pv_systems = DefaultConfig()
+        pv_systems.systems = []
+        pv_systems.max_proximity_km = 5.0
+        config.pv_systems = pv_systems
+        
+        return config
     
     def load_data(self) -> dict:
         
@@ -191,6 +257,181 @@ class PredictiveMaintenancePipeline:
     def _print_summary_n_systems(self):
         """Print executive summary for N-system analysis"""
         pass
+
+    def analyze_monitoring_systems(self, monitoring_data_dir: Path) -> dict:
+        """
+        Analyze multiple PV systems from monitoring_data directory using pairwise comparison.
+        
+        Args:
+            monitoring_data_dir: Path to directory containing pv_system_N_actual.csv and 
+                                pv_system_N_predicted.csv files
+            
+        Returns:
+            Dictionary with per-system analysis including pairwise deviation scores
+        """
+        try:
+            monitoring_data_dir = Path(monitoring_data_dir)
+            
+            # Find all system files
+            actual_files = sorted(monitoring_data_dir.glob('pv_system_*_actual.csv'))
+            
+            if not actual_files:
+                return {'error': 'No monitoring data files found'}
+            
+            # Load data for all systems
+            pv_data = {}
+            system_ids = []
+            
+            for actual_file in actual_files:
+                # Extract system ID from filename (e.g., pv_system_1_actual.csv -> 1)
+                filename = actual_file.stem  # 'pv_system_1_actual'
+                system_id = filename.split('_')[2]  # Get '1'
+                system_name = f'PV_System_{system_id}'
+                system_ids.append(int(system_id))
+                
+                predicted_file = actual_file.parent / f'pv_system_{system_id}_predicted.csv'
+                
+                if not predicted_file.exists():
+                    continue
+                
+                actual_df = pd.read_csv(actual_file)
+                predicted_df = pd.read_csv(predicted_file)
+                
+                pv_data[system_name] = {
+                    'actual': actual_df,
+                    'predicted': predicted_df
+                }
+            
+            if len(pv_data) < 2:
+                # Need at least 2 systems for comparative analysis
+                # Fall back to single system analysis
+                return self._fallback_single_system_analysis(pv_data)
+            
+            # Temporarily override calculator's pv_names to match actual data
+            actual_pv_names = list(pv_data.keys())
+            original_pv_names = self.pr_calculator.pv_names
+            original_n_systems = self.pr_calculator.n_systems
+            
+            self.pr_calculator.pv_names = actual_pv_names
+            self.pr_calculator.n_systems = len(actual_pv_names)
+            
+            try:
+                # Calculate PR for all systems
+                pr_all_systems = self.pr_calculator.calculate_all_systems_pr(pv_data)
+                
+                # Calculate pairwise deviations
+                pairwise_result = self.pr_calculator.create_pairwise_comparison_matrix(pr_all_systems)
+                
+                # Analyze deviations
+                deviation_analysis = self.deviation_calculator.analyze_pairwise_deviations(
+                    pr_all_systems, 
+                    pairwise_result
+                )
+            finally:
+                # Restore original values
+                self.pr_calculator.pv_names = original_pv_names
+                self.pr_calculator.n_systems = original_n_systems
+            
+            # Format results for monitoring API
+            systems_status = {}
+            
+            # Convert to list to avoid "dictionary changed size during iteration" error
+            for system_name in list(pv_data.keys()):
+                if system_name not in deviation_analysis['system_status']:
+                    continue
+                
+                status_info = deviation_analysis['system_status'][system_name]
+                system_id = int(system_name.split('_')[-1])
+                
+                # Calculate recent PR from the data
+                actual_df = pv_data[system_name]['actual']
+                predicted_df = pv_data[system_name]['predicted']
+                
+                # Use last 7 days to calculate recent PR
+                recent_actual = actual_df.tail(7)['energy_kwh'].sum()
+                recent_predicted = predicted_df.tail(7)['energy_kwh'].sum()
+                recent_pr = recent_actual / recent_predicted if recent_predicted > 0 else 0.0
+                
+                # Determine severity and issues
+                category = status_info['category']
+                mean_dev = status_info['mean_deviation']
+                
+                if category == 'CRITICAL':
+                    severity = 'critical'
+                    status = 'critical'
+                    issues = [f'Critical deviation from peer systems ({mean_dev:.1%})']
+                elif category == 'MEDIUM':
+                    severity = 'warning'
+                    status = 'warning'
+                    issues = [f'Performance deviation detected ({mean_dev:.1%})']
+                else:
+                    severity = 'normal'
+                    status = 'healthy'
+                    issues = []
+                
+                systems_status[system_id] = {
+                    'status': status,
+                    'severity': severity,
+                    'recent_pr': float(recent_pr),
+                    'mean_deviation': float(mean_dev) if not pd.isna(mean_dev) else 0.0,
+                    'issues_detected': issues,
+                    'category': category,
+                    'is_faulty': bool(status_info['is_faulty']),
+                    'analysis_method': 'pairwise_comparative'
+                }
+            
+            return {
+                'systems': systems_status,
+                'cluster_analysis': convert_numpy_types(deviation_analysis.get('cluster_analysis', {})),
+                'analysis_date': deviation_analysis.get('analysis_date')
+            }
+            
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return {'error': str(e)}
+    
+    def _fallback_single_system_analysis(self, pv_data: dict) -> dict:
+        """Fallback for when only one system is available"""
+        systems_status = {}
+        
+        for system_name, data in pv_data.items():
+            system_id = int(system_name.split('_')[-1])
+            
+            actual_df = data['actual']
+            predicted_df = data['predicted']
+            
+            # Simple PR calculation
+            total_actual = actual_df['energy_kwh'].sum()
+            total_predicted = predicted_df['energy_kwh'].sum()
+            
+            pr = total_actual / total_predicted if total_predicted > 0 else 0
+            deviation = 1.0 - pr
+            
+            if deviation < 0.10:
+                status = 'healthy'
+                severity = 'normal'
+                issues = []
+            elif deviation < 0.20:
+                status = 'warning'
+                severity = 'warning'
+                issues = ['Performance below normal range']
+            else:
+                status = 'critical'
+                severity = 'critical'
+                issues = ['Performance significantly below expected']
+            
+            systems_status[system_id] = {
+                'status': status,
+                'severity': severity,
+                'mean_deviation': float(deviation),
+                'issues_detected': issues,
+                'category': 'NORMAL' if deviation < 0.10 else 'MEDIUM' if deviation < 0.20 else 'CRITICAL',
+                'is_faulty': bool(deviation >= 0.10),
+                'analysis_method': 'single_system_fallback'
+            }
+        
+        return {'systems': systems_status}
 
     def analyze_single_system(self, dates: list, actual: list, predicted: list) -> dict:
         """
