@@ -247,7 +247,6 @@ const BlogPage = () => {
         </section>
 
         <Footer
-          logoImage="https://play.teleporthq.io/static/svg/default-img.svg"
           logoAlt="Solaira Logo"
           phone="(+216) 99-999-999"
           email="info@solaira.tn"

@@ -8,7 +8,15 @@
 import { withApiAuth } from '../../lib/auth/apiMiddleware';
 
 function pickAllowedUpdates(body) {
-  const allowedKeys = ['display_name', 'phone_number', 'timezone'];
+  const allowedKeys = [
+    'display_name', 
+    'phone_number', 
+    'timezone',
+    'consumption_profile',
+    'current_system',
+    'battery_size',
+    'preferences'
+  ];
   const updates = {};
 
   if (!body || typeof body !== 'object') return updates;

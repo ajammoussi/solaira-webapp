@@ -451,21 +451,23 @@
     display: none;
   }
 
-  /* Mobile sidebar - slide in from left */
+  /* Mobile sidebar - slide in from right */
   .sidebar {
     position: fixed;
-    left: -280px;
+    left: auto;
+    right: 0;
     top: 90px;
     bottom: 0;
     z-index: 90;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-    transition: left 0.3s ease;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease;
     width: 280px !important;
   }
   
   /* Don't apply collapsed state on mobile */
   .sidebar.sidebarCollapsed {
-    left: -280px;
+    left: auto;
+    right: -280px;
     width: 280px !important;
   }
 

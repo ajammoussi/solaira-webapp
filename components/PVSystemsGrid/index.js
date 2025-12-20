@@ -3,7 +3,7 @@
  * Shows systems as cards with color-coded status indicators
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import * as LucideIcons from 'lucide-react';
 import styles from './styles.module.css';
 import pvMonitoringService from '../../lib/services/pvMonitoring';
@@ -15,36 +15,50 @@ const PVSystemsGrid = ({ refreshInterval = 30000, noPadding = false, onUpdate })
   const [lastUpdated, setLastUpdated] = useState(null);
   const [selectedSystem, setSelectedSystem] = useState(null);
 
-  const fetchSystemsStatus = async () => {
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  const fetchSystemsStatus = useCallback(async () => {
     try {
       const data = await pvMonitoringService.getAllSystemsStatus();
-      setSystems(data.systems || []);
-      const timestamp = new Date(data.timestamp);
-      setLastUpdated(timestamp);
-      if (onUpdate) {
-        onUpdate({
-          lastUpdated: timestamp,
-          systemCount: (data.systems || []).length
-        });
+      if (isMounted.current) {
+        setSystems(data.systems || []);
+        const timestamp = new Date(data.timestamp);
+        setLastUpdated(timestamp);
+        if (onUpdate) {
+          onUpdate({
+            lastUpdated: timestamp,
+            systemCount: (data.systems || []).length
+          });
+        }
+        setError(null);
       }
-      setError(null);
     } catch (err) {
       console.error('Error fetching systems status:', err);
-      // More specific error message
-      if (err.response) {
-        // Server responded with error
-        setError(`Backend error: ${err.response.data?.detail || err.response.statusText}`);
-      } else if (err.request) {
-        // Request made but no response
-        setError('Cannot connect to backend. Is it running on http://localhost:8001?');
-      } else {
-        // Something else happened
-        setError(`Error: ${err.message}`);
+      if (isMounted.current) {
+        // More specific error message
+        if (err.response) {
+          // Server responded with error
+          setError(`Backend error: ${err.response.data?.detail || err.response.statusText}`);
+        } else if (err.request) {
+          // Request made but no response
+          setError('Cannot connect to backend. Is it running on http://localhost:8001?');
+        } else {
+          // Something else happened
+          setError(`Error: ${err.message}`);
+        }
       }
     } finally {
-      setLoading(false);
+      if (isMounted.current) {
+        setLoading(false);
+      }
     }
-  };
+  }, [onUpdate]);
 
   useEffect(() => {
     fetchSystemsStatus();
@@ -52,8 +66,10 @@ const PVSystemsGrid = ({ refreshInterval = 30000, noPadding = false, onUpdate })
     // Auto-refresh
     const interval = setInterval(fetchSystemsStatus, refreshInterval);
 
-    return () => clearInterval(interval);
-  }, [refreshInterval]);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [fetchSystemsStatus, refreshInterval]);
 
   const getStatusColor = (severity) => {
     switch (severity) {
@@ -132,10 +148,6 @@ const PVSystemsGrid = ({ refreshInterval = 30000, noPadding = false, onUpdate })
             Last updated: {lastUpdated ? lastUpdated.toLocaleTimeString() : 'Never'}
           </p>
         </div>
-        <button onClick={fetchSystemsStatus} className={styles.refreshButton}>
-          <LucideIcons.RefreshCw size={20} />
-          Refresh
-        </button>
       </div>
 
       <div className={styles.systemsGrid}>

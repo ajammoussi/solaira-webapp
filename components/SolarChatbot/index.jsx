@@ -47,6 +47,7 @@ const SolarChatbot = ({ energyData, userId = 'default_user' }) => {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState(null);
+  const [isShaking, setIsShaking] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -63,6 +64,41 @@ const SolarChatbot = ({ energyData, userId = 'default_user' }) => {
       inputRef.current.focus();
     }
   }, [isOpen]);
+
+  // Animation logic: Shake once a minute, stop if opened
+  useEffect(() => {
+    const hasOpened = sessionStorage.getItem('chatbot_opened');
+    if (hasOpened) return;
+
+    // Initial shake after 3 seconds
+    const initialTimer = setTimeout(() => {
+      if (!sessionStorage.getItem('chatbot_opened')) {
+        setIsShaking(true);
+        setTimeout(() => setIsShaking(false), 2000);
+      }
+    }, 3000);
+
+    // Shake every 60 seconds
+    const interval = setInterval(() => {
+      if (!sessionStorage.getItem('chatbot_opened')) {
+        setIsShaking(true);
+        setTimeout(() => setIsShaking(false), 2000);
+      }
+    }, 60000);
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const handleToggle = () => {
+    if (!isOpen) {
+      sessionStorage.setItem('chatbot_opened', 'true');
+      setIsShaking(false);
+    }
+    setIsOpen(!isOpen);
+  };
 
   // Send message to backend API
   const handleSendMessage = async () => {
@@ -119,8 +155,8 @@ const SolarChatbot = ({ energyData, userId = 'default_user' }) => {
     <>
       {/* Floating Sun Icon Button */}
       <button 
-        className={`${styles.sunButton} ${isOpen ? styles.sunButtonActive : ''}`}
-        onClick={() => setIsOpen(!isOpen)}
+        className={`${styles.sunButton} ${isOpen ? styles.sunButtonActive : ''} ${isShaking ? styles.shake : ''}`}
+        onClick={handleToggle}
         aria-label="Solar AI Assistant"
       >
         <svg className={styles.sunIcon} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -25,11 +25,13 @@ const NotFound = (props) => {
           .not-found-container1 {
             width: 100%;
             display: flex;
-            overflow: auto;
+            overflow: hidden;
             min-height: 100vh;
             align-items: center;
             flex-direction: column;
             justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
           }
           .not-found-container2 {
             display: flex;
@@ -37,25 +39,32 @@ const NotFound = (props) => {
             align-items: center;
             flex-direction: column;
             justify-content: center;
+            width: 100%;
           }
           .not-found-text2 {
             color: rgb(38, 38, 38);
-            font-size: 252px;
+            font-size: clamp(100px, 20vw, 252px);
             margin-top: -20px;
             font-weight: 900;
             margin-bottom: -20px;
-            letter-spacing: -20px;
+            letter-spacing: clamp(-10px, -2vw, -20px);
+            text-align: center;
           }
           .not-found-container3 {
-            width: 421px;
+            width: 100%;
+            max-width: 421px;
             display: flex;
             align-items: center;
             flex-direction: column;
             justify-content: center;
+            padding: 0 20px;
+            box-sizing: border-box;
           }
           .not-found-text3 {
             text-align: center;
             font-weight: 400;
+            font-size: clamp(16px, 4vw, 24px);
+            line-height: 1.5;
           }
         `}
       </style>
