@@ -29,3 +29,4 @@ tf2onnx
 onnx
 onnxruntime
 pvlib
+pyyaml
