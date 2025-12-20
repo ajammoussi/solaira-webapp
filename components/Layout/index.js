@@ -141,7 +141,7 @@ const Layout = ({ children }) => {
             <Link href="/dashboard">
               <a className={styles.logoLink}>
                 <div className={styles.logo}>
-                  <img src="/solaria-small-logo.png" alt="Solaira Logo" className={styles.logoImage} />
+                  <img src="/solaria-small-logo1.png" alt="Solaira Logo" className={styles.logoImage} />
                   <span className={styles.logoText}>Solaira</span>
                 </div>
               </a>
