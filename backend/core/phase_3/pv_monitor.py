@@ -36,15 +36,15 @@ class PVSystem:
         """Set consistent degradation factor"""
         if self._base_performance is None:
             # Set once and keep it consistent
-            # Healthy systems: ~90% ±1%
-            # Warning systems: ~82% (8% below, ~10-12% deviation)
-            # Critical systems: ~73% (17% below, ~18-20% deviation)
+            # Healthy systems: ~95% ±1%
+            # Warning systems: ~88% (7% below, ~10-12% deviation)
+            # Critical systems: ~80% (15% below, ~18-20% deviation)
             if self.health == HealthStatus.HEALTHY:
-                self._base_performance = np.random.uniform(0.89, 0.91)
+                self._base_performance = np.random.uniform(0.94, 0.96)
             elif self.health == HealthStatus.WARNING:
-                self._base_performance = np.random.uniform(0.81, 0.83)
+                self._base_performance = np.random.uniform(0.87, 0.89)
             else:  # CRITICAL
-                self._base_performance = np.random.uniform(0.72, 0.74)
+                self._base_performance = np.random.uniform(0.79, 0.81)
     
     @property
     def id(self) -> int:
@@ -204,10 +204,10 @@ class SimpleAnalyzer:
         deviation = 1.0 - pr
         
         # Determine status based on deviation thresholds
-        # <15% deviation: healthy
-        # 15-20% deviation: warning
+        # <10% deviation: healthy
+        # 10-20% deviation: warning
         # >20% deviation: critical
-        if deviation < 0.15:
+        if deviation < 0.10:
             status = 'healthy'
             severity = 'normal'
             issues = []
@@ -249,12 +249,9 @@ class PVMonitoringService:
         self.store = DataStore(self.data_dir)
         self.systems: Dict[int, PVSystem] = {}
         self.monitoring_active = False  # For compatibility, but we don't use it
-        
-        print(f"📁 PV Monitoring Service initialized (data dir: {self.data_dir})")
     
     def configure_systems(self, num_systems: int, capacity_per_system: float = 5.0) -> Dict:
         """Configure the number of PV systems to monitor"""
-        print(f"\n🔧 Configuring {num_systems} PV systems...")
         
         self.systems.clear()
         
@@ -271,7 +268,7 @@ class PVMonitoringService:
             system_id = i + 1
             system = PVSystem(
                 system_id=system_id,
-                name=f"PV System {system_id}",
+                name=f"Solar Panel {system_id}",
                 capacity_kw=capacity_per_system,
                 health=healths[i]
             )
@@ -281,11 +278,6 @@ class PVMonitoringService:
             df = SolarDataGenerator.generate_history(system, days=30)
             self.store.save_system_data(system_id, df)
             
-            print(f"   ✅ System {system_id}: {healths[i].value} "
-                  f"(degradation: {system.degradation_factor:.1%})")
-        
-        print(f"✅ Configured {num_systems} systems\n")
-        
         return {
             'num_systems': num_systems,
             'systems': [
@@ -387,12 +379,24 @@ class PVMonitoringService:
     
     # Compatibility methods (old interface)
     def start_monitoring(self, interval_seconds: int = 60):
-        """Compatibility - does nothing (no background threads!)"""
-        print("⚠️  Note: start_monitoring() is deprecated - no background threads")
-        return {'status': 'not_implemented', 'message': 'No background monitoring'}
+        """
+        Start monitoring simulation.
+        Triggers an immediate reading generation to simulate system activity.
+        """
+        self.monitoring_active = True
+        
+        # Trigger immediate reading generation so user sees "something happening"
+        readings = self.generate_readings()
+        
+        return {
+            'status': 'started', 
+            'message': f'Monitoring started. Generated {len(readings)} new readings.',
+            'active_systems': len(self.systems)
+        }
     
     def stop_monitoring(self):
-        """Compatibility - does nothing"""
+        """Stop monitoring simulation"""
+        self.monitoring_active = False
         return {'status': 'stopped'}
 
 

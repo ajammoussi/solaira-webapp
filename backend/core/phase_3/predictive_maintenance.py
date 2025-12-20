@@ -13,10 +13,10 @@ if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 # Import phase 3 modules
-from src_final.phase_3.config_loader import load_config, get_data_paths
-from src_final.phase_3.performance_ratio import PerformanceRatioCalculator
-from src_final.phase_3.deviation_score import DeviationScoreCalculator
-# from src_final.phase_3.visualization import MaintenanceVisualizer  # Disabled - requires matplotlib
+from backend.core.phase_3.config_loader import load_config, get_data_paths
+from backend.core.phase_3.performance_ratio import PerformanceRatioCalculator
+from backend.core.phase_3.deviation_score import DeviationScoreCalculator
+# from backend.core.phase_3.visualization import MaintenanceVisualizer  # Disabled - requires matplotlib
 
 
 class PredictiveMaintenancePipeline:
@@ -28,9 +28,6 @@ class PredictiveMaintenancePipeline:
         Args:
             config_path: Optional path to configuration file
         """
-        print("=" * 80)
-        print("PV SYSTEM PREDICTIVE MAINTENANCE - PHASE 3")
-        print("=" * 80)
         
         # Load configuration
         self.config = load_config(config_path)
@@ -43,44 +40,30 @@ class PredictiveMaintenancePipeline:
         
         # Results storage
         self.results = {}
-        
-        print("\n✅ Pipeline initialized successfully\n")
     
     def load_data(self) -> dict:
-
-        print("\n" + "=" * 80)
-        print("STEP 1: LOADING DATA FOR N PV SYSTEMS")
-        print("=" * 80)
         
         pv_data = {}
         systems = self.config.pv_systems.systems
-        
-        print(f"\n📂 Loading data for {len(systems)} systems...")
         
         for system in systems:
             pv_name = system['name']
             actual_data_path = system['actual_data']
             predicted_data_path = system['predicted_data']
             
-            print(f"\n   System: {pv_name}")
-            
             # Load actual data
             actual_path = project_root / actual_data_path
             if not actual_path.exists():
-                print(f"      ⚠️  Actual data not found: {actual_path}")
                 continue
             
             actual_df = pd.read_csv(actual_path)
-            print(f"      ✓ Actual: {len(actual_df)} records")
             
             # Load predicted data
             pred_path = project_root / predicted_data_path
             if not pred_path.exists():
-                print(f"      ⚠️  Predicted data not found: {pred_path}")
                 continue
             
             predicted_df = pd.read_csv(pred_path)
-            print(f"      ✓ Predicted: {len(predicted_df)} records")
             
             pv_data[pv_name] = {
                 'actual': actual_df,
@@ -90,16 +73,10 @@ class PredictiveMaintenancePipeline:
         if not pv_data:
             raise FileNotFoundError("No valid PV system data loaded!")
         
-        print(f"\n✅ Loaded data for {len(pv_data)} systems: {', '.join(pv_data.keys())}")
-        
         self.results['data'] = pv_data
         return pv_data
     
     def calculate_performance_ratios(self, pv_data: dict) -> pd.DataFrame:
-
-        print("\n" + "=" * 80)
-        print("STEP 2: CALCULATING PERFORMANCE RATIOS FOR N SYSTEMS")
-        print("=" * 80)
         
         # Calculate PR for all systems
         pr_all_systems = self.pr_calculator.calculate_all_systems_pr(pv_data)
@@ -109,10 +86,6 @@ class PredictiveMaintenancePipeline:
         return pr_all_systems
     
     def calculate_pairwise_deviations(self, pr_all_systems: pd.DataFrame) -> dict:
-
-        print("\n" + "=" * 80)
-        print("STEP 3: CALCULATING PAIRWISE DEVIATION MATRIX")
-        print("=" * 80)
         
         # Create pairwise comparison matrix
         pairwise_result = self.pr_calculator.create_pairwise_comparison_matrix(pr_all_systems)
@@ -133,13 +106,8 @@ class PredictiveMaintenancePipeline:
                             deviation_analysis: dict,
                             pairwise_matrix: dict,
                             output_dir: Path = None) -> dict:
-
-        print("\n" + "=" * 80)
-        print("STEP 4: CREATING VISUALIZATIONS (DISABLED)")
-        print("=" * 80)
         
         # Visualization disabled - requires matplotlib
-        print("\n   ⚠️  Visualization disabled (matplotlib not installed)")
         
         figures = {}
         self.results['figures'] = figures
@@ -147,10 +115,6 @@ class PredictiveMaintenancePipeline:
         return figures
     
     def export_results(self, output_dir: Path = None):
-
-        print("\n" + "=" * 80)
-        print("STEP 5: EXPORTING RESULTS")
-        print("=" * 80)
         
         if output_dir is None:
             output_dir = project_root / 'results' / 'phase_3'
@@ -164,31 +128,24 @@ class PredictiveMaintenancePipeline:
         reports_dir.mkdir(exist_ok=True)
         
         # Export DataFrames
-        print("\n📊 Exporting data files...")
         
         if 'pr_all_systems' in self.results:
             pr_path = data_dir / 'pr_all_systems.csv'
             self.results['pr_all_systems'].to_csv(pr_path, index=False)
-            print(f"   ✓ PR all systems: {pr_path.name}")
         
         # Export JSON reports
-        print("\n📄 Exporting JSON reports...")
         
         # Pairwise matrix
         if 'pairwise_matrix' in self.results:
             pairwise_path = reports_dir / 'pairwise_deviation_matrix.json'
             with open(pairwise_path, 'w') as f:
                 json.dump(self.results['pairwise_matrix'], f, indent=2, default=str)
-            print(f"   ✓ Pairwise matrix: {pairwise_path.name}")
         
         # Deviation analysis
         if 'deviation_analysis' in self.results:
             deviation_path = reports_dir / 'deviation_analysis.json'
             with open(deviation_path, 'w') as f:
                 json.dump(self.results['deviation_analysis'], f, indent=2, default=str)
-            print(f"   ✓ Deviation analysis: {deviation_path.name}")
-        
-        print(f"\n   ✅ All results exported to: {output_dir}")
     
 
     
@@ -219,17 +176,12 @@ class PredictiveMaintenancePipeline:
             # Step 5: Export results
             self.export_results()
             
-            print("\n" + "=" * 80)
-            print("✅ N-SYSTEM ANALYSIS COMPLETE")
-            print("=" * 80)
-            
             # Print summary
             self._print_summary_n_systems()
             
             return self.results
             
         except Exception as e:
-            print(f"\n❌ Error during analysis: {e}")
             import traceback
             traceback.print_exc()
             raise
@@ -238,43 +190,85 @@ class PredictiveMaintenancePipeline:
     
     def _print_summary_n_systems(self):
         """Print executive summary for N-system analysis"""
+        pass
+
+    def analyze_single_system(self, dates: list, actual: list, predicted: list) -> dict:
+        """
+        Analyze a single PV system from memory data (for API endpoint).
         
-        print("\n📊 N-SYSTEM ANALYSIS SUMMARY")
-        print("-" * 80)
-        
-        if 'deviation_analysis' in self.results:
-            analysis = self.results['deviation_analysis']
+        Args:
+            dates: List of date strings
+            actual: List of actual production values
+            predicted: List of predicted production values
             
-            if 'error' not in analysis:
-                print(f"\n Total Systems: {analysis['n_systems']}")
-                print(f" Systems: {', '.join(analysis['system_names'])}")
-                
-                cluster = analysis['cluster_analysis']
-                print(f"\n System Health Distribution:")
-                print(f"   Healthy: {cluster['n_healthy']}")
-                print(f"   Faulty: {cluster['n_faulty']}")
-                print(f"   Health Ratio: {cluster['cluster_health_ratio']:.1%}")
-                
-                if analysis['faulty_systems']:
-                    print(f"\n 🚨 Faulty Systems Detected:")
-                    for fault in analysis['faulty_systems']:
-                        print(f"   • {fault['pv_system']}: "
-                              f"{fault['mean_deviation']:.1%} deviation ({fault['severity']})")
-                else:
-                    print(f"\n ✅ All systems operating within normal parameters")
-                
-                if cluster.get('healthy_cluster'):
-                    print(f"\n Healthy Cluster:")
-                    print(f"   Systems: {', '.join(cluster['healthy_cluster'])}")
-                    print(f"   Mean Deviation: {cluster.get('healthy_mean_deviation', 0):.1%}")
-        
-        if 'pairwise_matrix' in self.results:
-            matrix_result = self.results['pairwise_matrix']
-            if 'error' not in matrix_result:
-                print(f"\n Pairwise Matrix Stats:")
-                print(f"   Valid comparison days: {matrix_result['n_valid_days']}")
-        
-        print("\n" + "=" * 80)
+        Returns:
+            Dictionary with analysis results and PR history
+        """
+        try:
+            # Create DataFrame
+            df = pd.DataFrame({
+                'date': pd.to_datetime(dates),
+                'actual_kwh': actual,
+                'predicted_kwh': predicted
+            })
+            
+            # Calculate PR
+            # Avoid division by zero
+            df['pr'] = df.apply(
+                lambda row: (row['actual_kwh'] / row['predicted_kwh']) 
+                if row['predicted_kwh'] > 0.1 else np.nan, 
+                axis=1
+            )
+            
+            # Filter invalid PRs
+            df['pr'] = df['pr'].replace([np.inf, -np.inf], np.nan)
+            
+            # Calculate mean PR
+            mean_pr = df['pr'].mean()
+            
+            # Determine status
+            status = "normal"
+            issues = []
+            
+            if pd.isna(mean_pr):
+                status = "unknown"
+                issues.append("Insufficient data to evaluate performance")
+            else:
+                if mean_pr < 0.7:
+                    status = "critical"
+                    issues.append("Performance significantly below expected (PR < 0.70)")
+                elif mean_pr < 0.8:
+                    status = "warning"
+                    issues.append("Performance below normal range (0.70 ≤ PR < 0.80)")
+            
+            # Format history for frontend
+            pr_history = []
+            for _, row in df.iterrows():
+                pr_val = row['pr']
+                if pd.notna(pr_val):
+                    pr_history.append({
+                        'date': row['date'].strftime('%Y-%m-%d'),
+                        'pr': float(pr_val)
+                    })
+            
+            return {
+                "analysis": {
+                    "status": status,
+                    "issues": issues,
+                    "mean_pr": float(mean_pr) if pd.notna(mean_pr) else None
+                },
+                "pr_history": pr_history
+            }
+            
+        except Exception as e:
+            return {
+                "analysis": {
+                    "status": "error",
+                    "issues": [str(e)],
+                    "mean_pr": None
+                },
+                "pr_history": []
+            }
 
 
 def main():

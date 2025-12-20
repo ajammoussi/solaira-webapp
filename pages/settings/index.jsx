@@ -187,8 +187,10 @@ const Settings = () => {
   }
 
   // Derived state for display
-  const selectedSystem = solarSystems.find(s => s.value === solarConfig.current_system);
-  const currentCapacity = selectedSystem ? selectedSystem.capacity_kw : config?.pv_capacity_kw || 0;
+  // Use profile.current_system to show the SAVED capacity, not the form state
+  const savedSystemId = profile?.current_system ? String(profile.current_system) : null;
+  const savedSystem = solarSystems.find(s => s.value === savedSystemId);
+  const currentCapacity = savedSystem ? savedSystem.capacity_kw : (config?.pv_capacity_kw || 0);
 
   return (
     <Layout>
@@ -242,7 +244,7 @@ const Settings = () => {
                     Battery Capacity
                   </div>
                   <div style={{ fontSize: '18px', fontWeight: 700, color: '#333' }}>
-                    {solarConfig.battery_size} kWh
+                    {profile?.battery_size || 0} kWh
                   </div>
                 </div>
                 <div>
@@ -340,7 +342,6 @@ const Settings = () => {
                 type="submit" 
                 disabled={solarLoading}
                 className={authStyles.primaryButton}
-                style={{ width: 'auto', padding: '0 24px' }}
               >
                 {solarLoading ? 'Saving...' : 'Save Configuration'}
               </button>

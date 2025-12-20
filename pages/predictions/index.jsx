@@ -110,10 +110,14 @@ const Predictions = () => {
 
   // Run Maintenance Analysis (adds the old Maintenance cards to this page)
   useEffect(() => {
+    let isMounted = true;
+
     const runAnalysis = async () => {
       if (!user || maintenanceData || maintLoading) return;
-      setMaintLoading(true);
-      setMaintError(null);
+      if (isMounted) {
+        setMaintLoading(true);
+        setMaintError(null);
+      }
 
       try {
         // Generate 30 days of mock data
@@ -139,37 +143,47 @@ const Predictions = () => {
 
         const results = await pythonApi.analyzeMaintenance(dates, actual, predicted);
 
-        const alerts = (results.analysis?.issues || []).map((issue) => ({
-          issue: 'Performance Issue',
-          severity: results.analysis?.status === 'critical' ? 'Critical' : 'Warning',
-          description: issue,
-        }));
+        if (isMounted) {
+          const alerts = (results.analysis?.issues || []).map((issue) => ({
+            issue: 'Performance Issue',
+            severity: results.analysis?.status === 'critical' ? 'Critical' : 'Warning',
+            description: issue,
+          }));
 
-        const prMap = {};
-        if (results.pr_history) {
-          results.pr_history.forEach((item) => {
-            const d = new Date(item.date).toISOString().split('T')[0];
-            prMap[d] = item.pr;
-          });
+          const prMap = {};
+          if (results.pr_history) {
+            results.pr_history.forEach((item) => {
+              const d = new Date(item.date).toISOString().split('T')[0];
+              prMap[d] = item.pr;
+            });
+          }
+
+          const chartData = dates.map((date, idx) => ({
+            date,
+            actual: actual[idx],
+            predicted: predicted[idx],
+            pr: (prMap[date] || 0) * 100,
+          }));
+
+          setMaintenanceData({ alerts, chartData });
         }
-
-        const chartData = dates.map((date, idx) => ({
-          date,
-          actual: actual[idx],
-          predicted: predicted[idx],
-          pr: (prMap[date] || 0) * 100,
-        }));
-
-        setMaintenanceData({ alerts, chartData });
       } catch (err) {
         console.error('Maintenance analysis failed:', err);
-        setMaintError('Failed to analyze maintenance data. Is the backend running?');
+        if (isMounted) {
+          setMaintError('Failed to analyze maintenance data. Is the backend running?');
+        }
       } finally {
-        setMaintLoading(false);
+        if (isMounted) {
+          setMaintLoading(false);
+        }
       }
     };
 
     runAnalysis();
+
+    return () => {
+      isMounted = false;
+    };
   }, [user, maintenanceData, maintLoading]);
 
   // Protect this page
@@ -350,7 +364,43 @@ const Predictions = () => {
               />
             </section>
 
+            {/* Solar Forecast Section */}
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <div className={styles.sectionIconWrapper}>
+                  <LucideIcons.Sun size={20} />
+                </div>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <h2 className={styles.sectionTitle}>Solar Generation Forecast</h2>
+                    <button 
+                      className={styles.infoButton}
+                      onClick={() => setShowForecastInfo(true)}
+                      aria-label="How does this forecast work?"
+                    >
+                      <LucideIcons.HelpCircle size={24} />
+                    </button>
+                  </div>
+                  <p className={styles.sectionDescription}>
+                    Predict future solar generation based on your system configuration and weather data.
+                  </p>
+                </div>
+              </div>
 
+              <PVForecastForm 
+                updatePredictions={setForecastPredictions} 
+                user={user}
+              />
+
+              {forecastPredictions && (
+                <>
+                  <PredictionChart predictions={forecastPredictions} />
+                  <div className={styles.forecastResults}>
+                    <PredictionTable predictions={forecastPredictions} />
+                  </div>
+                </>
+              )}
+            </section>
 
             {/* Maintenance & System Health (from old Maintenance page) */}
             {maintError && (
@@ -458,44 +508,6 @@ const Predictions = () => {
                     </div>
                   </section>
                 )}
-
-                {/* Solar Forecast Section */}
-                <section className={styles.section}>
-                  <div className={styles.sectionHeader}>
-                    <div className={styles.sectionIconWrapper}>
-                      <LucideIcons.Sun size={20} />
-                    </div>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <h2 className={styles.sectionTitle}>Solar Generation Forecast</h2>
-                        <button 
-                          className={styles.infoButton}
-                          onClick={() => setShowForecastInfo(true)}
-                          aria-label="How does this forecast work?"
-                        >
-                          <LucideIcons.HelpCircle size={24} />
-                        </button>
-                      </div>
-                      <p className={styles.sectionDescription}>
-                        Predict future solar generation based on your system configuration and weather data.
-                      </p>
-                    </div>
-                  </div>
-
-                  <PVForecastForm 
-                    updatePredictions={setForecastPredictions} 
-                    user={user}
-                  />
-
-                  {forecastPredictions && (
-                    <>
-                      <PredictionChart predictions={forecastPredictions} />
-                      <div className={styles.forecastResults}>
-                        <PredictionTable predictions={forecastPredictions} />
-                      </div>
-                    </>
-                  )}
-                </section>
               </>
             )}
 
