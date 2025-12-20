@@ -534,7 +534,7 @@ const Dashboard = () => {
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Savings</span>
                   <span className={styles.summaryStatValue}>
-                    €{stats?.today?.savings?.toFixed(2) || '0.00'}
+                    TND {stats?.today?.savings?.toFixed(2) || '0.00'}
                   </span>
                 </div>
               </div>
@@ -565,7 +565,7 @@ const Dashboard = () => {
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Savings</span>
                   <span className={styles.summaryStatValue}>
-                    €{stats?.month?.savings?.toFixed(2) || '0.00'}
+                    TND  {stats?.month?.savings?.toFixed(2) || '0.00'}
                   </span>
                 </div>
               </div>
@@ -596,7 +596,7 @@ const Dashboard = () => {
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Savings</span>
                   <span className={styles.summaryStatValue}>
-                    €{stats?.year?.savings?.toFixed(2) || '0.00'}
+                    TND {stats?.year?.savings?.toFixed(2) || '0.00'}
                   </span>
                 </div>
               </div>
