@@ -224,11 +224,18 @@
   margin-bottom: 32px;
 }
 
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
 .sectionTitle {
   font-size: 20px;
   font-weight: 700;
   color: #333333;
-  margin: 0 0 20px 0;
+  margin: 0;
 }
 
 .summaryGrid {
@@ -243,6 +250,12 @@
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border-left: 4px solid #00D9A3; /* Teal accent border */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summaryCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .summaryPeriod {
@@ -501,6 +514,9 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   border-left: 4px solid;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .co2Card:hover {
@@ -559,19 +575,23 @@
   font-size: 14px;
   color: #6B7280;
   margin: 0 0 16px 0;
+  min-height: 20px; /* Reduced from 21px */
 }
 
 .co2Details {
   display: grid;
-  gap: 12px;
+  gap: 8px; /* Reduced from 12px */
+  margin-top: auto; /* Push details to bottom */
+  flex-grow: 1;
 }
 
 .co2DetailItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 8px;
+  padding-bottom: 6px; /* Reduced from 8px */
   border-bottom: 1px solid #E5E7EB;
+  min-height: 32px; /* Reduced from 37px */
 }
 
 .co2DetailLabel {
@@ -591,6 +611,7 @@
   gap: 8px;
   font-size: 13px;
   margin-top: 12px;
+  min-height: 20px;
 }
 
 .co2Trend {
@@ -611,7 +632,7 @@
   background-color: #E5E7EB;
   border-radius: 3px;
   overflow: hidden;
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .co2ProgressFill {
@@ -692,3 +713,122 @@
     gap: 8px;
   }
 }
+
+/* Help Button - Matching Predictions Page Style */
+.helpButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #F97316; /* Orange color */
+  padding: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.helpButton:hover {
+  color: #EA580C;
+  background-color: #FFF7ED;
+  border-radius: 50%;
+}
+
+/* Modal Styles - Matching Predictions Page Style */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: overlayFadeIn 0.2s ease-out forwards;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modalContent {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, opacity;
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modalClose {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9CA3AF;
+  transition: color 0.2s;
+  padding: 4px;
+  border-radius: 50%;
+}
+
+.modalClose:hover {
+  color: #374151;
+  background-color: #F3F4F6;
+}
+
+.modalTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 16px 0;
+}
+
+.modalSubtitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
+  margin: 24px 0 12px 0;
+}
+
+.modalText {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #4B5563;
+  margin-bottom: 16px;
+}
+
+.modalList {
+  list-style-type: disc;
+  padding-left: 24px;
+  margin-bottom: 24px;
+  color: #4B5563;
+}
+
+.modalList li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+

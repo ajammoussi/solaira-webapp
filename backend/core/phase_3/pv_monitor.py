@@ -1,3 +1,8 @@
+"""
+PV Monitoring System - Refactored (Drop-in Replacement)
+Keeps the same interface as old code but WITHOUT the insanity
+"""
+
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
@@ -6,21 +11,6 @@ from typing import Dict, List, Optional
 import json
 from dataclasses import dataclass
 from enum import Enum
-import sys
-
-# Add project root to path for imports
-project_root = Path(__file__).parent.parent.parent.parent
-if str(project_root) not in sys.path:
-    sys.path.insert(0, str(project_root))
-
-# Import the predictive maintenance pipeline
-try:
-    from src_final.phase_3.predictive_maintenance import PredictiveMaintenancePipeline
-    from src_final.phase_3.config_loader import load_config
-    PIPELINE_AVAILABLE = True
-except ImportError as e:
-    print(f"⚠️  Predictive maintenance pipeline not available: {e}")
-    PIPELINE_AVAILABLE = False
 
 
 class HealthStatus(Enum):
@@ -46,15 +36,15 @@ class PVSystem:
         """Set consistent degradation factor"""
         if self._base_performance is None:
             # Set once and keep it consistent
-            # Healthy systems: ~90% ±1%
-            # Warning systems: ~82% (8% below, ~10-12% deviation)
-            # Critical systems: ~73% (17% below, ~18-20% deviation)
+            # Healthy systems: ~95% ±1%
+            # Warning systems: ~88% (7% below, ~10-12% deviation)
+            # Critical systems: ~80% (15% below, ~18-20% deviation)
             if self.health == HealthStatus.HEALTHY:
-                self._base_performance = np.random.uniform(0.89, 0.91)
+                self._base_performance = np.random.uniform(0.94, 0.96)
             elif self.health == HealthStatus.WARNING:
-                self._base_performance = np.random.uniform(0.81, 0.83)
+                self._base_performance = np.random.uniform(0.87, 0.89)
             else:  # CRITICAL
-                self._base_performance = np.random.uniform(0.72, 0.74)
+                self._base_performance = np.random.uniform(0.79, 0.81)
     
     @property
     def id(self) -> int:
@@ -214,10 +204,10 @@ class SimpleAnalyzer:
         deviation = 1.0 - pr
         
         # Determine status based on deviation thresholds
-        # <15% deviation: healthy
-        # 15-20% deviation: warning
+        # <10% deviation: healthy
+        # 10-20% deviation: warning
         # >20% deviation: critical
-        if deviation < 0.15:
+        if deviation < 0.10:
             status = 'healthy'
             severity = 'normal'
             issues = []
@@ -250,102 +240,18 @@ class SimpleAnalyzer:
 
 class PVMonitoringService:
     """
-    Main monitoring service - integrates with src_final/phase_3 predictive maintenance pipeline
-    Generates realistic data and uses advanced comparative analysis
+    Main monitoring service - drop-in replacement for old code
+    Same interface, but WITHOUT background threads and spam
     """
     
     def __init__(self, data_dir: Optional[str] = None):
         self.data_dir = Path(data_dir) if data_dir else Path("backend/core/phase_3/monitoring_data")
         self.store = DataStore(self.data_dir)
         self.systems: Dict[int, PVSystem] = {}
-        self.monitoring_active = False  # For compatibility
-        
-        # Initialize predictive maintenance pipeline if available
-        self.pipeline = None
-        self.pipeline_config = None
-        if PIPELINE_AVAILABLE:
-            try:
-                # Create a custom config for the monitoring data
-                self._setup_pipeline_config()
-                print(f"📁 PV Monitoring Service initialized with predictive maintenance pipeline")
-                print(f"   Data dir: {self.data_dir}")
-            except Exception as e:
-                print(f"⚠️  Could not initialize pipeline: {e}")
-                print(f"📁 PV Monitoring Service initialized (basic mode)")
-        else:
-            print(f"📁 PV Monitoring Service initialized (basic mode - no pipeline)")
-    
-    def _setup_pipeline_config(self):
-        """Create a configuration file for the pipeline based on current systems"""
-        if not self.systems:
-            return
-        
-        config_path = self.data_dir / 'monitoring_config.yaml'
-        
-        # Build config dynamically
-        systems_config = []
-        for system_id, system in self.systems.items():
-            systems_config.append({
-                'name': f'PV_System_{system_id}',
-                'actual_data': str(self.data_dir / f'pv_system_{system_id}_actual.csv'),
-                'predicted_data': str(self.data_dir / f'pv_system_{system_id}_predicted.csv')
-            })
-        
-        config_dict = {
-            'config_version': '3.0.0',
-            'system_name': 'PV Monitoring System',
-            'pv_systems': {'systems': systems_config},
-            'deviation_score': {
-                'warning_threshold': 0.15,
-                'critical_threshold': 0.20,
-                'moving_average_days': 3,
-                'consecutive_days_alert': 2,
-                'min_valid_pairs': 2
-            },
-            'performance_ratio': {
-                'expected_pr_min': 0.60,
-                'expected_pr_max': 0.90,
-                'optimal_pr': 0.80
-            },
-            'analysis': {
-                'analysis_level': 'daily',
-                'min_hours_for_daily_pr': 8,
-                'min_production_kwh': 0.1,
-                'short_term_window_days': 7,
-                'medium_term_window_days': 30,
-                'long_term_window_days': 90
-            },
-            'data_sources': {
-                'timestamp_column': 'date',
-                'actual_power_column': 'energy_kwh',
-                'predicted_power_column': 'energy_kwh'
-            },
-            'maintenance_alerts': {
-                'consecutive_days_critical': 2,
-                'consecutive_days_alert': 3,
-                'consecutive_days_warning': 5,
-                'priority_critical': 'CRITICAL',
-                'priority_high': 'HIGH',
-                'priority_medium': 'MEDIUM',
-                'priority_low': 'LOW'
-            }
-        }
-        
-        # Save config
-        import yaml
-        try:
-            with open(config_path, 'w') as f:
-                yaml.dump(config_dict, f, default_flow_style=False)
-            
-            # Initialize pipeline with this config
-            self.pipeline = PredictiveMaintenancePipeline(str(config_path))
-            self.pipeline_config = config_path
-        except Exception as e:
-            print(f"⚠️  Could not create pipeline config: {e}")
+        self.monitoring_active = False  # For compatibility, but we don't use it
     
     def configure_systems(self, num_systems: int, capacity_per_system: float = 5.0) -> Dict:
         """Configure the number of PV systems to monitor"""
-        print(f"\n🔧 Configuring {num_systems} PV systems...")
         
         self.systems.clear()
         
@@ -362,7 +268,7 @@ class PVMonitoringService:
             system_id = i + 1
             system = PVSystem(
                 system_id=system_id,
-                name=f"PV System {system_id}",
+                name=f"Solar Panel {system_id}",
                 capacity_kw=capacity_per_system,
                 health=healths[i]
             )
@@ -372,15 +278,6 @@ class PVMonitoringService:
             df = SolarDataGenerator.generate_history(system, days=30)
             self.store.save_system_data(system_id, df)
             
-            print(f"   ✅ System {system_id}: {healths[i].value} "
-                  f"(degradation: {system.degradation_factor:.1%})")
-        
-        # Setup pipeline configuration after systems are created
-        if PIPELINE_AVAILABLE:
-            self._setup_pipeline_config()
-        
-        print(f"✅ Configured {num_systems} systems\n")
-        
         return {
             'num_systems': num_systems,
             'systems': [
@@ -442,101 +339,30 @@ class PVMonitoringService:
         return readings
     
     def analyze_system(self, system_id: int, hours: int = 24) -> Dict:
-        """Analyze a specific PV system using the predictive maintenance pipeline"""
+        """Analyze a specific PV system"""
         if system_id not in self.systems:
             return {'error': 'System not found'}
         
-        # Try to use pipeline analysis if available
-        if self.pipeline is not None:
-            try:
-                # Run pipeline analysis
-                results = self.pipeline.run_full_analysis()
-                
-                # Extract analysis for this specific system
-                if 'deviation_analysis' in results and 'system_status' in results['deviation_analysis']:
-                    system_name = f'PV_System_{system_id}'
-                    system_status = results['deviation_analysis']['system_status']
-                    
-                    if system_name in system_status:
-                        status_data = system_status[system_name]
-                        
-                        # Map to our format
-                        return {
-                            'system_id': system_id,
-                            'system_name': self.systems[system_id].name,
-                            'status': 'critical' if status_data['category'] == 'CRITICAL' else 
-                                     'warning' if status_data['category'] == 'MEDIUM' else 'healthy',
-                            'severity': status_data['category'].lower(),
-                            'recent_pr': status_data.get('mean_deviation', 0),
-                            'mean_deviation': status_data['mean_deviation'],
-                            'category': status_data['category'],
-                            'is_faulty': status_data['is_faulty'],
-                            'severity_score': status_data['severity_score'],
-                            'issues_detected': ['Performance deviation detected'] if status_data['is_faulty'] else [],
-                            'analysis_method': 'pairwise_comparative',
-                            'pipeline_analysis': True
-                        }
-            except Exception as e:
-                print(f"⚠️  Pipeline analysis failed: {e}, falling back to simple analysis")
-        
-        # Fallback to simple analysis
         df = self.store.load_system_data(system_id)
         if df is None:
             return {
                 'system_id': system_id,
                 'status': 'no_data',
                 'severity': 'normal',
-                'message': 'No data available',
-                'pipeline_analysis': False
+                'message': 'No data available'
             }
         
         analysis = SimpleAnalyzer.analyze_system(df)
         analysis['system_id'] = system_id
         analysis['system_name'] = self.systems[system_id].name
-        analysis['pipeline_analysis'] = False
         
         return analysis
     
     def get_all_systems_status(self) -> List[Dict]:
-        """Get status for all systems using pipeline analysis"""
+        """Get status for all systems"""
         if not self.systems:
             return []
         
-        # Try pipeline analysis for all systems at once
-        if self.pipeline is not None:
-            try:
-                results = self.pipeline.run_full_analysis()
-                
-                if 'deviation_analysis' in results and 'system_status' in results['deviation_analysis']:
-                    system_statuses = []
-                    system_status = results['deviation_analysis']['system_status']
-                    
-                    for system_id in self.systems.keys():
-                        system_name = f'PV_System_{system_id}'
-                        
-                        if system_name in system_status:
-                            status_data = system_status[system_name]
-                            system_statuses.append({
-                                'system_id': system_id,
-                                'system_name': self.systems[system_id].name,
-                                'status': 'critical' if status_data['category'] == 'CRITICAL' else 
-                                         'warning' if status_data['category'] == 'MEDIUM' else 'healthy',
-                                'severity': status_data['category'].lower(),
-                                'mean_deviation': status_data['mean_deviation'],
-                                'category': status_data['category'],
-                                'is_faulty': status_data['is_faulty'],
-                                'severity_score': status_data['severity_score'],
-                                'issues_detected': ['Performance deviation detected'] if status_data['is_faulty'] else [],
-                                'analysis_method': 'pairwise_comparative',
-                                'pipeline_analysis': True
-                            })
-                    
-                    if system_statuses:
-                        return system_statuses
-            except Exception as e:
-                print(f"⚠️  Pipeline analysis failed: {e}, falling back to simple analysis")
-        
-        # Fallback to individual analysis
         return [self.analyze_system(sid) for sid in self.systems.keys()]
     
     def get_system_history(self, system_id: int, hours: int = 24) -> List[Dict]:
@@ -551,26 +377,26 @@ class PVMonitoringService:
         # Convert to list of dicts
         return df.to_dict('records')
     
-    def get_detailed_analysis(self) -> Optional[Dict]:
-        """Get detailed pipeline analysis results including pairwise matrix"""
-        if self.pipeline is None:
-            return None
-        
-        try:
-            results = self.pipeline.run_full_analysis()
-            return results
-        except Exception as e:
-            print(f"⚠️  Detailed analysis failed: {e}")
-            return None
-    
     # Compatibility methods (old interface)
     def start_monitoring(self, interval_seconds: int = 60):
-        """Compatibility - does nothing (no background threads!)"""
-        print("⚠️  Note: start_monitoring() is deprecated - no background threads")
-        return {'status': 'not_implemented', 'message': 'No background monitoring'}
+        """
+        Start monitoring simulation.
+        Triggers an immediate reading generation to simulate system activity.
+        """
+        self.monitoring_active = True
+        
+        # Trigger immediate reading generation so user sees "something happening"
+        readings = self.generate_readings()
+        
+        return {
+            'status': 'started', 
+            'message': f'Monitoring started. Generated {len(readings)} new readings.',
+            'active_systems': len(self.systems)
+        }
     
     def stop_monitoring(self):
-        """Compatibility - does nothing"""
+        """Stop monitoring simulation"""
+        self.monitoring_active = False
         return {'status': 'stopped'}
 
 
