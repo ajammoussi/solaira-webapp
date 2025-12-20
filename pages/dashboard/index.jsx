@@ -26,9 +26,19 @@ import styles from './styles.module.css';
 
 const Dashboard = () => {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
-  const { realtime, stats, loading, error, lastUpdated } = useAllEnergyData();
+  const { user, profile, loading: authLoading } = useAuth();
+  const { realtime, stats, forecast, loading, error, lastUpdated } = useAllEnergyData();
   const [predictedProduction, setPredictedProduction] = useState(null);
+  
+  // Help Modal States
+  const [showSolarHelp, setShowSolarHelp] = useState(false);
+  const [showConsumptionHelp, setShowConsumptionHelp] = useState(false);
+  const [showGridHelp, setShowGridHelp] = useState(false);
+  const [showBatteryHelp, setShowBatteryHelp] = useState(false);
+  const [show24hHelp, setShow24hHelp] = useState(false);
+  const [showFlowHelp, setShowFlowHelp] = useState(false);
+  const [showCO2Help, setShowCO2Help] = useState(false);
+  const [showSummaryHelp, setShowSummaryHelp] = useState(false);
 
   // Protect this page - redirect to signin if not authenticated
   useEffect(() => {
@@ -40,6 +50,8 @@ const Dashboard = () => {
 
   // Fetch production prediction from trained models
   useEffect(() => {
+    let isMounted = true;
+
     if (realtime && !loading) {
       // This would be replaced with actual API call to your ML models
       // For now, simulate prediction based on current production
@@ -48,6 +60,8 @@ const Dashboard = () => {
           // Simulate API call delay
           await new Promise(resolve => setTimeout(resolve, 500));
           
+          if (!isMounted) return;
+
           // Simple prediction based on current production and time of day
           const hour = new Date().getHours();
           let prediction = realtime.pv_production_kw || 0;
@@ -67,12 +81,18 @@ const Dashboard = () => {
           setPredictedProduction(prediction);
         } catch (error) {
           console.error('Error fetching prediction:', error);
-          setPredictedProduction(realtime.pv_production_kw || 0);
+          if (isMounted) {
+            setPredictedProduction(realtime.pv_production_kw || 0);
+          }
         }
       };
       
       simulatePrediction();
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [realtime, loading]);
 
   // Calculate CO₂ emissions
@@ -136,33 +156,33 @@ const Dashboard = () => {
     
     // Appliance breakdown (calculated from consumption)
     appliances: {
-      electric_car: (realtime?.consumption_kw || 0) * 0.21,
-      air_conditioning: (realtime?.consumption_kw || 0) * 0.17,
-      washing_machine: (realtime?.consumption_kw || 0) * 0.13,
-      dryer: (realtime?.consumption_kw || 0) * 0.17,
-      heat_pump: (realtime?.consumption_kw || 0) * 0.21,
-      boiler: (realtime?.consumption_kw || 0) * 0.11
+      electric_car: (realtime?.consumption_kw || 0) * 0.18,
+      air_conditioning: (realtime?.consumption_kw || 0) * 0.15,
+      washing_machine: (realtime?.consumption_kw || 0) * 0.10,
+      dryer: (realtime?.consumption_kw || 0) * 0.12,
+      heat_pump: (realtime?.consumption_kw || 0) * 0.18,
+      boiler: (realtime?.consumption_kw || 0) * 0.12
     },
     
     // Summary statistics for context
     stats: {
       today: {
-        production: stats?.today?.total_production_kwh || 0,
-        consumption: stats?.today?.total_consumption_kwh || 0,
-        self_consumption: stats?.today?.self_consumption_percent || 0,
-        savings: stats?.today?.cost_savings_eur || 0
+        production: stats?.today?.production || 0,
+        consumption: stats?.today?.consumption || 0,
+        self_consumption: stats?.today?.selfConsumption || 0,
+        savings: stats?.today?.savings || 0
       },
       month: {
-        production: stats?.month?.total_production_kwh || 0,
-        consumption: stats?.month?.total_consumption_kwh || 0,
-        self_consumption: stats?.month?.self_consumption_percent || 0,
-        savings: stats?.month?.cost_savings_eur || 0
+        production: stats?.month?.production || 0,
+        consumption: stats?.month?.consumption || 0,
+        self_consumption: stats?.month?.selfConsumption || 0,
+        savings: stats?.month?.savings || 0
       },
       year: {
-        production: stats?.year?.total_production_kwh || 0,
-        consumption: stats?.year?.total_consumption_kwh || 0,
-        self_consumption: stats?.year?.self_consumption_percent || 0,
-        savings: stats?.year?.cost_savings_eur || 0
+        production: stats?.year?.production || 0,
+        consumption: stats?.year?.consumption || 0,
+        self_consumption: stats?.year?.selfConsumption || 0,
+        savings: stats?.year?.savings || 0
       }
     },
     
@@ -198,7 +218,9 @@ const Dashboard = () => {
                 <span className={styles.metricUnit}>kW</span>
               </div>
               <div className={styles.metricFooter}>
-                <span className={styles.metricTrend}>↑ 12%</span>
+                <span className={styles.metricTrend}>
+                  {realtime?.pv_trend_pct >= 0 ? '↑' : '↓'} {Math.abs(realtime?.pv_trend_pct || 0).toFixed(0)}%
+                </span>
                 <span className={styles.metricCompare}>vs yesterday</span>
               </div>
             </div>
@@ -214,7 +236,9 @@ const Dashboard = () => {
                 <span className={styles.metricUnit}>kW</span>
               </div>
               <div className={styles.metricFooter}>
-                <span className={styles.metricTrend}>↓ 5%</span>
+                <span className={styles.metricTrend}>
+                  {realtime?.consumption_trend_pct >= 0 ? '↑' : '↓'} {Math.abs(realtime?.consumption_trend_pct || 0).toFixed(0)}%
+                </span>
                 <span className={styles.metricCompare}>vs yesterday</span>
               </div>
             </div>
@@ -245,14 +269,14 @@ const Dashboard = () => {
                 <span className={styles.metricLabel}>Battery</span>
               </div>
               <div className={styles.metricValue}>
-                {realtime?.battery_soc_percent?.toFixed(0) || '0'}
+                {Math.max(realtime?.battery_soc_percent || 0, 18.9).toFixed(1)}
                 <span className={styles.metricUnit}>%</span>
               </div>
               <div className={styles.metricFooter}>
                 <div className={styles.batteryIndicator}>
                   <div 
                     className={styles.batteryFill} 
-                    style={{ width: `${realtime?.battery_soc_percent || 0}%` }}
+                    style={{ width: `${Math.max(realtime?.battery_soc_percent || 0, 18.9)}%` }}
                   ></div>
                 </div>
               </div>
@@ -265,12 +289,22 @@ const Dashboard = () => {
           <div className={styles.sectionHeader}>
             <LucideIcons.BarChart className={styles.sectionIcon} />
             <h2 className={styles.sectionTitle}>24-Hour Overview</h2>
+            <button className={styles.helpButton} onClick={() => setShow24hHelp(true)}><LucideIcons.HelpCircle size={20} /></button>
           </div>
           <p className={styles.sectionDescription}>
             Hourly breakdown of energy import, export, and solar production
           </p>
           <div className={styles.chartContainer}>
-            <ElectricityUsage card={false} />
+            <ElectricityUsage 
+              card={false}
+              gridImportData={forecast?.raw?.slice(0, 24).map(f => Number(f.grid_import_kwh) || 0) || []}
+              solarData={forecast?.raw?.slice(0, 24).map(f => Number(f.pv_generation_kwh) || 0) || []}
+              gridExportData={forecast?.raw?.slice(0, 24).map(f => -(Number(f.grid_export_kwh) || 0)) || []}
+              categories={forecast?.raw?.slice(0, 24).map(f => {
+                const d = new Date(f.datetime);
+                return d.getHours() + ':00';
+              }) || ['0:00', '4:00', '8:00', '12:00', '16:00', '20:00']}
+            />
           </div>
         </section>
 
@@ -279,6 +313,7 @@ const Dashboard = () => {
           <div className={styles.sectionHeader}>
             <LucideIcons.Activity className={styles.sectionIcon} />
             <h2 className={styles.sectionTitle}>Energy Flow</h2>
+            <button className={styles.helpButton} onClick={() => setShowFlowHelp(true)}><LucideIcons.HelpCircle size={20} /></button>
           </div>
           <p className={styles.sectionDescription}>
             Real-time visualization of energy distribution across your home
@@ -292,12 +327,12 @@ const Dashboard = () => {
                 home_consumption: realtime?.consumption_kw || 0,
                 grid_export: realtime?.grid_export_kw || 0,
                 appliances: {
-                  electric_car: (realtime?.consumption_kw || 0) * 0.21,
-                  air_conditioning: (realtime?.consumption_kw || 0) * 0.17,
-                  washing_machine: (realtime?.consumption_kw || 0) * 0.13,
-                  dryer: (realtime?.consumption_kw || 0) * 0.17,
-                  heat_pump: (realtime?.consumption_kw || 0) * 0.21,
-                  boiler: (realtime?.consumption_kw || 0) * 0.11
+                  electric_car: (realtime?.consumption_kw || 0) * 0.18,
+                  air_conditioning: (realtime?.consumption_kw || 0) * 0.15,
+                  washing_machine: (realtime?.consumption_kw || 0) * 0.10,
+                  dryer: (realtime?.consumption_kw || 0) * 0.12,
+                  heat_pump: (realtime?.consumption_kw || 0) * 0.18,
+                  boiler: (realtime?.consumption_kw || 0) * 0.12
                 }
               }}
             />
@@ -309,6 +344,7 @@ const Dashboard = () => {
           <div className={styles.sectionHeader}>
             <LucideIcons.Leaf className={styles.sectionIcon} />
             <h2 className={styles.sectionTitle}>CO₂ Emissions Impact</h2>
+            <button className={styles.helpButton} onClick={() => setShowCO2Help(true)}><LucideIcons.HelpCircle size={20} /></button>
           </div>
           <p className={styles.sectionDescription}>
             Track your carbon footprint and environmental impact in real-time
@@ -393,7 +429,10 @@ const Dashboard = () => {
                 </div>
                 <div className={styles.co2Progress}>
                   <div 
-                    className={`${styles.co2ProgressFill} ${styles.red}`}
+                    className={`${styles.co2ProgressFill} ${
+                      co2Data.status.daily === 'good' ? styles.green : 
+                      co2Data.status.daily === 'moderate' ? styles.yellow : styles.red
+                    }`}
                     style={{ 
                       width: `${Math.min(100, (parseFloat(co2Data.daily.co2Produced) / 10) * 100)}%` 
                     }}
@@ -412,7 +451,7 @@ const Dashboard = () => {
                   {Math.abs(parseFloat(co2Data.daily.netCO2))}
                   <span className={styles.co2Unit}>kg</span>
                   <span style={{ 
-                    color: parseFloat(co2Data.daily.netCO2) >= 0 ? '#F44336' : '#00A86B',
+                    color: parseFloat(co2Data.daily.netCO2) < 0 ? '#F44336' : '#00A86B',
                     fontSize: '14px',
                     marginLeft: '8px',
                     fontWeight: 600
@@ -460,105 +499,15 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-
-            {/* ML Model Prediction Section */}
-            {predictedProduction && (
-              <div className={styles.co2Visualization}>
-                <div className={styles.sectionHeader} style={{ marginBottom: '20px' }}>
-                  <LucideIcons.Brain className={styles.sectionIcon} />
-                  <h3 className={styles.sectionTitle} style={{ fontSize: '18px', margin: 0 }}>
-                    AI-Powered CO₂ Prediction
-                  </h3>
-                  <span style={{ 
-                    fontSize: '12px', 
-                    backgroundColor: '#00D9A3', 
-                    color: 'white',
-                    padding: '2px 8px',
-                    borderRadius: '12px',
-                    fontWeight: 600
-                  }}>
-                    Powered by ML Models
-                  </span>
-                </div>
-                <p className={styles.sectionDescription} style={{ marginBottom: '20px' }}>
-                  Using trained XGBoost/LSTM models to predict future emissions impact
-                </p>
-                
-                <div className={styles.co2ChartContainer}>
-                  <div className={styles.co2Bar} style={{ 
-                    height: `${Math.min(100, (parseFloat(co2Data.monthly.co2Produced) / 500) * 100)}%`,
-                    backgroundColor: '#F44336'
-                  }}>
-                    <div className={styles.co2BarValue}>
-                      {co2Data.monthly.co2Produced} kg
-                    </div>
-                    <div className={styles.co2BarLabel}>Current</div>
-                  </div>
-                  <div className={styles.co2Bar} style={{ 
-                    height: `${Math.min(100, (parseFloat(co2Data.monthly.co2Avoided) / 500) * 100)}%`,
-                    backgroundColor: '#00D9A3'
-                  }}>
-                    <div className={styles.co2BarValue}>
-                      {co2Data.monthly.co2Avoided} kg
-                    </div>
-                    <div className={styles.co2BarLabel}>Avoided</div>
-                  </div>
-                  <div className={styles.co2Bar} style={{ 
-                    height: `${Math.min(100, (Math.abs(parseFloat(futureCO2.monthly.avoided)) / 500) * 100)}%`,
-                    backgroundColor: '#4CAF50'
-                  }}>
-                    <div className={styles.co2BarValue}>
-                      {futureCO2.monthly.avoided} kg
-                    </div>
-                    <div className={styles.co2BarLabel}>
-                      Predicted*
-                    </div>
-                  </div>
-                  <div className={styles.co2Bar} style={{ 
-                    height: `${Math.min(100, (Math.abs(parseFloat(co2Data.monthly.netCO2)) / 500) * 100)}%`,
-                    backgroundColor: parseFloat(co2Data.monthly.netCO2) >= 0 ? '#FF9800' : '#2196F3'
-                  }}>
-                    <div className={styles.co2BarValue}>
-                      {co2Data.monthly.netCO2} kg
-                    </div>
-                    <div className={styles.co2BarLabel}>Net</div>
-                  </div>
-                </div>
-                
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  marginTop: '40px',
-                  fontSize: '13px',
-                  color: '#6B7280'
-                }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <div style={{ width: '12px', height: '12px', backgroundColor: '#F44336', borderRadius: '2px' }}></div>
-                      <span>Current Production: {realtime?.pv_production_kw?.toFixed(2) || '0.00'} kW</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
-                      <div style={{ width: '12px', height: '12px', backgroundColor: '#4CAF50', borderRadius: '2px' }}></div>
-                      <span>ML Prediction: {predictedProduction?.toFixed(2) || '0.00'} kW</span>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '11px', fontStyle: 'italic' }}>
-                      *Based on XGBoost/LSTM models (85% confidence)
-                    </div>
-                    <div style={{ fontSize: '11px', marginTop: '4px' }}>
-                      Grid intensity: {co2Data.intensity.grid.toFixed(3)} kg CO₂/kWh
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </section>
 
         {/* Summary Statistics */}
         <section className={styles.summarySection}>
-          <h2 className={styles.sectionTitle}>Energy Summary</h2>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>Energy Summary</h2>
+            <button className={styles.helpButton} onClick={() => setShowSummaryHelp(true)}><LucideIcons.HelpCircle size={20} /></button>
+          </div>
           <div className={styles.summaryGrid}>
             {/* Today */}
             <div className={styles.summaryCard}>
@@ -567,25 +516,25 @@ const Dashboard = () => {
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Production</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.today?.total_production_kwh?.toFixed(1) || '0.0'} kWh
+                    {stats?.today?.production?.toFixed(1) || '0.0'} kWh
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Consumption</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.today?.total_consumption_kwh?.toFixed(1) || '0.0'} kWh
+                    {stats?.today?.consumption?.toFixed(1) || '0.0'} kWh
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Self-Consumption</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.today?.self_consumption_percent?.toFixed(0) || '0'}%
+                    {stats?.today?.selfConsumption || '0'}%
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Savings</span>
                   <span className={styles.summaryStatValue}>
-                    €{stats?.today?.cost_savings_eur?.toFixed(2) || '0.00'}
+                    €{stats?.today?.savings?.toFixed(2) || '0.00'}
                   </span>
                 </div>
               </div>
@@ -598,25 +547,25 @@ const Dashboard = () => {
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Production</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.month?.total_production_kwh?.toFixed(1) || '0.0'} kWh
+                    {stats?.month?.production?.toFixed(1) || '0.0'} kWh
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Consumption</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.month?.total_consumption_kwh?.toFixed(1) || '0.0'} kWh
+                    {stats?.month?.consumption?.toFixed(1) || '0.0'} kWh
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Self-Consumption</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.month?.self_consumption_percent?.toFixed(0) || '0'}%
+                    {stats?.month?.selfConsumption || '0'}%
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Savings</span>
                   <span className={styles.summaryStatValue}>
-                    €{stats?.month?.cost_savings_eur?.toFixed(2) || '0.00'}
+                    €{stats?.month?.savings?.toFixed(2) || '0.00'}
                   </span>
                 </div>
               </div>
@@ -629,25 +578,25 @@ const Dashboard = () => {
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Production</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.year?.total_production_kwh?.toFixed(1) || '0.0'} kWh
+                    {stats?.year?.production?.toFixed(1) || '0.0'} kWh
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Consumption</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.year?.total_consumption_kwh?.toFixed(1) || '0.0'} kWh
+                    {stats?.year?.consumption?.toFixed(1) || '0.0'} kWh
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Self-Consumption</span>
                   <span className={styles.summaryStatValue}>
-                    {stats?.year?.self_consumption_percent?.toFixed(0) || '0'}%
+                    {stats?.year?.selfConsumption || '0'}%
                   </span>
                 </div>
                 <div className={styles.summaryStatItem}>
                   <span className={styles.summaryStatLabel}>Savings</span>
                   <span className={styles.summaryStatValue}>
-                    €{stats?.year?.cost_savings_eur?.toFixed(2) || '0.00'}
+                    €{stats?.year?.savings?.toFixed(2) || '0.00'}
                   </span>
                 </div>
               </div>
@@ -656,12 +605,89 @@ const Dashboard = () => {
         </section>
       </div>
       
-      {/* Solar AI Chatbot - Now with comprehensive energy data */}
-      <SolarChatbot 
-        energyData={chatbotEnergyData}
-        userId={user?.id || user?.email || 'guest_user'}
-      />
+      {/* Solar AI Chatbot - Removed duplicate, handled in _app.js */}
+
+      {/* Help Modals */}
+      <HelpModal show={showSolarHelp} onClose={() => setShowSolarHelp(false)} title="Solar Production">
+        <p className={styles.modalText}>Real-time power being generated by your solar panels.</p>
+        <ul className={styles.modalList}>
+          <li><strong>kW:</strong> Kilowatts of power currently being produced.</li>
+          <li><strong>Trend:</strong> Percentage change compared to the same time yesterday.</li>
+        </ul>
+      </HelpModal>
+
+      <HelpModal show={showConsumptionHelp} onClose={() => setShowConsumptionHelp(false)} title="Consumption">
+        <p className={styles.modalText}>Total power currently being used by your home.</p>
+        <ul className={styles.modalList}>
+          <li>Includes all appliances, lights, and devices.</li>
+          <li>High consumption reduces the amount of solar energy available for export or battery charging.</li>
+        </ul>
+      </HelpModal>
+
+      <HelpModal show={showGridHelp} onClose={() => setShowGridHelp(false)} title="Grid Flow">
+        <p className={styles.modalText}>Power exchange with the utility grid.</p>
+        <ul className={styles.modalList}>
+          <li><strong>Exporting (+):</strong> Sending excess solar energy to the grid (earning credits).</li>
+          <li><strong>Importing (-):</strong> Drawing power from the grid because solar/battery isn't enough.</li>
+        </ul>
+      </HelpModal>
+
+      <HelpModal show={showBatteryHelp} onClose={() => setShowBatteryHelp(false)} title="Battery Status">
+        <p className={styles.modalText}>Current charge level of your home battery.</p>
+        <ul className={styles.modalList}>
+          <li><strong>%:</strong> State of Charge (SoC).</li>
+          <li>Batteries charge when solar production exceeds consumption.</li>
+          <li>Batteries discharge to power your home when solar is low (e.g., at night).</li>
+        </ul>
+      </HelpModal>
+
+      <HelpModal show={show24hHelp} onClose={() => setShow24hHelp(false)} title="24-Hour Overview">
+        <p className={styles.modalText}>A forecast of your energy balance for the next 24 hours.</p>
+        <ul className={styles.modalList}>
+          <li><strong>Solar (Yellow):</strong> Predicted generation.</li>
+          <li><strong>Consumption (Blue):</strong> Predicted usage.</li>
+          <li><strong>Grid (Grey):</strong> Expected import/export.</li>
+        </ul>
+      </HelpModal>
+
+      <HelpModal show={showFlowHelp} onClose={() => setShowFlowHelp(false)} title="Energy Flow">
+        <p className={styles.modalText}>Visualizes where your energy is coming from and where it's going.</p>
+        <p className={styles.modalText}>The "Other" category represents consumption not accounted for by major appliances (lights, small electronics, phantom load).</p>
+      </HelpModal>
+
+      <HelpModal show={showCO2Help} onClose={() => setShowCO2Help(false)} title="CO₂ Emissions">
+        <p className={styles.modalText}>Your environmental impact.</p>
+        <ul className={styles.modalList}>
+          <li><strong>Avoided:</strong> Emissions saved by using solar instead of grid power.</li>
+          <li><strong>Produced:</strong> Emissions from grid power you imported.</li>
+          <li><strong>Net Balance:</strong> The overall impact (negative is good!).</li>
+        </ul>
+      </HelpModal>
+
+      <HelpModal show={showSummaryHelp} onClose={() => setShowSummaryHelp(false)} title="Energy Summary">
+        <p className={styles.modalText}>Aggregated statistics for different time periods.</p>
+        <ul className={styles.modalList}>
+          <li><strong>Self-Consumption:</strong> Percentage of solar energy used directly by your home.</li>
+          <li><strong>Savings:</strong> Estimated money saved on electricity bills.</li>
+        </ul>
+      </HelpModal>
+
     </Layout>
+  );
+};
+
+const HelpModal = ({ show, onClose, title, children }) => {
+  if (!show) return null;
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+        <button className={styles.modalClose} onClick={onClose}>
+          <LucideIcons.X size={24} />
+        </button>
+        <h3 className={styles.modalTitle}>{title}</h3>
+        {children}
+      </div>
+    </div>
   );
 };
 

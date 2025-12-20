@@ -1,8 +1,8 @@
 // Button/index.js
-import React from 'react';
+import React, { forwardRef } from 'react';
 import styles from './styles.module.css';
 
-const Button = ({ 
+const Button = forwardRef(({ 
   children, 
   onClick, 
   variant = 'default', 
@@ -12,7 +12,7 @@ const Button = ({
   href,
   className = '',
   ...props 
-}) => {
+}, ref) => {
   const buttonClasses = [
     styles.button,
     variant === 'primary' && styles.primary,
@@ -31,17 +31,19 @@ const Button = ({
 
   if (href) {
     return (
-      <a href={href} className={buttonClasses} {...props}>
+      <a href={href} className={buttonClasses} {...props} ref={ref}>
         {content}
       </a>
     );
   }
 
   return (
-    <button type={type} onClick={onClick} className={buttonClasses} {...props}>
+    <button type={type} onClick={onClick} className={buttonClasses} {...props} ref={ref}>
       {content}
     </button>
   );
-};
+});
+
+Button.displayName = 'Button';
 
 export default Button;

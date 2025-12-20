@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { MapPin } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 import styles from './styles.module.css';
 
-export function PVForecastForm({ updatePredictions }) {
+export function PVForecastForm({ updatePredictions, user }) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [locating, setLocating] = useState(false);
   const [days, setDays] = useState(2); // Default 48h
   const [formData, setFormData] = useState({
     latitude: 51.75,
@@ -15,12 +18,80 @@ export function PVForecastForm({ updatePredictions }) {
     temperature_coefficient: -0.004,
   });
 
+  // Load saved location from profile on mount
+  useEffect(() => {
+    if (user) {
+      const fetchSavedLocation = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('latitude, longitude')
+            .eq('id', user.id)
+            .single();
+            
+          if (data && data.latitude != null && data.longitude != null) {
+            setFormData(prev => ({
+              ...prev,
+              latitude: data.latitude,
+              longitude: data.longitude
+            }));
+          }
+        } catch (err) {
+          console.error('Error fetching saved location:', err);
+        }
+      };
+      fetchSavedLocation();
+    }
+  }, [user]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: parseFloat(value)
     }));
+  };
+
+  const handleUseCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser');
+      return;
+    }
+
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = parseFloat(position.coords.latitude.toFixed(4));
+        const lon = parseFloat(position.coords.longitude.toFixed(4));
+
+        setFormData(prev => ({
+          ...prev,
+          latitude: lat,
+          longitude: lon
+        }));
+
+        // Save to Supabase profile
+        if (user) {
+          try {
+            await supabase
+              .from('profiles')
+              .update({ latitude: lat, longitude: lon })
+              .eq('id', user.id);
+          } catch (err) {
+            console.error('Failed to save location to profile:', err);
+          }
+        }
+
+        setLocating(false);
+      },
+      (error) => {
+        console.error('Error getting location:', error);
+        let msg = 'Unable to retrieve your location.';
+        if (error.code === 1) msg = 'Location access denied. Please enable permissions.';
+        alert(msg);
+        setLocating(false);
+      }
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -85,6 +156,31 @@ export function PVForecastForm({ updatePredictions }) {
           </div>
         </div>
 
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
+          <button
+            type="button"
+            onClick={handleUseCurrentLocation}
+            disabled={locating}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '13px',
+              padding: '8px 12px',
+              background: '#EFF6FF',
+              color: '#2563EB',
+              border: '1px solid #BFDBFE',
+              borderRadius: '6px',
+              cursor: locating ? 'wait' : 'pointer',
+              fontWeight: 500,
+              transition: 'all 0.2s'
+            }}
+          >
+            <MapPin size={14} />
+            {locating ? 'Locating...' : 'Use Current Location'}
+          </button>
+        </div>
+
         <div className={styles.formGrid}>
           <div className={styles.formGroup}>
             <label className={styles.label}>Latitude</label>
@@ -122,30 +218,6 @@ export function PVForecastForm({ updatePredictions }) {
               required
             />
           </div>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Tilt (°)</label>
-            <input
-              type="number"
-              step="any"
-              name="tilt"
-              value={formData.tilt}
-              onChange={handleChange}
-              className={styles.input}
-              required
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Orientation (°)</label>
-            <input
-              type="number"
-              step="any"
-              name="orientation"
-              value={formData.orientation}
-              onChange={handleChange}
-              className={styles.input}
-              required
-            />
-          </div>
         </div>
 
         <button
@@ -158,6 +230,30 @@ export function PVForecastForm({ updatePredictions }) {
 
         {showAdvanced && (
           <div className={styles.formGrid}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Tilt (°)</label>
+              <input
+                type="number"
+                step="any"
+                name="tilt"
+                value={formData.tilt}
+                onChange={handleChange}
+                className={styles.input}
+                required
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Orientation (°)</label>
+              <input
+                type="number"
+                step="any"
+                name="orientation"
+                value={formData.orientation}
+                onChange={handleChange}
+                className={styles.input}
+                required
+              />
+            </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>Inverter Efficiency (0-1)</label>
               <input

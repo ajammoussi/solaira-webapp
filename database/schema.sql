@@ -43,6 +43,8 @@ CREATE TABLE profiles (
   phone_number TEXT,
   timezone TEXT DEFAULT 'UTC+01:00',
   preferences JSONB DEFAULT '{}',
+  latitude NUMERIC(10, 7),
+  longitude NUMERIC(10, 7),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

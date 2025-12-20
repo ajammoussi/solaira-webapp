@@ -16,6 +16,7 @@
   min-height: 100vh;
   align-items: center;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
 .frame1920wlight {
@@ -25,6 +26,7 @@
   align-items: flex-start;
   flex-shrink: 0;
   background-color: #ffffff;
+  box-sizing: border-box;
 }
 
 .frame1 {
@@ -95,7 +97,7 @@
 
 .container108 {
   flex: 1;
-  min-width: 400px;
+  width: 100%;
   max-width: 600px;
   display: flex;
   flex-direction: column;
@@ -209,7 +211,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 400px;
+  width: 100%;
 }
 
 .component310 {
@@ -290,12 +292,11 @@
   }
   
   .container108 {
-    min-width: auto;
     width: 100%;
+    max-width: 100%;
   }
   
   .container117 {
-    min-width: auto;
     width: 100%;
   }
 }
@@ -313,10 +314,12 @@
   .text122 {
     font-size: 40px;
     line-height: 1.2;
+    word-break: break-word;
   }
   
   .text146 {
     font-size: 32px;
+    word-break: break-word;
   }
   
   .hero-image {
@@ -326,5 +329,12 @@
   .container109 {
     flex-direction: column;
     align-items: flex-start;
+    width: 100%;
+  }
+
+  .component13 {
+    width: 100%;
+    justify-content: center;
+    padding: 13px 20px;
   }
 }

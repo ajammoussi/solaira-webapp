@@ -2,12 +2,14 @@
 .section {
   width: 100%;
   padding: 60px 0;
+  box-sizing: border-box;
 }
 
 .container {
   max-width: 1920px;
   margin: 0 auto;
   padding: 0 254px;
+  box-sizing: border-box;
 }
 
 .content {
@@ -18,14 +20,19 @@
   padding: 40px 80px;
   background: #e8f5f0;
   border-radius: 50px;
+  box-sizing: border-box;
 }
 
 .content.reverse {
-  direction: rtl;
+  grid-template-columns: 1.1fr 0.9fr;
 }
 
-.content.reverse > * {
-  direction: ltr;
+.content.reverse .textContent {
+  order: 2;
+}
+
+.content.reverse .imageWrapper {
+  order: 1;
 }
 
 /* Text Content */
@@ -157,7 +164,12 @@
   }
 
   .content.reverse {
-    direction: ltr;
+    grid-template-columns: 1fr;
+  }
+
+  .content.reverse .textContent,
+  .content.reverse .imageWrapper {
+    order: unset;
   }
 
   .imageWrapper {
@@ -176,7 +188,7 @@
   }
 
   .content {
-    padding: 30px 25px;
+    padding: 30px 20px;
     gap: 30px;
     border-radius: 30px;
   }
@@ -193,5 +205,24 @@
     width: 100%;
     aspect-ratio: 16/9;
     border-radius: 16px;
+    min-height: auto;
+    max-height: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  .content {
+    padding: 24px 16px;
+    gap: 24px;
+    border-radius: 24px;
+  }
+
+  .title {
+    font-size: 24px;
+    word-break: break-word;
   }
 }

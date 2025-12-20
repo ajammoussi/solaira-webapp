@@ -1,12 +1,13 @@
 .footer {
   width: 100%;
   display: flex;
-  padding: 40px 190px 24px;
+  padding: 40px 5% 24px;
   position: relative;  /* Changed from absolute */
   align-items: flex-start;
   flex-shrink: 0;
   flex-direction: column;
   background-color: var(--dl-color-www-solaira-nl-white);
+  box-sizing: border-box;
 }
 
 .container266 {
@@ -19,7 +20,7 @@
 }
 
 .horizontalBorder9 {
-  gap: 234.89999389648438px;
+  gap: 20px;
   display: flex;
   padding: 49px 0 0;
   align-self: stretch;
@@ -29,6 +30,7 @@
   border-style: solid;
   border-width: 1px 0 0;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .container267 {
@@ -198,12 +200,13 @@
 }
 
 .container276 {
-  gap: 1053.1300048828125px;
+  gap: 20px;
   display: flex;
   align-self: stretch;
   align-items: flex-start;
   flex-shrink: 0;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .container277 {
@@ -240,5 +243,61 @@
   height: auto;
   text-align: left;
   line-height: 18px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .footer {
+    padding: 40px 20px;
+  }
+
+  .container266 {
+    padding: 0;
+    gap: 40px;
+  }
+
+  .horizontalBorder9 {
+    flex-direction: column;
+    height: auto;
+    gap: 40px;
+    padding-top: 30px;
+  }
+
+  .container267,
+  .container268,
+  .container269 {
+    width: 100%;
+    height: auto;
+    padding: 0;
+  }
+
+  .container269 {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .container270,
+  .container272,
+  .container274 {
+    height: auto;
+    min-width: 140px;
+  }
+  
+  .linkmargin13 {
+    padding-bottom: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container269 {
+    flex-direction: column;
+    gap: 32px;
+  }
+  
+  .container270,
+  .container272,
+  .container274 {
+    width: 100%;
+  }
 }
 

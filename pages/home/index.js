@@ -11,7 +11,8 @@ import Footer from '../../components/Footer'
 import CookieBanner from '../../components/CookieBanner'
 import SectionHeading from '../../components/SectionHeading'
 import InfoSection from '../../components/InfoSection'
-import Lottie from "lottie-react";
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import solairaHouseAnimation from "../../public/solaira_house.json";
 import styles from './styles.module.css';
 
