@@ -12,4 +12,5 @@ venv
 
 # PV Monitoring generated data
 /backend/core/phase_3/monitoring_data/
-*.csv
+/backend/chatbot/database/memory.sqlite-shm
+/backend/chatbot/database/memory.sqlite-wal
