@@ -407,7 +407,7 @@ export default function Account() {
       </Head>
 
       <Layout>
-        <div style={{ maxWidth: '800px', padding: '40px 24px' }}>
+        <div style={{ maxWidth: '800px', padding: '40px 24px', margin: '0 auto' }}>
           <h1 style={{ fontSize: '28px', fontWeight: '600', color: '#191818', marginBottom: '32px' }}>
             Account Settings
           </h1>

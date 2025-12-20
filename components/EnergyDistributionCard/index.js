@@ -11,9 +11,6 @@ const mdiArrowRight = "M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.
 const mdiArrowLeft = "M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z";
 const mdiArrowUp = "M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z";
 const mdiArrowDown = "M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z";
-const mdiLeaf = "M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 2,11.5 2,13.5C2,15.5 3.75,17.25 3.75,17.25C7,8 17,8 17,8Z";
-const mdiFire = "M17.66 11.2C17.43 10.9 17.15 10.64 16.89 10.38C16.22 9.78 15.46 9.35 14.82 8.72C13.33 7.26 13 4.85 13.95 3C13 3.23 12.17 3.75 11.46 4.32C8.87 6.4 7.85 10.07 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C6.87 12.33 6.69 10.28 7.45 8.64C5.78 10 4.87 12.3 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C18.86 17.66 19.5 15 18.56 12.72L18.43 12.46C18.22 12 17.66 11.2 17.66 11.2M14.5 17.5C14.22 17.74 13.76 18 13.4 18.1C12.28 18.5 11.16 17.94 10.5 17.28C11.69 17 12.4 16.12 12.61 15.23C12.78 14.43 12.46 13.77 12.33 13C12.21 12.26 12.23 11.63 12.5 10.94C12.69 11.32 12.89 11.7 13.13 12C13.9 13 15.11 13.44 15.37 14.8C15.41 14.94 15.43 15.08 15.43 15.23C15.46 16.05 15.1 16.95 14.5 17.5H14.5Z";
-const mdiWater = "M12,20A6,6 0 0,1 6,14C6,10 12,3.25 12,3.25C12,3.25 18,10 18,14A6,6 0 0,1 12,20Z";
 
 const EnergyDistributionCard = ({ 
   energyData = null, 
@@ -101,7 +98,7 @@ const EnergyDistributionCard = ({
       <div style={{ position: 'relative' }}>
         {/* Top row: Solar */}
         {hasSolar && (
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px', transform: 'translateY(-30px)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <span style={{ fontSize: '11px', color: '#666', marginBottom: '4px' }}>Solar</span>
               <div style={{
@@ -125,10 +122,10 @@ const EnergyDistributionCard = ({
         )}
 
         {/* Middle row: Grid and Home */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '500px', margin: '0 auto 10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '600px', margin: '30px auto 10px', alignItems: 'center', transform: 'translateY(-20px)' }}>
           {/* Grid */}
           {hasGrid && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <div style={{
                 width: '80px',
                 height: '80px',
@@ -230,7 +227,7 @@ const EnergyDistributionCard = ({
 
         {/* Bottom row: Battery */}
         {hasBattery && (
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px', transform: 'translateY(-10px)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <div style={{
                 width: '80px',
@@ -264,7 +261,7 @@ const EnergyDistributionCard = ({
           </div>
         )}
 
-        {/* Connection lines with animated dots */}
+        {/* Connection lines with animated dots - ORIGINAL SVG PATHS PRESERVED */}
         <div style={{
           position: 'absolute',
           bottom: hasBattery ? '100px' : '0',
@@ -282,7 +279,7 @@ const EnergyDistributionCard = ({
             style={{
               width: 'calc(100% - 160px)',
               height: '100%',
-              maxWidth: '340px',
+              maxWidth: '450px',
             }}
             preserveAspectRatio="xMidYMid slice"
           >
@@ -356,7 +353,7 @@ const EnergyDistributionCard = ({
               </>
             )}
 
-            {/* Animated dots */}
+            {/* Animated dots - ONLY show when flow > 0.01 */}
             {animate && solarToGrid > 0.01 && (
               <circle r="1" fill="#a280db" strokeWidth="4">
                 <animateMotion dur={`${6 - (solarToGrid / totalLines) * 6}s`} repeatCount="indefinite" calcMode="linear">

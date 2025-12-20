@@ -26,9 +26,19 @@ import styles from './styles.module.css';
 
 const Dashboard = () => {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const { realtime, stats, forecast, loading, error, lastUpdated } = useAllEnergyData();
   const [predictedProduction, setPredictedProduction] = useState(null);
+  
+  // Help Modal States
+  const [showSolarHelp, setShowSolarHelp] = useState(false);
+  const [showConsumptionHelp, setShowConsumptionHelp] = useState(false);
+  const [showGridHelp, setShowGridHelp] = useState(false);
+  const [showBatteryHelp, setShowBatteryHelp] = useState(false);
+  const [show24hHelp, setShow24hHelp] = useState(false);
+  const [showFlowHelp, setShowFlowHelp] = useState(false);
+  const [showCO2Help, setShowCO2Help] = useState(false);
+  const [showSummaryHelp, setShowSummaryHelp] = useState(false);
 
   // Protect this page - redirect to signin if not authenticated
   useEffect(() => {
@@ -136,12 +146,12 @@ const Dashboard = () => {
     
     // Appliance breakdown (calculated from consumption)
     appliances: {
-      electric_car: (realtime?.consumption_kw || 0) * 0.21,
-      air_conditioning: (realtime?.consumption_kw || 0) * 0.17,
-      washing_machine: (realtime?.consumption_kw || 0) * 0.13,
-      dryer: (realtime?.consumption_kw || 0) * 0.17,
-      heat_pump: (realtime?.consumption_kw || 0) * 0.21,
-      boiler: (realtime?.consumption_kw || 0) * 0.11
+      electric_car: (realtime?.consumption_kw || 0) * 0.18,
+      air_conditioning: (realtime?.consumption_kw || 0) * 0.15,
+      washing_machine: (realtime?.consumption_kw || 0) * 0.10,
+      dryer: (realtime?.consumption_kw || 0) * 0.12,
+      heat_pump: (realtime?.consumption_kw || 0) * 0.18,
+      boiler: (realtime?.consumption_kw || 0) * 0.12
     },
     
     // Summary statistics for context
@@ -269,6 +279,7 @@ const Dashboard = () => {
           <div className={styles.sectionHeader}>
             <LucideIcons.BarChart className={styles.sectionIcon} />
             <h2 className={styles.sectionTitle}>24-Hour Overview</h2>
+            <button className={styles.helpButton} onClick={() => setShow24hHelp(true)}><LucideIcons.HelpCircle size={20} /></button>
           </div>
           <p className={styles.sectionDescription}>
             Hourly breakdown of energy import, export, and solar production
@@ -292,6 +303,7 @@ const Dashboard = () => {
           <div className={styles.sectionHeader}>
             <LucideIcons.Activity className={styles.sectionIcon} />
             <h2 className={styles.sectionTitle}>Energy Flow</h2>
+            <button className={styles.helpButton} onClick={() => setShowFlowHelp(true)}><LucideIcons.HelpCircle size={20} /></button>
           </div>
           <p className={styles.sectionDescription}>
             Real-time visualization of energy distribution across your home
@@ -305,12 +317,12 @@ const Dashboard = () => {
                 home_consumption: realtime?.consumption_kw || 0,
                 grid_export: realtime?.grid_export_kw || 0,
                 appliances: {
-                  electric_car: (realtime?.consumption_kw || 0) * 0.21,
-                  air_conditioning: (realtime?.consumption_kw || 0) * 0.17,
-                  washing_machine: (realtime?.consumption_kw || 0) * 0.13,
-                  dryer: (realtime?.consumption_kw || 0) * 0.17,
-                  heat_pump: (realtime?.consumption_kw || 0) * 0.21,
-                  boiler: (realtime?.consumption_kw || 0) * 0.11
+                  electric_car: (realtime?.consumption_kw || 0) * 0.18,
+                  air_conditioning: (realtime?.consumption_kw || 0) * 0.15,
+                  washing_machine: (realtime?.consumption_kw || 0) * 0.10,
+                  dryer: (realtime?.consumption_kw || 0) * 0.12,
+                  heat_pump: (realtime?.consumption_kw || 0) * 0.18,
+                  boiler: (realtime?.consumption_kw || 0) * 0.12
                 }
               }}
             />
@@ -322,6 +334,7 @@ const Dashboard = () => {
           <div className={styles.sectionHeader}>
             <LucideIcons.Leaf className={styles.sectionIcon} />
             <h2 className={styles.sectionTitle}>CO₂ Emissions Impact</h2>
+            <button className={styles.helpButton} onClick={() => setShowCO2Help(true)}><LucideIcons.HelpCircle size={20} /></button>
           </div>
           <p className={styles.sectionDescription}>
             Track your carbon footprint and environmental impact in real-time
@@ -406,7 +419,10 @@ const Dashboard = () => {
                 </div>
                 <div className={styles.co2Progress}>
                   <div 
-                    className={`${styles.co2ProgressFill} ${styles.red}`}
+                    className={`${styles.co2ProgressFill} ${
+                      co2Data.status.daily === 'good' ? styles.green : 
+                      co2Data.status.daily === 'moderate' ? styles.yellow : styles.red
+                    }`}
                     style={{ 
                       width: `${Math.min(100, (parseFloat(co2Data.daily.co2Produced) / 10) * 100)}%` 
                     }}
@@ -478,7 +494,10 @@ const Dashboard = () => {
 
         {/* Summary Statistics */}
         <section className={styles.summarySection}>
-          <h2 className={styles.sectionTitle}>Energy Summary</h2>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>Energy Summary</h2>
+            <button className={styles.helpButton} onClick={() => setShowSummaryHelp(true)}><LucideIcons.HelpCircle size={20} /></button>
+          </div>
           <div className={styles.summaryGrid}>
             {/* Today */}
             <div className={styles.summaryCard}>
@@ -581,7 +600,88 @@ const Dashboard = () => {
         energyData={chatbotEnergyData}
         userId={user?.id || user?.email || 'guest_user'}
       />
+
+      {/* Help Modals */}
+      <HelpModal show={showSolarHelp} onClose={() => setShowSolarHelp(false)} title="Solar Production">
+        <p className={styles.modalText}>Real-time power being generated by your solar panels.</p>
+        <ul className={styles.modalList}>
+          <li><strong>kW:</strong> Kilowatts of power currently being produced.</li>
+          <li><strong>Trend:</strong> Percentage change compared to the same time yesterday.</li>
+        </ul>
+      </HelpModal>
+
+      <HelpModal show={showConsumptionHelp} onClose={() => setShowConsumptionHelp(false)} title="Consumption">
+        <p className={styles.modalText}>Total power currently being used by your home.</p>
+        <ul className={styles.modalList}>
+          <li>Includes all appliances, lights, and devices.</li>
+          <li>High consumption reduces the amount of solar energy available for export or battery charging.</li>
+        </ul>
+      </HelpModal>
+
+      <HelpModal show={showGridHelp} onClose={() => setShowGridHelp(false)} title="Grid Flow">
+        <p className={styles.modalText}>Power exchange with the utility grid.</p>
+        <ul className={styles.modalList}>
+          <li><strong>Exporting (+):</strong> Sending excess solar energy to the grid (earning credits).</li>
+          <li><strong>Importing (-):</strong> Drawing power from the grid because solar/battery isn't enough.</li>
+        </ul>
+      </HelpModal>
+
+      <HelpModal show={showBatteryHelp} onClose={() => setShowBatteryHelp(false)} title="Battery Status">
+        <p className={styles.modalText}>Current charge level of your home battery.</p>
+        <ul className={styles.modalList}>
+          <li><strong>%:</strong> State of Charge (SoC).</li>
+          <li>Batteries charge when solar production exceeds consumption.</li>
+          <li>Batteries discharge to power your home when solar is low (e.g., at night).</li>
+        </ul>
+      </HelpModal>
+
+      <HelpModal show={show24hHelp} onClose={() => setShow24hHelp(false)} title="24-Hour Overview">
+        <p className={styles.modalText}>A forecast of your energy balance for the next 24 hours.</p>
+        <ul className={styles.modalList}>
+          <li><strong>Solar (Yellow):</strong> Predicted generation.</li>
+          <li><strong>Consumption (Blue):</strong> Predicted usage.</li>
+          <li><strong>Grid (Grey):</strong> Expected import/export.</li>
+        </ul>
+      </HelpModal>
+
+      <HelpModal show={showFlowHelp} onClose={() => setShowFlowHelp(false)} title="Energy Flow">
+        <p className={styles.modalText}>Visualizes where your energy is coming from and where it's going.</p>
+        <p className={styles.modalText}>The "Other" category represents consumption not accounted for by major appliances (lights, small electronics, phantom load).</p>
+      </HelpModal>
+
+      <HelpModal show={showCO2Help} onClose={() => setShowCO2Help(false)} title="CO₂ Emissions">
+        <p className={styles.modalText}>Your environmental impact.</p>
+        <ul className={styles.modalList}>
+          <li><strong>Avoided:</strong> Emissions saved by using solar instead of grid power.</li>
+          <li><strong>Produced:</strong> Emissions from grid power you imported.</li>
+          <li><strong>Net Balance:</strong> The overall impact (negative is good!).</li>
+        </ul>
+      </HelpModal>
+
+      <HelpModal show={showSummaryHelp} onClose={() => setShowSummaryHelp(false)} title="Energy Summary">
+        <p className={styles.modalText}>Aggregated statistics for different time periods.</p>
+        <ul className={styles.modalList}>
+          <li><strong>Self-Consumption:</strong> Percentage of solar energy used directly by your home.</li>
+          <li><strong>Savings:</strong> Estimated money saved on electricity bills.</li>
+        </ul>
+      </HelpModal>
+
     </Layout>
+  );
+};
+
+const HelpModal = ({ show, onClose, title, children }) => {
+  if (!show) return null;
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+        <button className={styles.modalClose} onClick={onClose}>
+          <LucideIcons.X size={24} />
+        </button>
+        <h3 className={styles.modalTitle}>{title}</h3>
+        {children}
+      </div>
+    </div>
   );
 };
 

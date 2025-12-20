@@ -31,7 +31,7 @@ const Energy = () => {
   const { historical, realtime: realtimeCSV, loading: csvLoading, error: csvError, config } = useCSVData();
   
   // Use unified data hook for consistency with Dashboard
-  const { realtime: realtimeData, stats } = useAllEnergyData();
+  const { realtime: realtimeData, stats } = useAllEnergyData(false);
   const todayStats = stats?.today;
   const monthStats = stats?.month;
   const yearStats = stats?.year;
@@ -409,9 +409,16 @@ const Energy = () => {
               <div className={styles.balanceMeter}>
                 <div className={styles.balanceScale}>
                   <div className={styles.balanceIndicator} style={{ left: `${gridStats.balancePercent}%` }}>
-                    <div className={styles.indicatorLabel}>
+                    <div 
+                      className={styles.indicatorLabel}
+                      style={{ color: parseFloat(gridStats.netEnergy) >= 0 ? '#00D9A3' : '#F44336' }}
+                    >
                       {parseFloat(gridStats.netEnergy) >= 0 ? 'Net Export' : 'Net Import'}: {Math.abs(parseFloat(gridStats.netEnergy)).toFixed(1)} kWh
                     </div>
+                    <div 
+                      className={styles.indicatorMarker}
+                      style={{ backgroundColor: parseFloat(gridStats.netEnergy) >= 0 ? '#00D9A3' : '#F44336' }}
+                    />
                   </div>
                 </div>
                 <div className={styles.balanceLabels}>
