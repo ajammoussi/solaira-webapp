@@ -25,6 +25,30 @@ pv_systems:
     - name: 'PV_System_4'
       actual_data: 'test_randomized_data/pv_system_4_actual.csv'
       predicted_data: 'test_randomized_data/pv_system_4_predicted.csv'
+      
+    - name: 'PV_System_5'
+      actual_data: 'test_randomized_data/pv_system_5_actual.csv'
+      predicted_data: 'test_randomized_data/pv_system_5_predicted.csv'
+      
+    - name: 'PV_System_6'
+      actual_data: 'test_randomized_data/pv_system_6_actual.csv'
+      predicted_data: 'test_randomized_data/pv_system_6_predicted.csv'
+      
+    - name: 'PV_System_7'
+      actual_data: 'test_randomized_data/pv_system_7_actual.csv'
+      predicted_data: 'test_randomized_data/pv_system_7_predicted.csv'
+      
+    - name: 'PV_System_8'
+      actual_data: 'test_randomized_data/pv_system_8_actual.csv'
+      predicted_data: 'test_randomized_data/pv_system_8_predicted.csv'
+      
+    - name: 'PV_System_9'
+      actual_data: 'test_randomized_data/pv_system_9_actual.csv'
+      predicted_data: 'test_randomized_data/pv_system_9_predicted.csv'
+      
+    - name: 'PV_System_10'
+      actual_data: 'test_randomized_data/pv_system_10_actual.csv'
+      predicted_data: 'test_randomized_data/pv_system_10_predicted.csv'
   
   # Optional: Maximum distance between systems (km) for validation
   max_proximity_km: 5.0

@@ -8,7 +8,7 @@ import * as LucideIcons from 'lucide-react';
 import styles from './styles.module.css';
 import pvMonitoringService from '../../lib/services/pvMonitoring';
 
-const PVSystemsGrid = ({ refreshInterval = 30000, noPadding = false, onUpdate }) => {
+const PVSystemsGrid = ({ refreshInterval = 60000, noPadding = false, onUpdate }) => {
   const [systems, setSystems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,10 +16,14 @@ const PVSystemsGrid = ({ refreshInterval = 30000, noPadding = false, onUpdate })
   const [selectedSystem, setSelectedSystem] = useState(null);
 
   const isMounted = useRef(true);
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     return () => {
       isMounted.current = false;
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
     };
   }, []);
 
@@ -58,18 +62,26 @@ const PVSystemsGrid = ({ refreshInterval = 30000, noPadding = false, onUpdate })
         setLoading(false);
       }
     }
-  }, [onUpdate]);
+  }, []); // Remove onUpdate from dependencies
 
   useEffect(() => {
+    // Clear any existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    // Initial fetch
     fetchSystemsStatus();
 
     // Auto-refresh
-    const interval = setInterval(fetchSystemsStatus, refreshInterval);
+    intervalRef.current = setInterval(fetchSystemsStatus, refreshInterval);
 
     return () => {
-      clearInterval(interval);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
     };
-  }, [fetchSystemsStatus, refreshInterval]);
+  }, [refreshInterval]); // Only depend on refreshInterval
 
   const getStatusColor = (severity) => {
     switch (severity) {
@@ -270,12 +282,14 @@ const SystemDetailModal = ({ system, onClose }) => {
                 </span>
               </div>
               <div>
-                <span className={styles.label}>Status:</span>
-                <span className={styles.value}>{system.status}</span>
+                <span className={styles.label}>Deviation Score:</span>
+                <span className={styles.value}>
+                  {system.mean_deviation != null ? (system.mean_deviation * 100).toFixed(1) + '%' : 'N/A'}
+                </span>
               </div>
               <div>
-                <span className={styles.label}>Data Points:</span>
-                <span className={styles.value}>{system.data_points}</span>
+                <span className={styles.label}>Status:</span>
+                <span className={styles.value}>{system.status}</span>
               </div>
               {system.current_anomaly && (
                 <div>
@@ -301,10 +315,10 @@ const SystemDetailModal = ({ system, onClose }) => {
 
           {!loading && history.length > 0 && (
             <div className={styles.detailSection}>
-              <h4>Recent History (Last 2 Hours)</h4>
+              <h4>Recent History</h4>
               <div className={styles.historyChart}>
                 <p className={styles.chartPlaceholder}>
-                  {history.length} data points collected
+                  Historical data available
                 </p>
               </div>
             </div>

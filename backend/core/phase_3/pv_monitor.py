@@ -229,11 +229,11 @@ class SimpleAnalyzer:
         return {
             'status': status,
             'severity': severity,
-            'recent_pr': pr,
-            'mean_deviation': deviation,
+            'recent_pr': float(pr),
+            'mean_deviation': float(deviation),
             'category': 'CRITICAL' if deviation >= 0.20 else 'MEDIUM' if deviation >= 0.15 else 'NORMAL',
             'issues_detected': issues,
-            'data_points': len(recent),
+            'data_points': int(len(recent)),
             'analysis_method': 'single_system'
         }
 
@@ -244,16 +244,23 @@ class PVMonitoringService:
     Same interface, but WITHOUT background threads and spam
     """
     
-    def __init__(self, data_dir: Optional[str] = None):
+    def __init__(self, data_dir: Optional[str] = None, maintenance_pipeline=None):
         self.data_dir = Path(data_dir) if data_dir else Path("backend/core/phase_3/monitoring_data")
         self.store = DataStore(self.data_dir)
         self.systems: Dict[int, PVSystem] = {}
         self.monitoring_active = False  # For compatibility, but we don't use it
+        self.maintenance_pipeline = maintenance_pipeline  # For pairwise deviation analysis
+        self.last_reading_time = None  # Track when we last generated readings
     
     def configure_systems(self, num_systems: int, capacity_per_system: float = 5.0) -> Dict:
         """Configure the number of PV systems to monitor"""
         
         self.systems.clear()
+        
+        # Delete all existing CSV files to start fresh
+        for csv_file in self.data_dir.glob('*.csv'):
+            csv_file.unlink()
+        print(f"🗑️ Cleared old monitoring data")
         
         # Distribute health statuses
         if num_systems >= 3:
@@ -274,9 +281,13 @@ class PVMonitoringService:
             )
             self.systems[system_id] = system
             
-            # Generate initial 30-day history
-            df = SolarDataGenerator.generate_history(system, days=30)
+            # Generate initial 30-day history ending TODAY
+            df = SolarDataGenerator.generate_history(system, days=30, end_date=datetime.now())
             self.store.save_system_data(system_id, df)
+            print(f"📊 Generated 30 days of data for System {system_id} (ending {datetime.now().strftime('%Y-%m-%d')})")
+        
+        # Reset last reading time so it generates next reading immediately
+        self.last_reading_time = None
             
         return {
             'num_systems': num_systems,
@@ -293,34 +304,45 @@ class PVMonitoringService:
     def generate_readings(self) -> List[Dict]:
         """
         Generate new daily readings for all systems
-        This is called manually, NOT by a background thread
+        Generates data for the NEXT day (for fast testing)
         """
         readings = []
-        today = datetime.now()
         
         for system in self.systems.values():
             # Load existing data
             df = self.store.load_system_data(system.system_id)
-            if df is None:
-                df = pd.DataFrame()
+            if df is None or df.empty:
+                # No data yet, start with today
+                next_date = datetime.now()
+            else:
+                # Find the most recent date and add 1 day
+                most_recent = pd.to_datetime(df['date']).max()
+                next_date = most_recent + timedelta(days=1)
             
-            # Generate new reading
+            next_date_str = next_date.strftime('%Y-%m-%d')
+            
+            # Generate new reading for the next day
             predicted, actual = SolarDataGenerator.daily_production(
-                today,
+                next_date,
                 system.capacity_kw,
                 system.degradation_factor
             )
             
             # Append
             new_row = pd.DataFrame([{
-                'date': today.strftime('%Y-%m-%d'),
+                'date': next_date_str,
                 'system_id': system.system_id,
                 'predicted_kwh': predicted,
                 'actual_kwh': actual,
             }])
             
-            df = pd.concat([df, new_row], ignore_index=True)
-            df = df.tail(30)  # Keep last 30 days
+            if df is None or df.empty:
+                df = new_row
+            else:
+                df = pd.concat([df, new_row], ignore_index=True)
+            
+            # Keep last 30 days
+            df = df.tail(30)
             
             # Save
             self.store.save_system_data(system.system_id, df)
@@ -328,8 +350,8 @@ class PVMonitoringService:
             pr = SimpleAnalyzer.calculate_pr(actual, predicted)
             
             readings.append({
-                'timestamp': today.isoformat(),
-                'date': today.strftime('%Y-%m-%d'),
+                'timestamp': next_date.isoformat(),
+                'date': next_date_str,
                 'system_id': system.system_id,
                 'actual_kwh': actual,
                 'predicted_kwh': predicted,
@@ -359,10 +381,42 @@ class PVMonitoringService:
         return analysis
     
     def get_all_systems_status(self) -> List[Dict]:
-        """Get status for all systems"""
+        """Get status for all systems using pairwise comparative analysis"""
         if not self.systems:
             return []
         
+        # Auto-generate new readings once per day (86400 seconds)
+        now = datetime.now()
+        if self.last_reading_time is None or (now - self.last_reading_time).seconds >= 86400:
+            print(f"⏰ Generating new readings at {now.strftime('%H:%M:%S')}")
+            self.generate_readings()
+            self.last_reading_time = now
+        
+        # Use predictive maintenance pipeline if available (for multi-system analysis)
+        if self.maintenance_pipeline and len(self.systems) >= 2:
+            try:
+                result = self.maintenance_pipeline.analyze_monitoring_systems(self.data_dir)
+                
+                if 'error' not in result and 'systems' in result:
+                    # Format the results for the API
+                    statuses = []
+                    for system_id in sorted(self.systems.keys()):
+                        if system_id in result['systems']:
+                            analysis = result['systems'][system_id]
+                            analysis['system_id'] = system_id
+                            analysis['system_name'] = self.systems[system_id].name
+                            statuses.append(analysis)
+                        else:
+                            # Fallback if system not in analysis
+                            statuses.append(self.analyze_system(system_id))
+                    
+                    return statuses
+            except Exception as e:
+                print(f"Warning: Pairwise analysis failed, using fallback: {e}")
+                import traceback
+                traceback.print_exc()
+        
+        # Fallback to simple single-system analysis
         return [self.analyze_system(sid) for sid in self.systems.keys()]
     
     def get_system_history(self, system_id: int, hours: int = 24) -> List[Dict]:
@@ -402,13 +456,24 @@ class PVMonitoringService:
 
 # Global instance (for compatibility with old code)
 _monitoring_service = None
+_maintenance_pipeline = None
 
 
-def get_monitoring_service() -> PVMonitoringService:
+def get_monitoring_service(maintenance_pipeline=None) -> PVMonitoringService:
     """Get or create the global monitoring service instance"""
-    global _monitoring_service
+    global _monitoring_service, _maintenance_pipeline
+    
+    # Store pipeline on first call
+    if maintenance_pipeline is not None and _maintenance_pipeline is None:
+        _maintenance_pipeline = maintenance_pipeline
+    
+    # Create service once and reuse it
     if _monitoring_service is None:
-        _monitoring_service = PVMonitoringService()
+        print(f"🔧 Creating new PVMonitoringService instance")
+        _monitoring_service = PVMonitoringService(maintenance_pipeline=_maintenance_pipeline)
+    else:
+        print(f"♻️ Reusing existing PVMonitoringService (has {len(_monitoring_service.systems)} systems)")
+    
     return _monitoring_service
 
 

@@ -599,10 +599,10 @@ def configure_pv_systems(request: PVSystemConfigRequest):
         if request.num_systems < 1 or request.num_systems > 20:
             raise HTTPException(status_code=400, detail="Number of systems must be between 1 and 20")
         
-        if request.capacity_per_system < 1.0 or request.capacity_per_system > 50.0:
-            raise HTTPException(status_code=400, detail="Capacity must be between 1.0 and 50.0 kW")
+        if request.capacity_per_system < 0.1 or request.capacity_per_system > 50.0:
+            raise HTTPException(status_code=400, detail="Capacity must be between 0.1 and 50.0 kW")
         
-        service = get_monitoring_service()
+        service = get_monitoring_service(maintenance_pipeline)
         result = service.configure_systems(request.num_systems, request.capacity_per_system)
         
         return result
@@ -616,7 +616,7 @@ def control_monitoring(request: MonitoringControlRequest):
     Start or stop the monitoring service
     """
     try:
-        service = get_monitoring_service()
+        service = get_monitoring_service(maintenance_pipeline)
         
         if request.action == 'start':
             result = service.start_monitoring(request.interval_seconds)
@@ -636,7 +636,7 @@ def get_systems_status():
     Get current status of all PV systems with anomaly detection
     """
     try:
-        service = get_monitoring_service()
+        service = get_monitoring_service(maintenance_pipeline)
         
         # Check if systems are configured
         if not service.systems:
@@ -666,7 +666,7 @@ def get_system_status(system_id: int):
     Get detailed status for a specific PV system
     """
     try:
-        service = get_monitoring_service()
+        service = get_monitoring_service(maintenance_pipeline)
         status = service.analyze_system(system_id, hours=2)
         
         if 'error' in status:
@@ -685,7 +685,7 @@ def get_system_history(system_id: int, hours: int = 24):
     Get historical data for a specific PV system
     """
     try:
-        service = get_monitoring_service()
+        service = get_monitoring_service(maintenance_pipeline)
         history = service.get_system_history(system_id, hours)
         
         return {
@@ -704,7 +704,7 @@ def get_pv_config():
     Get current PV systems configuration
     """
     try:
-        service = get_monitoring_service()
+        service = get_monitoring_service(maintenance_pipeline)
         
         return {
             'num_systems': len(service.systems),
