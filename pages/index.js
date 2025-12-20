@@ -11,7 +11,8 @@ import Footer from '../components/Footer'
 import CookieBanner from '../components/CookieBanner'
 import SectionHeading from '../components/SectionHeading'
 import InfoSection from '../components/InfoSection'
-import Lottie from "lottie-react";
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import solairaHouseAnimation from "../public/solaira_house.json";
 
 const Frame1920wlight = (props) => {
@@ -60,7 +61,7 @@ const Frame1920wlight = (props) => {
                       <div className="frame1920wlight-heading1">
                         <span className="frame1920wlight-text122 www.solaira.tnSemanticHeading1">
                           <span className="frame1920wlight-text123">
-                            🌞Solaira,
+                            Solaira,
                           </span>
                           <br></br>
                           <span className="frame1920wlight-text125">
@@ -228,14 +229,12 @@ const Frame1920wlight = (props) => {
                   </FeaturesSection>
                   
                   <InfoSection
-                    title="Claim your VAT refund on your home battery from"
+                    title="Achieve complete energy independence with"
                     highlightedTitle="Solaira"
-                    description="It is now possible to reclaim the VAT on your home battery purchase. In collaboration with De Centrale, we handle this for all our customers."
-                    buttonText="Read more"
-                    buttonLink="/vat-refund"
+                    description="Store your excess solar energy and use it when you need it most. Our smart battery systems ensure you have power even during grid outages, maximizing your savings and reliability."
+                    buttonText="Explore Solutions"
+                    buttonLink="/energy"
                     image="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                    logo="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                    logoAlt="De Centrale"
                   />
                   
                   <SectionHeading 
@@ -246,8 +245,7 @@ const Frame1920wlight = (props) => {
                 </div>
                 
                 <Footer
-                  logoImage="https://play.teleporthq.io/static/svg/default-img.svg"
-                  logoAlt="SVG6578a5b54fa1fa278cef6591footerlogosvgfill1657"
+                  logoAlt="Solaira Logo"
                   phone="(+216) 99-999-999"
                   email="info@solaira.tn"
                   address={
@@ -288,6 +286,7 @@ const Frame1920wlight = (props) => {
           min-height: 100vh;
           align-items: center;
           flex-direction: column;
+          box-sizing: border-box;
         }
         
         .frame1920wlight-frame1920wlight {
@@ -297,7 +296,9 @@ const Frame1920wlight = (props) => {
           align-items: flex-start;
           flex-shrink: 0;
           background-color: #ffffff;
+          box-sizing: border-box;
         }
+
         
         .frame1920wlight-frame1 {
           width: 100%;
@@ -367,7 +368,7 @@ const Frame1920wlight = (props) => {
         
         .frame1920wlight-container108 {
           flex: 1;
-          min-width: 400px;
+          width: 100%;
           max-width: 600px;
           display: flex;
           flex-direction: column;
@@ -386,7 +387,7 @@ const Frame1920wlight = (props) => {
         .frame1920wlight-text122 {
           font-size: 66px;
           font-family: Outfit, sans-serif;
-          font-weight: 300;
+          font-weight: 350;
           line-height: 78px;
         }
         
@@ -481,7 +482,7 @@ const Frame1920wlight = (props) => {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          min-width: 400px;
+          width: 100%;
         }
         
         .frame1920wlight-component310 {
@@ -562,12 +563,11 @@ const Frame1920wlight = (props) => {
           }
           
           .frame1920wlight-container108 {
-            min-width: auto;
             width: 100%;
+            max-width: 100%;
           }
           
           .frame1920wlight-container117 {
-            min-width: auto;
             width: 100%;
           }
         }
@@ -586,9 +586,12 @@ const Frame1920wlight = (props) => {
             font-size: 40px;
             line-height: 1.2;
           }
+            word-break: break-word;
+          }
           
           .frame1920wlight-text146 {
             font-size: 32px;
+            word-break: break-word;
           }
           
           .frame1920wlight-hero-image {
@@ -598,7 +601,13 @@ const Frame1920wlight = (props) => {
           .frame1920wlight-container109 {
             flex-direction: column;
             align-items: flex-start;
+            width: 100%;
           }
+
+          .frame1920wlight-component13 {
+            width: 100%;
+            justify-content: center;
+            padding: 13px 20px
         }
       `}
       </style>

@@ -189,6 +189,7 @@
     z-index: 1001;
     padding: 20px;
     box-shadow: -5px 0 15px rgba(0,0,0,0.05);
+    box-sizing: border-box; /* Ensure padding doesn't overflow width */
   }
 
   /* When menu is open */
@@ -210,6 +211,8 @@
   .ctaContainer {
     width: 100%;
     max-width: 200px;
+    display: flex;
+    justify-content: center;
   }
   
   .headerButton {
@@ -223,6 +226,7 @@
   .topBannerContainer {
     padding: 0 20px;
     justify-content: space-between;
+    flex-wrap: wrap; /* Allow wrapping on very small screens */
   }
 
   .topBannerLeft {

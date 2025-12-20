@@ -12,18 +12,20 @@ const FeatureCard = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className={styles.card}>
+    <div 
+      className={styles.card}
+      onClick={() => setIsExpanded(!isExpanded)}
+    >
       {/* Decorative dots pattern */}
       <div className={styles.dots}></div>
       
       {/* Plus button */}
-      <button 
+      <div 
         className={styles.plusButton}
-        onClick={() => setIsExpanded(!isExpanded)}
         aria-label={isExpanded ? "Collapse" : "Expand"}
       >
         <span className={`${styles.plusIcon} ${isExpanded ? styles.rotated : ''}`}>+</span>
-      </button>
+      </div>
 
       {/* Icon */}
       <div className={styles.iconWrapper} style={{ backgroundColor: iconColor }}>

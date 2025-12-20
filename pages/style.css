@@ -1,4 +1,5 @@
 :root {
+  box-sizing: border-box;
   --dl-layout-size-large: 144px;
   --dl-layout-size-small: 48px;
   --dl-layout-space-unit: 16px;
@@ -911,4 +912,9 @@
     grid-template-columns: 1fr;
   }
 }
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
 

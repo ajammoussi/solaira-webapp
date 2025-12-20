@@ -28,11 +28,13 @@ const Footer = ({
               <div className={styles.linkmargin13}>
                 <div className={styles.link5}>
                   <div className={styles.logo2}>
-                    <img
-                      src={logoImage}
-                      alt={logoAlt}
-                      className={styles.logoImage}
-                    />
+                    {logoImage && (
+                      <img
+                        src={logoImage}
+                        alt={logoAlt}
+                        className={styles.logoImage}
+                      />
+                    )}
                   </div>
                 </div>
               </div>

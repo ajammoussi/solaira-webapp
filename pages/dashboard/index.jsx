@@ -50,6 +50,8 @@ const Dashboard = () => {
 
   // Fetch production prediction from trained models
   useEffect(() => {
+    let isMounted = true;
+
     if (realtime && !loading) {
       // This would be replaced with actual API call to your ML models
       // For now, simulate prediction based on current production
@@ -58,6 +60,8 @@ const Dashboard = () => {
           // Simulate API call delay
           await new Promise(resolve => setTimeout(resolve, 500));
           
+          if (!isMounted) return;
+
           // Simple prediction based on current production and time of day
           const hour = new Date().getHours();
           let prediction = realtime.pv_production_kw || 0;
@@ -77,12 +81,18 @@ const Dashboard = () => {
           setPredictedProduction(prediction);
         } catch (error) {
           console.error('Error fetching prediction:', error);
-          setPredictedProduction(realtime.pv_production_kw || 0);
+          if (isMounted) {
+            setPredictedProduction(realtime.pv_production_kw || 0);
+          }
         }
       };
       
       simulatePrediction();
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [realtime, loading]);
 
   // Calculate CO₂ emissions

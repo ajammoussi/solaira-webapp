@@ -1,12 +1,13 @@
 .footer {
   width: 100%;
   display: flex;
-  padding: 40px 190px 24px;
+  padding: 40px 5% 24px;
   position: relative;  /* Changed from absolute */
   align-items: flex-start;
   flex-shrink: 0;
   flex-direction: column;
   background-color: var(--dl-color-www-solaira-nl-white);
+  box-sizing: border-box;
 }
 
 .container266 {
@@ -19,7 +20,7 @@
 }
 
 .horizontalBorder9 {
-  gap: 234.89999389648438px;
+  gap: 20px;
   display: flex;
   padding: 49px 0 0;
   align-self: stretch;
@@ -29,6 +30,7 @@
   border-style: solid;
   border-width: 1px 0 0;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .container267 {
@@ -198,12 +200,13 @@
 }
 
 .container276 {
-  gap: 1053.1300048828125px;
+  gap: 20px;
   display: flex;
   align-self: stretch;
   align-items: flex-start;
   flex-shrink: 0;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .container277 {

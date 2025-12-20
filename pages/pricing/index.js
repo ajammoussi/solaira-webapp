@@ -11,8 +11,8 @@ const PricingPage = () => {
   const plans = [
     {
       name: 'Starter',
-      price: { monthly: 199, annual: 1990 },
-      savings: { monthly: 400, annual: 4800 },
+      price: { monthly: 49, annual: 490 },
+      savings: { monthly: 300, annual: 3600 },
       description: 'Perfect for small households',
       features: [
         '5 kWh Battery Capacity',
@@ -31,8 +31,8 @@ const PricingPage = () => {
     },
     {
       name: 'Smart Home',
-      price: { monthly: 349, annual: 3490 },
-      savings: { monthly: 800, annual: 9600 },
+      price: { monthly: 89, annual: 890 },
+      savings: { monthly: 600, annual: 7200 },
       description: 'Most popular for medium homes',
       features: [
         '10 kWh Battery Capacity',
@@ -53,7 +53,7 @@ const PricingPage = () => {
     },
     {
       name: 'Premium',
-      price: { monthly: 599, annual: 5990 },
+      price: { monthly: 139, annual: 1390 },
       savings: { monthly: 1200, annual: 14400 },
       description: 'For large homes & businesses',
       features: [

@@ -35,12 +35,10 @@ function SetupEnforcer() {
 function ChatbotWrapper() {
   const { user, isGuest } = useAuth()
   
-  // Only render chatbot when user is logged in (not a guest)
-  if (isGuest || !user) {
-    return null
-  }
+  // Render chatbot for everyone, passing user ID if available or 'guest'
+  const userId = user?.email || user?.id || 'guest';
   
-  return <SolarChatbot energyData={null} userId={user.email || user.id} />
+  return <SolarChatbot energyData={null} userId={userId} />
 }
 
 export default function MyApp({ Component, pageProps }) {
