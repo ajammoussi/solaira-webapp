@@ -9,6 +9,7 @@ class CustomDocument extends Document {
             content="width=device-width, initial-scale=1.0"
           ></meta>
           <meta charSet="utf-8"></meta>
+          <link rel="icon" href="/solaria-small-logo1.png" />
           <meta property="twitter:card" content="summary_large_image"></meta>
           <style
             dangerouslySetInnerHTML={{
