@@ -40,11 +40,12 @@ except ImportError as _chatbot_import_error:  # pragma: no cover - dep-gated
 else:
     _CHATBOT_UNAVAILABLE = None
 
-# Load environment variables
-# Explicitly load .env.local from the project root
+# Load environment variables.
+# Mirrors Next.js precedence: .env.local wins, then .env. Values already present
+# in the real environment are never overridden (load_dotenv default).
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-env_path = os.path.join(root_dir, '.env.local')
-load_dotenv(dotenv_path=env_path)
+for env_name in ('.env.local', '.env'):
+    load_dotenv(dotenv_path=os.path.join(root_dir, env_name))
 
 # Configure logging
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper())
