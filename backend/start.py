@@ -22,7 +22,23 @@ def start_services():
     
     # Path to solar forecast api directory
     solar_forecast_dir = os.path.join(backend_dir, "models", "quartz-solar-forecast")
-    
+
+    # The forecast service pins older packages than the main backend (pydantic
+    # 2.6.2 vs 2.9.2, xarray 2022.12 vs latest), so it runs from its own venv
+    # when one exists. Falls back to the current interpreter otherwise.
+    forecast_python = sys.executable
+    forecast_venv_python = os.path.join(
+        backend_dir,
+        ".venv-forecast",
+        "Scripts" if os.name == "nt" else "bin",
+        "python.exe" if os.name == "nt" else "python",
+    )
+    if os.path.exists(forecast_venv_python):
+        forecast_python = forecast_venv_python
+    else:
+        print("NOTE: backend/.venv-forecast not found; running the forecast service "
+              "with the same interpreter as the main backend.")
+
     processes = []
 
     print("Starting Main Backend on port 8001...")
@@ -31,11 +47,11 @@ def start_services():
     p1 = subprocess.Popen([sys.executable, main_py_path], cwd=root_dir)
     processes.append(p1)
 
-    print("Starting Solar Forecast API on port 8002...")
+    print(f"Starting Solar Forecast API on port 8002 ({forecast_python})...")
     # Run uvicorn for the solar forecast API
     # We change cwd to the solar forecast directory to make imports work easily
     p2 = subprocess.Popen(
-        [sys.executable, "-m", "uvicorn", "api.v1.api:app", "--host", "0.0.0.0", "--port", "8002"],
+        [forecast_python, "-m", "uvicorn", "api.v1.api:app", "--host", "0.0.0.0", "--port", "8002"],
         cwd=solar_forecast_dir
     )
     processes.append(p2)

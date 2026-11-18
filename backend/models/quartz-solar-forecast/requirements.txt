@@ -1,0 +1,28 @@
+# Dependencies of the vendored Quartz forecast service (mirrors pyproject.toml).
+#
+# Install into a SEPARATE Python 3.11 venv: these pins conflict with
+# backend/requirements.txt (pydantic 2.6.2 vs 2.9.2, xarray 2022.12 vs latest).
+#
+# The package itself is not installed. `backend/start.py` runs uvicorn with
+# this directory as cwd, so `quartz_solar_forecast` imports as a local package
+# and the missing dist metadata simply reports version 0.0.0.
+xarray==2022.12.0
+pv-site-prediction==0.1.19
+pydantic==2.6.2
+# Not in pyproject.toml, but api/v1/api.py imports it.
+fastapi==0.115.0
+python-dotenv==1.0.1
+openmeteo-requests==1.2.0
+requests-cache==1.2.0
+# requests-cache 1.2.0's cattrs serializer breaks on requests >=2.32
+# (NameError: RequestsCookieJar when caching the open-meteo response).
+requests==2.31.0
+retry-requests==2.0.0
+xgboost==2.0.3
+typer
+async_timeout
+uvicorn[standard]
+pydantic_settings
+httpx
+sentry_sdk
+huggingface_hub==0.17.3
