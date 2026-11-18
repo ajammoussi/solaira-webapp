@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check lib/api lib/config lib/supabase.js tests jest.config.js .eslintrc.json .prettierrc",
     "test": "jest",
-    "test:ci": "jest --ci --coverage --forceExit"
+    "test:ci": "jest --ci --coverage"
   },
   "license": "MIT",
   "dependencies": {

@@ -245,7 +245,13 @@ class PVMonitoringService:
     """
     
     def __init__(self, data_dir: Optional[str] = None, maintenance_pipeline=None):
-        self.data_dir = Path(data_dir) if data_dir else Path("backend/core/phase_3/monitoring_data")
+        if data_dir:
+            self.data_dir = Path(data_dir)
+        else:
+            # Absolute default: the working directory is not guaranteed (pytest,
+            # uvicorn and `python backend/main.py` all start in different places,
+            # which used to write a duplicate backend/backend/ tree).
+            self.data_dir = Path(__file__).resolve().parent / "monitoring_data"
         self.store = DataStore(self.data_dir)
         self.systems: Dict[int, PVSystem] = {}
         self.monitoring_active = False  # For compatibility, but we don't use it

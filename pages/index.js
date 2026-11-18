@@ -4,6 +4,7 @@ import Link from 'next/link'
 import FeaturesSection from '../components/FeaturesSection'
 import FeatureCard from '../components/FeatureCard'
 import { useTranslations } from 'next-intl'
+import { SITE_URL } from '../lib/config/env'
 import Header from '../components/Header'
 import Button from '../components/Button'
 import TrustBadge from '../components/TrustBadge'
@@ -24,7 +25,7 @@ const Frame1920wlight = (props) => {
           <title>Solaira - Smart Energy Solutions</title>
           <meta name="description" content="Solaira provides intelligent home battery systems. Save up to 1200 TND every month with clean, smart energy." />
           <meta property="og:title" content="Solaira - Smart Energy Solutions" />
-          <link rel="canonical" href="https://untitled-vjvsif.teleporthq.app/" />
+          <link rel="canonical" href={SITE_URL} />
         </Head>
         
         <div className="frame1920wlight-frame1920wlight">

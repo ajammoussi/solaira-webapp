@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import * as LucideIcons from 'lucide-react';
 import Button from '../Button';
 import { useAuth } from '../../lib/hooks/useAuth';
+import { CONTACT_PHONE } from '../../lib/config/env';
 import styles from './styles.module.css';
 
 // Key used to signal logout across tabs
@@ -126,7 +127,7 @@ const Layout = ({ children }) => {
             </div>
             <div className={styles.topBannerRight}>
               <img src="/Flag_of_Tunisia.svg" alt="TN" className={styles.flag} />
-              <span className={styles.topBannerText}>(+216) 99-999-999</span>
+              <span className={styles.topBannerText}>{CONTACT_PHONE}</span>
             </div>
           </div>
         </div>

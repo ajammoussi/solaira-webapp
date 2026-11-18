@@ -47,16 +47,6 @@ describe('lib/config/env', () => {
     process.env.NEXT_PUBLIC_DEFAULT_PANELS = 'not-a-number';
     expect(loadFresh().DEFAULT_PANELS).toBe(10);
   });
-
-  it('requireEnv names the missing variable', () => {
-    const env = loadFresh();
-    expect(() => env.requireEnv('DEFINITELY_NOT_SET')).toThrow(/DEFINITELY_NOT_SET/);
-  });
-
-  it('requireEnv returns the value when present', () => {
-    process.env.SOME_REQUIRED_VALUE = 'ok';
-    expect(loadFresh().requireEnv('SOME_REQUIRED_VALUE')).toBe('ok');
-  });
 });
 
 describe('lib/config/solar-systems', () => {

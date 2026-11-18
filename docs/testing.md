@@ -55,6 +55,7 @@ backend/tests/
   test_pv_systems_api.py configure/status/history contract + input validation
   test_maintenance.py    length validation, status mapping, JSON safety (no NaN)
   test_config_paths.py   YAML files parse and referenced data files exist
+  test_fixture_integrity guard: the suite never mutates tracked fixtures
 ```
 
 Notes:

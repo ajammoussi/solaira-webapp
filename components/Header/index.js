@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'; // ADD THIS IMPORT
 import * as LucideIcons from 'lucide-react';
 import styles from './styles.module.css';
 import Button from '../Button';
+import { CONTACT_PHONE } from '../../lib/config/env';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -28,7 +29,7 @@ const Header = () => {
           </div>
           <div className={styles.topBannerRight}>
             <img src="/Flag_of_Tunisia.svg" alt="TN" className={styles.flag} />
-            <span className={styles.topBannerText}>(+216) 99-999-999</span>
+            <span className={styles.topBannerText}>{CONTACT_PHONE}</span>
           </div>
         </div>
       </div>

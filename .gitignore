@@ -34,8 +34,11 @@ coverage/
 *.sqlite-wal
 *.db
 
-# ─── Generated backend data ────────────────────────────────────────────
-backend/core/phase_3/monitoring_data/
+# ─── Backend generated output ─────────────────────────────────────────
+# monitoring_data/ is intentionally tracked: maintenance_config.yaml and the
+# predictive-maintenance tests read those CSV fixtures, so ignoring the folder
+# would hide real drift (and did hide a stray backend/backend/ copy).
+results/
 
 # ─── Tooling / editor ──────────────────────────────────────────────────
 .vscode/

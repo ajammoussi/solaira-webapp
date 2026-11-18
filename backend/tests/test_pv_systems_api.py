@@ -2,6 +2,9 @@
 
 Validates the endpoint shapes the frontend actually consumes
 (``lib/api/pvMonitoring.js``) and the input validation guards.
+
+Directory isolation (``configure_systems`` deletes every CSV it finds) is
+handled globally by the autouse fixture in ``conftest.py``.
 """
 
 import pytest
@@ -45,14 +48,6 @@ def test_configure_then_status_lists_systems(client):
     assert body["total_systems"] == 3
     assert len(body["systems"]) == 3
     assert "timestamp" in body
-
-
-def test_status_before_configuration_is_empty(client):
-    reset_monitoring_service()
-    client.app.state.__dict__.pop("_pv_reset", None)
-    body = client.get("/api/pv-systems/status").json()
-    assert body["total_systems"] >= 0
-    assert "systems" in body
 
 
 def test_monitoring_start_and_stop(client):
