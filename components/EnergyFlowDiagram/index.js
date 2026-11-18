@@ -34,9 +34,9 @@ const EnergyFlowDiagram = ({ data, card = true }) => {
       if (!containerRef.current) return;
 
       try {
-        // Dynamic import to fix SSR/Build error with @svgdotjs/svg.js
-        const module = await import('apexsankey');
-        const ApexSankey = module.default || module;
+        // Dynamic import to fix SSR/Build error in the sankey renderer
+        const sankeyModule = await import('apexsankey');
+        const ApexSankey = sankeyModule.default || sankeyModule;
 
         if (!isMounted) return;
 

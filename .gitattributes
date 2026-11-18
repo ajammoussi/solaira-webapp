@@ -1,0 +1,25 @@
+# Normalize line endings on checkout; keep binaries untouched.
+* text=auto eol=lf
+
+*.js    text
+*.jsx   text
+*.json  text
+*.md    text
+*.py    text
+*.yml   text
+*.yaml  text
+*.css   text
+*.sql   text
+
+# Data & model artifacts: never diff, never convert
+*.csv   -text
+*.pkl   binary
+*.onnx  binary
+*.h5    binary
+*.png   binary
+*.jpg   binary
+*.ico   binary
+*.svg   text
+
+# Lockfiles: treat as generated
+package-lock.json linguist-generated=true

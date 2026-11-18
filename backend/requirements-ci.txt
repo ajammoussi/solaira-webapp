@@ -1,0 +1,17 @@
+# Slim dependency set for CI and local development.
+# Excludes tensorflow, onnxruntime and the vendored Quartz package: the tests do
+# not need them, and installing TensorFlow would dominate CI runtime.
+# For the full serving stack, use requirements.txt.
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic==2.9.2
+python-dotenv==1.0.1
+pandas
+numpy
+scikit-learn
+joblib
+pyyaml
+statsmodels
+httpx
+pytest==8.4.1
+ruff==0.8.4

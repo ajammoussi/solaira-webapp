@@ -18,7 +18,7 @@ import Layout from '../../components/Layout';
 import { useAuth } from '../../lib/hooks/useAuth';
 import { useEnergySimulation } from '../../lib/hooks/useEnergySimulation';
 import { useDailyPrediction } from '../../lib/hooks/useDailyPrediction';
-import pythonApi from '../../lib/services/pythonApi';
+import pythonApi from '../../lib/api/pythonApi';
 import { useMaintenanceAlerts } from '../../lib/hooks/useEnergyData';
 import { useCSVData } from '../../lib/hooks/useCSVData';
 import { PVForecastForm, PredictionChart, PredictionTable } from '../../components/solar-forecast';

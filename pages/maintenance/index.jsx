@@ -14,23 +14,12 @@ import * as LucideIcons from 'lucide-react';
 import { ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Layout from '../../components/Layout';
 import { useAuth } from '../../lib/hooks/useAuth';
-import SolarChatbot from '../../components/SolarChatbot';
 import PVSystemsGrid from '../../components/PVSystemsGrid';
-// import PVSystemsConfig from '../../components/PVSystemsConfig';
 import { useMaintenanceAlerts } from '../../lib/hooks/useEnergyData';
-import pythonApi from '../../lib/services/pythonApi';
-import pvMonitoringService from '../../lib/services/pvMonitoring';
-import { PVForecastForm, PredictionChart, PredictionTable } from '../../components/solar-forecast';
+import pythonApi from '../../lib/api/pythonApi';
+import pvMonitoringService from '../../lib/api/pvMonitoring';
+import { SOLAR_SYSTEMS } from '../../lib/config/solar-systems';
 import styles from '../energy/styles.module.css';
-
-const SOLAR_SYSTEMS = [
-  { value: '2', panelCount: 2, capacity_kw: 0.9 },
-  { value: '4', panelCount: 4, capacity_kw: 1.8 },
-  { value: '8', panelCount: 8, capacity_kw: 3.5 },
-  { value: '10', panelCount: 10, capacity_kw: 4.4 },
-  { value: '12', panelCount: 12, capacity_kw: 5.3 },
-  { value: '16', panelCount: 16, capacity_kw: 7.0 },
-];
 
 const Maintenance = () => {
   const router = useRouter();
@@ -269,8 +258,6 @@ const Maintenance = () => {
             onUpdate={(data) => setSystemsLastUpdated(data.lastUpdated)}
           />
         </section>
-
-        {/* SolarChatbot handled in _app.js */}
 
         {/* Help Modal */}
         {showHelp && (

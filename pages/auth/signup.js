@@ -13,7 +13,6 @@ import {
   Input,
   PasswordInput,
   PrimaryButton,
-  GuestButton,
   OAuthButtons,
   Divider,
   ErrorMessage,
@@ -24,7 +23,7 @@ import {
 
 export default function SignUp() {
   const router = useRouter();
-  const { user, isGuest, loading: authLoading, signUp, signInWithOAuth, enterGuestMode } = useAuth();
+  const { user, isGuest, loading: authLoading, signUp, signInWithOAuth } = useAuth();
   
   const [formData, setFormData] = useState({
     fullName: '',
@@ -35,7 +34,6 @@ export default function SignUp() {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [guestLoading, setGuestLoading] = useState(false);
   const [generalError, setGeneralError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -151,12 +149,6 @@ export default function SignUp() {
     }
   };
 
-  const handleGuestAccess = () => {
-    setGuestLoading(true);
-    enterGuestMode();
-    router.push('/dashboard');
-  };
-
   // Show loading while checking auth
   if (authLoading) {
     return (
@@ -262,7 +254,7 @@ export default function SignUp() {
             )}
           </div>
 
-          <PrimaryButton loading={loading} disabled={guestLoading}>
+          <PrimaryButton loading={loading}>
             Create Account
           </PrimaryButton>
         </form>
@@ -273,7 +265,6 @@ export default function SignUp() {
           onGoogleClick={() => handleOAuthSignIn('google')}
           onGitHubClick={() => handleOAuthSignIn('github')}
           loading={loading}
-          disabled={guestLoading}
         />
 
         <AuthFooter

@@ -1,26 +1,44 @@
+import logging
+import os
+import sys
+from contextlib import asynccontextmanager
+from datetime import datetime
+from typing import List, Optional
+
+import joblib
+import numpy as np
+import pandas as pd
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List, Optional
-import pandas as pd
-import numpy as np
-import joblib
-import os
-import sys
-from datetime import datetime
-from contextlib import asynccontextmanager
-from dotenv import load_dotenv
-import logging
 
 # Add backend directory to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from backend.core.phase_1.data_processing import prepare_features_for_ml
-from backend.core.phase_2.simulator import EnergySimulator
 from backend.core.phase_2.realtime_manager import RealtimeEnergyManager
-from backend.core.phase_3.pv_monitor import get_monitoring_service
+from backend.core.phase_2.simulator import EnergySimulator
 from backend.core.phase_3.predictive_maintenance import PredictiveMaintenancePipeline
-from backend.chatbot.src import SupportAgent, MESSAGES, rate_limited
+from backend.core.phase_3.pv_monitor import get_monitoring_service
+
+# The chatbot stack (langchain/langgraph/cerebras) is optional: the rest of the
+# API must boot without it so the service stays useful for forecasting only.
+try:
+    from backend.chatbot.src import MESSAGES, SupportAgent, rate_limited
+except ImportError as _chatbot_import_error:  # pragma: no cover - dep-gated
+    SupportAgent = None
+    MESSAGES = {
+        "length": "Message is too long.",
+        "rate_limited": "You are sending messages too quickly.",
+    }
+
+    def rate_limited(user_name) -> bool:
+        return False
+
+    _CHATBOT_UNAVAILABLE = str(_chatbot_import_error)
+else:
+    _CHATBOT_UNAVAILABLE = None
 
 # Load environment variables
 # Explicitly load .env.local from the project root
@@ -29,15 +47,20 @@ env_path = os.path.join(root_dir, '.env.local')
 load_dotenv(dotenv_path=env_path)
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper())
 logger = logging.getLogger(__name__)
 
 # Global variables to store models
 models = {}
 MODELS_DIR = os.path.join(os.path.dirname(__file__), 'models')
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'core', 'phase_2', 'system_config.yaml')
-CONSUMPTION_DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'processed_power_usage_2023_2024.csv')
-PV_DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'processed_pv_data_2023_2024.csv')
+
+# DATA_DIR is overridable so tests can point at fixtures
+DATA_DIR = os.getenv("DATA_DIR") or os.path.join(os.path.dirname(__file__), 'data')
+if not os.path.isabs(DATA_DIR):
+    DATA_DIR = os.path.join(root_dir, DATA_DIR)
+CONSUMPTION_DATA_PATH = os.path.join(DATA_DIR, 'processed_power_usage_2023_2024.csv')
+PV_DATA_PATH = os.path.join(DATA_DIR, 'processed_pv_data_2023_2024.csv')
 
 # Initialize Simulator
 simulator = None
@@ -96,8 +119,8 @@ async def lifespan(app: FastAPI):
         try:
             realtime_manager = RealtimeEnergyManager(
                 config_path=CONFIG_PATH if os.path.exists(CONFIG_PATH) else None,
-                battery_capacity_kwh=13.5,
-                initial_soc=50.0
+                battery_capacity_kwh=float(os.getenv("BATTERY_CAPACITY_KWH", "13.5")),
+                initial_soc=float(os.getenv("INITIAL_SOC_PERCENT", "50.0"))
             )
             print("✅ Realtime Energy Manager initialized.")
         except Exception as e:
@@ -125,6 +148,8 @@ async def lifespan(app: FastAPI):
 
     if not CEREBRAS_API_KEY:
         logger.warning("CEREBRAS_API_KEY environment variable not found. Chatbot will not function.")
+    elif SupportAgent is None:
+        logger.warning("Chatbot dependencies unavailable (%s). Chatbot disabled.", _CHATBOT_UNAVAILABLE)
     else:
         logger.info("Initializing SupportAgent with models: %s", MODEL_NAMES)
         try:
@@ -153,33 +178,16 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Solaira Energy API", version="2.0", lifespan=lifespan)
 
-# Configure CORS
+# Configure CORS.
+# Defaults to "*" for local development; set CORS_ORIGINS in production.
+cors_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "*").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for dev. In production, specify the frontend URL.
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Health check endpoint
-@app.get("/")
-def health_check():
-    """Health check endpoint"""
-    return {
-        "status": "running",
-        "service": "Solaira Energy API",
-        "version": "2.0",
-        "endpoints": {
-            "docs": "/docs",
-            "pv_systems": "/api/pv-systems/status"
-        }
-    }
-
-@app.get("/health")
-def health():
-    """Alternative health check"""
-    return {"status": "ok"}
 
 # --- Pydantic Models ---
 
@@ -255,6 +263,11 @@ def read_root():
         "status": "healthy",
         "message": "Solaira Energy API is running"
     }
+
+@app.get("/health")
+def health():
+    """Alternative health check"""
+    return {"status": "ok"}
 
 @app.post("/predict")
 def predict(request: PredictionRequest):
@@ -606,6 +619,8 @@ def configure_pv_systems(request: PVSystemConfigRequest):
         result = service.configure_systems(request.num_systems, request.capacity_per_system)
         
         return result
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error configuring PV systems: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -626,6 +641,8 @@ def control_monitoring(request: MonitoringControlRequest):
             raise HTTPException(status_code=400, detail="Action must be 'start' or 'stop'")
         
         return result
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error controlling monitoring: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -735,4 +752,4 @@ if __name__ == "__main__":
         else:
             print(f"  {route.path}")
             
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", "8001")))

@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import * as LucideIcons from 'lucide-react';
 import styles from './styles.module.css';
-import pvMonitoringService from '../../lib/services/pvMonitoring';
+import pvMonitoringService from '../../lib/api/pvMonitoring';
 
 const PVSystemsGrid = ({ refreshInterval = 60000, noPadding = false, onUpdate }) => {
   const [systems, setSystems] = useState([]);

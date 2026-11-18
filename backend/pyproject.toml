@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=67"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "solaira-backend"
+version = "2.0.0"
+description = "Solaira forecasting, simulation and PV monitoring API"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = ["tf_env", "models/quartz-solar-forecast", "data", ".venv"]
+python_files = ["test_*.py"]
+addopts = "-q --strict-markers"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning",
+]
+markers = [
+    "slow: needs ML model artifacts, TensorFlow or ONNX Runtime",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+# Scope: the serving path we own. Legacy training modules and the vendored
+# Quartz package are excluded from linting (pre-existing style debt there).
+extend-exclude = [
+    "models/quartz-solar-forecast",
+    "core/phase_1/Consumption.py",
+    "core/phase_1/retrain_models.py",
+]
+
+[tool.ruff.lint]
+# E9/F8x: real bugs (syntax errors, undefined names, redefinitions).
+# E4/E7: import layout and statement hygiene.
+select = ["E9", "F821", "F811", "E4", "E7", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/*" = ["E402"]  # sys.path bootstrap before local imports is intentional
+"tests/*" = ["E501", "I001"]
+# Runtime feature-detection and legacy formatting; not worth churn now.
+"core/phase_2/realtime_manager.py" = ["I001"]
+"core/phase_2/simulator.py" = ["I001"]
+"core/phase_2/config_models.py" = ["I001"]
+"core/phase_3/*" = ["I001"]
+"core/pv_energy/*" = ["I001"]
+"core/wind_energy/*" = ["I001"]
+"chatbot/*" = ["I001"]

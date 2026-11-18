@@ -1,7 +1,8 @@
+import os
 import subprocess
 import sys
-import os
 import time
+
 
 def start_services():
     # Check Python version

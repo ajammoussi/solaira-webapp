@@ -4,16 +4,17 @@ LSTM Models for Solar PV Power Prediction
 This module provides LSTM-based deep learning models for solar PV power prediction,
 following the same pattern as other models in the project.
 """
-from src.phase_1.data_processing import get_common_train_test_split
+import os
+import sys
+import warnings
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-import warnings
-import sys
-import os
+from src.phase_1.data_processing import get_common_train_test_split
+
 warnings.filterwarnings('ignore')
 
 proj_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -21,10 +22,10 @@ if proj_root not in sys.path:
     sys.path.insert(0, proj_root)
 
 try:
-    from tensorflow.keras.models import Sequential
-    from tensorflow.keras.layers import LSTM, Dense, Dropout
-    from tensorflow.keras.callbacks import EarlyStopping
     import tensorflow as tf
+    from tensorflow.keras.callbacks import EarlyStopping
+    from tensorflow.keras.layers import LSTM, Dense, Dropout
+    from tensorflow.keras.models import Sequential
     # Set random seeds for reproducibility
     tf.random.set_seed(42)
     TENSORFLOW_AVAILABLE = True

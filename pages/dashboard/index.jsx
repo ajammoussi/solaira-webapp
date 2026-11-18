@@ -18,7 +18,6 @@ import * as LucideIcons from 'lucide-react';
 import Layout from '../../components/Layout';
 import EnergyFlowDiagram from '../../components/EnergyFlowDiagram';
 import ElectricityUsage from '../../components/ElectricityUsage';
-import SolarChatbot from '../../components/SolarChatbot';
 import { useAuth } from '../../lib/hooks/useAuth';
 import { useAllEnergyData } from '../../lib/hooks/useEnergyData';
 import { calculateCO2Emissions, predictFutureCO2 } from '../../lib/utils/co2Calculations';

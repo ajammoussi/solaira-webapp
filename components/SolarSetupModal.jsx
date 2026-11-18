@@ -6,20 +6,8 @@
 
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { SOLAR_SYSTEMS, BATTERY_OPTIONS } from '../lib/config/solar-systems';
 import styles from '../components/Auth/styles.module.css';
-
-const SOLAR_SYSTEMS = [
-  { value: '2', label: '2 Panels', panelCount: 2, capacity: '~0.9 kWp', capacity_kw: 0.9, avgDailyYield: '5.5 kWh', pctCovered: '27%', verdict: 'Too Small', description: 'Minimal impact on bills' },
-  { value: '4', label: '4 Panels', panelCount: 4, capacity: '~1.8 kWp', capacity_kw: 1.8, avgDailyYield: '11.1 kWh', pctCovered: '55%', verdict: 'Entry Level', description: 'Good for day usage' },
-  { value: '8', label: '8 Panels', panelCount: 8, capacity: '~3.5 kWp', capacity_kw: 3.5, avgDailyYield: '22.1 kWh', pctCovered: '110%', verdict: 'Economic', description: 'Neutral over a year' },
-  { value: '10', label: '10 Panels', panelCount: 10, capacity: '~4.4 kWp', capacity_kw: 4.4, avgDailyYield: '27.7 kWh', pctCovered: '138%', verdict: 'High Performance', description: 'Great for large families', recommended: true },
-  { value: '12', label: '12 Panels', panelCount: 12, capacity: '~5.3 kWp', capacity_kw: 5.3, avgDailyYield: '33.2 kWh', pctCovered: '165%', verdict: 'Off-Grid Choice', description: '90%+ independence' },
-  { value: '16', label: '16 Panels', panelCount: 16, capacity: '~7.0 kWp', capacity_kw: 7.0, avgDailyYield: '44.2 kWh', pctCovered: '220%', verdict: 'EV Ready', description: 'Best for electric vehicles' },
-];
-
-const BATTERY_OPTIONS = [
-  { value: '13.5', label: '13.5 kWh', size: 13.5, description: 'Home battery storage' },
-];
 
 export default function SolarSetupModal({ onComplete }) {
   const [loading, setLoading] = useState(false);

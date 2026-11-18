@@ -1,14 +1,15 @@
-from src.phase_1.visualization import plot_individual_ml_predictions
-from src.phase_1.data_processing import get_common_train_test_split
-import pandas as pd
+import os
+import sys
+
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import xgboost as xgb
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import cross_val_score, TimeSeriesSplit
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-import matplotlib.pyplot as plt
-import sys
-import os
+from sklearn.model_selection import TimeSeriesSplit, cross_val_score
+from src.phase_1.data_processing import get_common_train_test_split
+from src.phase_1.visualization import plot_individual_ml_predictions
 
 proj_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if proj_root not in sys.path:

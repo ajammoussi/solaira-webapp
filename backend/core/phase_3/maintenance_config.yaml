@@ -8,48 +8,14 @@ system_name: 'Multi-PV Comparative Monitoring System'
 # Systems should be nearby (similar weather/irradiance conditions)
 # ============================================================================
 pv_systems:
-  # Array of PV system configurations
+  # Array of PV system configurations.
+  # Paths are resolved relative to the repository root. Only systems whose
+  # files exist are loaded; missing entries are skipped by the loader.
   systems:
     - name: 'PV_System_1'
-      actual_data: 'test_randomized_data/pv_system_1_actual.csv'
-      predicted_data: 'test_randomized_data/pv_system_1_predicted.csv'
-      
-    - name: 'PV_System_2'
-      actual_data: 'test_randomized_data/pv_system_2_actual.csv'
-      predicted_data: 'test_randomized_data/pv_system_2_predicted.csv'
-      
-    - name: 'PV_System_3'
-      actual_data: 'test_randomized_data/pv_system_3_actual.csv'
-      predicted_data: 'test_randomized_data/pv_system_3_predicted.csv'
-      
-    - name: 'PV_System_4'
-      actual_data: 'test_randomized_data/pv_system_4_actual.csv'
-      predicted_data: 'test_randomized_data/pv_system_4_predicted.csv'
-      
-    - name: 'PV_System_5'
-      actual_data: 'test_randomized_data/pv_system_5_actual.csv'
-      predicted_data: 'test_randomized_data/pv_system_5_predicted.csv'
-      
-    - name: 'PV_System_6'
-      actual_data: 'test_randomized_data/pv_system_6_actual.csv'
-      predicted_data: 'test_randomized_data/pv_system_6_predicted.csv'
-      
-    - name: 'PV_System_7'
-      actual_data: 'test_randomized_data/pv_system_7_actual.csv'
-      predicted_data: 'test_randomized_data/pv_system_7_predicted.csv'
-      
-    - name: 'PV_System_8'
-      actual_data: 'test_randomized_data/pv_system_8_actual.csv'
-      predicted_data: 'test_randomized_data/pv_system_8_predicted.csv'
-      
-    - name: 'PV_System_9'
-      actual_data: 'test_randomized_data/pv_system_9_actual.csv'
-      predicted_data: 'test_randomized_data/pv_system_9_predicted.csv'
-      
-    - name: 'PV_System_10'
-      actual_data: 'test_randomized_data/pv_system_10_actual.csv'
-      predicted_data: 'test_randomized_data/pv_system_10_predicted.csv'
-  
+      actual_data: 'core/phase_3/monitoring_data/pv_system_1_actual.csv'
+      predicted_data: 'core/phase_3/monitoring_data/pv_system_1_predicted.csv'
+
   # Optional: Maximum distance between systems (km) for validation
   max_proximity_km: 5.0
 

@@ -13,13 +13,13 @@ import { useRouter } from 'next/router';
 import * as LucideIcons from 'lucide-react';
 import Layout from '../../components/Layout';
 import { useAuth } from '../../lib/hooks/useAuth';
-import { useHistoricalData, useAllEnergyData } from '../../lib/hooks/useEnergyData';
+import { useAllEnergyData } from '../../lib/hooks/useEnergyData';
 import { useCSVData } from '../../lib/hooks/useCSVData';
 import { calculateCO2Emissions, calculateCO2Equivalents } from '../../lib/utils/co2Calculations';
+import { EXPORT_PRICE_KWH } from '../../lib/config/env';
 import styles from './styles.module.css';
 import EnergyDistributionCard from '../../components/EnergyDistributionCard';
 import BarChart from '../../components/BarChart';
-import SolarChatbot from '../../components/SolarChatbot';
 
 
 const Energy = () => {
@@ -96,7 +96,7 @@ const Energy = () => {
     const exported = todayStats.gridExport || 0;
     const imported = todayStats.gridImport || 0;
     const netEnergy = exported - imported;
-    const netSavings = netEnergy * 0.12; // €0.12 per kWh
+    const netSavings = netEnergy * EXPORT_PRICE_KWH;
     
     // Calculate balance indicator position (0% = all import, 100% = all export)
     const total = exported + imported;
@@ -390,7 +390,7 @@ const Energy = () => {
                 <div className={styles.gridCardContent}>
                   <div className={styles.gridCardValue}>{gridStats.exported} kWh</div>
                   <div className={styles.gridCardLabel}>Exported Today</div>
-                  <div className={styles.gridCardSub}>≈ €{(parseFloat(gridStats.exported) * 0.12).toFixed(2)} earned</div>
+                  <div className={styles.gridCardSub}>≈ €{(parseFloat(gridStats.exported) * EXPORT_PRICE_KWH).toFixed(2)} earned</div>
                 </div>
               </div>
               
@@ -399,7 +399,7 @@ const Energy = () => {
                 <div className={styles.gridCardContent}>
                   <div className={styles.gridCardValue}>{gridStats.imported} kWh</div>
                   <div className={styles.gridCardLabel}>Imported Today</div>
-                  <div className={styles.gridCardSub}>≈ €{(parseFloat(gridStats.imported) * 0.12).toFixed(2)} cost</div>
+                  <div className={styles.gridCardSub}>≈ €{(parseFloat(gridStats.imported) * EXPORT_PRICE_KWH).toFixed(2)} cost</div>
                 </div>
               </div>
             </div>

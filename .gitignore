@@ -1,16 +1,47 @@
-/node_modules
-/.next
+# ─── Node ──────────────────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# ─── Environment (never commit real values) ────────────────────────────
 .env
 .env.local
-/pes-challenge-solaira-webapp.backup
-/.vscode
+.env.*.local
+
+# ─── Python ────────────────────────────────────────────────────────────
 __pycache__/
-venv
-/backend/chatbot/__pycache__/
-/backend/.venv
-/backend/.venv-forecast
+*.py[cod]
 .venv/
-# PV Monitoring generated data
-/backend/core/phase_3/monitoring_data/
-/backend/chatbot/database/memory.sqlite-shm
-/backend/chatbot/database/memory.sqlite-wal
+venv/
+backend/tf_env/
+backend/.venv/
+backend/.venv-forecast/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+coverage.xml
+coverage/
+
+# ─── Runtime state (never commit) ──────────────────────────────────────
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+
+# ─── Generated backend data ────────────────────────────────────────────
+backend/core/phase_3/monitoring_data/
+
+# ─── Tooling / editor ──────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ─── Backups ───────────────────────────────────────────────────────────
+*.backup

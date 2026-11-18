@@ -1,0 +1,27 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "env": {
+    "browser": true,
+    "node": true,
+    "jest": true
+  },
+  "ignorePatterns": ["backend/", "node_modules/", ".next/", "public/", "coverage/"],
+  "rules": {
+    "react/prop-types": "off",
+    "react/no-unescaped-entities": "off",
+    "no-unused-vars": [
+      "warn",
+      {
+        "args": "after-used",
+        "ignoreRestSiblings": true,
+        "argsIgnorePattern": "^_"
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["tests/**/*.js", "tests/**/*.jsx", "jest.config.js"],
+      "env": { "jest": true }
+    }
+  ]
+}
