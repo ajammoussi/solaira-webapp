@@ -7,7 +7,9 @@ import xgboost as xgb
 import onnxruntime as ort
 
 # Configuration
-MODEL_DIR = os.path.join(os.path.dirname(__file__), 'models')
+# Artifacts live in backend/models/wind (the only directory with scaler.pkl);
+# core/wind_energy/models lacks the scaler.
+MODEL_DIR = os.path.join(os.path.dirname(__file__), '..', '..', 'models', 'wind')
 XGB_PATH = os.path.join(MODEL_DIR, 'energy_xgboost_pure_forecast.json')
 LSTM_PATH = os.path.join(MODEL_DIR, 'best_energy_lstm_model.onnx')
 SCALER_PATH = os.path.join(MODEL_DIR, 'scaler.pkl')
