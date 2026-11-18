@@ -2,6 +2,7 @@
 -- SOLAIRA ENERGY MANAGEMENT SYSTEM - SUPABASE SCHEMA
 -- ============================================================
 -- Run this in your Supabase SQL Editor
+-- Safe to re-run: tables, enums, policies and triggers are created idempotently.
 -- ============================================================
 
 -- Enable UUID extension
@@ -11,36 +12,49 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- ENUMS
 -- ============================================================
 
-CREATE TYPE alert_type AS ENUM (
-  'BATTERY_FULL',
-  'BATTERY_LOW', 
-  'EXCESS_PRODUCTION',
-  'HIGH_CONSUMPTION',
-  'LOW_CONSUMPTION',
-  'FORECAST_DEPLETION'
-);
+DO $$ BEGIN
+  CREATE TYPE alert_type AS ENUM (
+    'BATTERY_FULL',
+    'BATTERY_LOW', 
+    'EXCESS_PRODUCTION',
+    'HIGH_CONSUMPTION',
+    'LOW_CONSUMPTION',
+    'FORECAST_DEPLETION'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE alert_severity AS ENUM (
-  'info',
-  'warning',
-  'critical'
-);
+DO $$ BEGIN
+  CREATE TYPE alert_severity AS ENUM (
+    'info',
+    'warning',
+    'critical'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE tilt_strategy AS ENUM (
-  'fixed',
-  'monthly_optimized',
-  'tracking'
-);
+DO $$ BEGIN
+  CREATE TYPE tilt_strategy AS ENUM (
+    'fixed',
+    'monthly_optimized',
+    'tracking'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- ============================================================
 -- PROFILES (extends Supabase Auth)
 -- ============================================================
 
-CREATE TABLE profiles (
+CREATE TABLE IF NOT EXISTS profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   display_name TEXT,
   email TEXT,
   phone_number TEXT,
+  -- Solar configuration written by /api/profile (pages/api/profile.js)
+  current_system TEXT DEFAULT '10',
+  consumption_profile TEXT DEFAULT 'home',
+  battery_size TEXT DEFAULT '13.5',
   timezone TEXT DEFAULT 'UTC+01:00',
   preferences JSONB DEFAULT '{}',
   latitude NUMERIC(10, 7),
@@ -49,11 +63,17 @@ CREATE TABLE profiles (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Converge installs created before the solar-configuration columns existed:
+-- CREATE TABLE IF NOT EXISTS does not alter an existing table.
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS current_system TEXT DEFAULT '10';
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS consumption_profile TEXT DEFAULT 'home';
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS battery_size TEXT DEFAULT '13.5';
+
 -- ============================================================
 -- LOCATIONS
 -- ============================================================
 
-CREATE TABLE locations (
+CREATE TABLE IF NOT EXISTS locations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   name TEXT NOT NULL,
@@ -69,7 +89,7 @@ CREATE TABLE locations (
 -- PV SYSTEMS (Energy Production)
 -- ============================================================
 
-CREATE TABLE pv_systems (
+CREATE TABLE IF NOT EXISTS pv_systems (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   location_id UUID REFERENCES locations(id) ON DELETE SET NULL,
@@ -90,7 +110,7 @@ CREATE TABLE pv_systems (
 -- BATTERIES (Energy Storage)
 -- ============================================================
 
-CREATE TABLE batteries (
+CREATE TABLE IF NOT EXISTS batteries (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   name TEXT NOT NULL,
@@ -111,7 +131,7 @@ CREATE TABLE batteries (
 -- LOAD PROFILES (Energy Consumption Patterns)
 -- ============================================================
 
-CREATE TABLE load_profiles (
+CREATE TABLE IF NOT EXISTS load_profiles (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   name TEXT NOT NULL,
@@ -130,7 +150,7 @@ CREATE TABLE load_profiles (
 -- WEATHER DATA
 -- ============================================================
 
-CREATE TABLE weather_data (
+CREATE TABLE IF NOT EXISTS weather_data (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   location_id UUID REFERENCES locations(id) ON DELETE CASCADE NOT NULL,
   timestamp TIMESTAMPTZ NOT NULL,
@@ -149,7 +169,7 @@ CREATE TABLE weather_data (
 -- ENERGY SNAPSHOTS (Real-time Tracking)
 -- ============================================================
 
-CREATE TABLE energy_snapshots (
+CREATE TABLE IF NOT EXISTS energy_snapshots (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   pv_system_id UUID REFERENCES pv_systems(id) ON DELETE SET NULL,
@@ -163,14 +183,14 @@ CREATE TABLE energy_snapshots (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_energy_snapshots_user_time ON energy_snapshots(user_id, timestamp DESC);
-CREATE INDEX idx_energy_snapshots_timestamp ON energy_snapshots(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_energy_snapshots_user_time ON energy_snapshots(user_id, timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_energy_snapshots_timestamp ON energy_snapshots(timestamp DESC);
 
 -- ============================================================
 -- CONSUMPTION RECORDS
 -- ============================================================
 
-CREATE TABLE consumption_records (
+CREATE TABLE IF NOT EXISTS consumption_records (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   battery_id UUID REFERENCES batteries(id) ON DELETE SET NULL,
@@ -182,13 +202,13 @@ CREATE TABLE consumption_records (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_consumption_records_user_time ON consumption_records(user_id, timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_consumption_records_user_time ON consumption_records(user_id, timestamp DESC);
 
 -- ============================================================
 -- FORECASTS - Production
 -- ============================================================
 
-CREATE TABLE production_forecasts (
+CREATE TABLE IF NOT EXISTS production_forecasts (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   pv_system_id UUID REFERENCES pv_systems(id) ON DELETE SET NULL,
@@ -206,7 +226,7 @@ CREATE TABLE production_forecasts (
 -- FORECASTS - Consumption
 -- ============================================================
 
-CREATE TABLE consumption_forecasts (
+CREATE TABLE IF NOT EXISTS consumption_forecasts (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   target_date DATE NOT NULL,
@@ -223,7 +243,7 @@ CREATE TABLE consumption_forecasts (
 -- FORECASTS - Battery Level
 -- ============================================================
 
-CREATE TABLE battery_level_forecasts (
+CREATE TABLE IF NOT EXISTS battery_level_forecasts (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   battery_id UUID REFERENCES batteries(id) ON DELETE SET NULL,
@@ -240,7 +260,7 @@ CREATE TABLE battery_level_forecasts (
 -- ALERTS
 -- ============================================================
 
-CREATE TABLE alerts (
+CREATE TABLE IF NOT EXISTS alerts (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   type alert_type NOT NULL,
@@ -253,14 +273,14 @@ CREATE TABLE alerts (
   read_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_alerts_user_unread ON alerts(user_id, is_read) WHERE is_read = FALSE;
-CREATE INDEX idx_alerts_user_time ON alerts(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_alerts_user_unread ON alerts(user_id, is_read) WHERE is_read = FALSE;
+CREATE INDEX IF NOT EXISTS idx_alerts_user_time ON alerts(user_id, created_at DESC);
 
 -- ============================================================
 -- ENERGY RECOMMENDATIONS
 -- ============================================================
 
-CREATE TABLE energy_recommendations (
+CREATE TABLE IF NOT EXISTS energy_recommendations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   alert_id UUID REFERENCES alerts(id) ON DELETE CASCADE,
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
@@ -289,23 +309,37 @@ ALTER TABLE alerts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE energy_recommendations ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: users can only access their own profile
+DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
 CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
 CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
 
 -- All other tables: users can only access their own data
+DROP POLICY IF EXISTS "Users own their locations" ON locations;
 CREATE POLICY "Users own their locations" ON locations FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users own their pv_systems" ON pv_systems;
 CREATE POLICY "Users own their pv_systems" ON pv_systems FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users own their batteries" ON batteries;
 CREATE POLICY "Users own their batteries" ON batteries FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users own their load_profiles" ON load_profiles;
 CREATE POLICY "Users own their load_profiles" ON load_profiles FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users own their energy_snapshots" ON energy_snapshots;
 CREATE POLICY "Users own their energy_snapshots" ON energy_snapshots FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users own their consumption_records" ON consumption_records;
 CREATE POLICY "Users own their consumption_records" ON consumption_records FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users own their production_forecasts" ON production_forecasts;
 CREATE POLICY "Users own their production_forecasts" ON production_forecasts FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users own their consumption_forecasts" ON consumption_forecasts;
 CREATE POLICY "Users own their consumption_forecasts" ON consumption_forecasts FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users own their battery_level_forecasts" ON battery_level_forecasts;
 CREATE POLICY "Users own their battery_level_forecasts" ON battery_level_forecasts FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users own their alerts" ON alerts;
 CREATE POLICY "Users own their alerts" ON alerts FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users own their energy_recommendations" ON energy_recommendations;
 CREATE POLICY "Users own their energy_recommendations" ON energy_recommendations FOR ALL USING (auth.uid() = user_id);
 
 -- Weather data: accessible by location owners
+DROP POLICY IF EXISTS "Users access weather for their locations" ON weather_data;
 CREATE POLICY "Users access weather for their locations" ON weather_data FOR ALL 
   USING (location_id IN (SELECT id FROM locations WHERE user_id = auth.uid()));
 
@@ -322,14 +356,19 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON profiles;
 CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+DROP TRIGGER IF EXISTS update_locations_updated_at ON locations;
 CREATE TRIGGER update_locations_updated_at BEFORE UPDATE ON locations
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+DROP TRIGGER IF EXISTS update_pv_systems_updated_at ON pv_systems;
 CREATE TRIGGER update_pv_systems_updated_at BEFORE UPDATE ON pv_systems
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+DROP TRIGGER IF EXISTS update_batteries_updated_at ON batteries;
 CREATE TRIGGER update_batteries_updated_at BEFORE UPDATE ON batteries
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+DROP TRIGGER IF EXISTS update_load_profiles_updated_at ON load_profiles;
 CREATE TRIGGER update_load_profiles_updated_at BEFORE UPDATE ON load_profiles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
@@ -353,6 +392,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
@@ -361,7 +401,16 @@ CREATE TRIGGER on_auth_user_created
 -- REALTIME SUBSCRIPTIONS
 -- ============================================================
 
--- Enable realtime for key tables
-ALTER PUBLICATION supabase_realtime ADD TABLE energy_snapshots;
-ALTER PUBLICATION supabase_realtime ADD TABLE alerts;
-ALTER PUBLICATION supabase_realtime ADD TABLE batteries;
+-- Enable realtime for key tables (duplicate_object = table already published)
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE energy_snapshots;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE alerts;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE batteries;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
