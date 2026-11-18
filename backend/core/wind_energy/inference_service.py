@@ -1,12 +1,7 @@
-import os
-import sys
 import pandas as pd
 import numpy as np
 
-# Ensure we can import from the same directory
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from inference_ensemble import WindEnergyPredictor as WindEnsemblePredictor
+from .inference_ensemble import WindEnergyPredictor as WindEnsemblePredictor
 
 class WindEnergyPredictorService:
     def __init__(self):

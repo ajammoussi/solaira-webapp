@@ -5,15 +5,10 @@ This service provides a clean interface for PV energy predictions using the
 optimized ensemble model (XGBoost + LSTM).
 """
 
-import os
-import sys
 import pandas as pd
 import numpy as np
 
-# Ensure we can import from the same directory
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from inference_ensemble import PVEnergyPredictor
+from .inference_ensemble import PVEnergyPredictor
 
 
 class PVEnergyPredictorService:
