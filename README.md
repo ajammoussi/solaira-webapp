@@ -14,13 +14,13 @@ Two Python services run side by side:
 The database and authentication are **Supabase** (Postgres + Auth), used directly
 by the browser. The Python services never touch the database.
 
-![Solaira architecture: Supabase database, Next.js + React frontend, FastAPI backend with ML pipeline, chatbot and energy simulation, Cerebras LLM, NASA POWER/ERA5 data APIs](docs/architecture.png)
+![Solaira architecture: Supabase database, Next.js + React frontend, FastAPI backend with ML pipeline, chatbot and energy simulation, Cerebras LLM, NASA POWER/ERA5 data APIs](docs/images/architecture.png)
 
 ## Screenshots
 
 | Dashboard — live monitoring | Energy simulation — 1-month analysis |
 | --- | --- |
-| ![Dashboard: solar production, consumption, grid flow and battery state of charge](docs/screenshot-dashboard.png) | ![Comprehensive energy simulation: PV, wind, consumption and battery SOC over one month](docs/screenshot-energy-simulation.png) |
+| ![Dashboard: solar production, consumption, grid flow and battery state of charge](docs/images/dashboard.png) | ![Comprehensive energy simulation: PV, wind, consumption and battery SOC over one month](docs/images/energy-simulation.png) |
 
 ---
 
