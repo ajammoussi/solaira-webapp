@@ -3,7 +3,8 @@
 **One file for both apps.** `.env.local` at the repository root:
 
 - Next.js loads it automatically.
-- `backend/main.py` loads it explicitly (`load_dotenv(root/.env.local)`).
+- `backend/main.py` loads it explicitly and falls back to `.env` when
+  `.env.local` is absent (same precedence as Next.js: `.env.local` wins).
 
 Copy the template and fill in the blanks:
 
@@ -20,8 +21,9 @@ too** — `backend/tests/test_env.py` enforces this for the backend.
 | Variable | Required | Default | Purpose |
 | --- | --- | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | **yes** | — | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **yes** | — | Supabase anon key (public) |
-| `SUPABASE_SERVICE_ROLE_KEY` | no | anon key | Server-side writes that bypass RLS |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **yes** | — | Publishable key `sb_publishable_…` (public; legacy `anon` JWT also works) |
+| `SUPABASE_SERVICE_ROLE_KEY` | no | publishable key | Secret key `sb_secret_…` for server-side writes that bypass RLS |
+| `SUPABASE_DB_URL` | no | — | Postgres URI, used only by `npm run db:apply`; never read by the apps |
 | `NEXT_PUBLIC_PYTHON_API_URL` | no | `http://localhost:8001` | Main API |
 | `SOLAR_FORECAST_SERVICE_URL` | no | `http://localhost:8002` | Quartz service (server-side proxy) |
 | `NEXT_PUBLIC_SITE_URL` | no | `http://localhost:3000` | Canonical URL, SEO |

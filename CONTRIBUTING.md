@@ -3,7 +3,16 @@
 ## Local setup
 
 Follow the quick start in [README.md](README.md). You need Node 18+ and
-Python 3.10+. Copy `.env.example` to `.env.local` and fill in Supabase.
+Python 3.11 (not 3.12 — `pv-site-prediction` pins `<3.12`). Copy `.env.example`
+to `.env.local`, fill in Supabase, then `npm run db:apply` once to create the
+schema (or paste `database/schema.sql` into the Supabase SQL editor).
+
+Backend tests and lint need the CI dependency set, which `backend/requirements.txt`
+does not include:
+
+```bash
+pip install -r backend/requirements-ci.txt
+```
 
 ## Before you push
 

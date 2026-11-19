@@ -14,6 +14,8 @@ Two Python services run side by side:
 The database and authentication are **Supabase** (Postgres + Auth), used directly
 by the browser. The Python services never touch the database.
 
+![Solaira architecture: Supabase database, Next.js + React frontend, FastAPI backend with ML pipeline, chatbot and energy simulation, Cerebras LLM, NASA POWER/ERA5 data APIs](docs/architecture.png)
+
 ---
 
 ## Quick start
@@ -21,20 +23,32 @@ by the browser. The Python services never touch the database.
 ```bash
 # 1. Configure the environment
 cp .env.example .env.local        # Windows: copy .env.example .env.local
-# then fill in your Supabase URL / anon key
+# then fill in Supabase URL, publishable key and secret key
 
-# 2. Frontend (http://localhost:3000)
+# 2. Install frontend dependencies
 npm ci
+
+# 3. Create the database schema (once; needs SUPABASE_DB_URL in .env.local)
+#    Dashboard > Settings > Database > Connection string > URI
+npm run db:apply                  # idempotent; also backfills profile rows
+
+# 4. Frontend (http://localhost:3000)
 npm run dev
 
-# 3. Backend (http://localhost:8001 and :8002)
-py -3.10 -m venv backend/.venv
+# 4. Backend (http://localhost:8001 and :8002)
+# Use Python 3.11: pv-site-prediction (forecast service) requires <3.12.
+py -3.11 -m venv backend/.venv
 backend/.venv/Scripts/activate     # Windows
 pip install -r backend/requirements.txt
-python backend/start.py
+
+# The forecast service pins older packages, so it gets its own venv.
+py -3.11 -m venv backend/.venv-forecast
+backend/.venv-forecast/Scripts/pip install -r backend/models/quartz-solar-forecast/requirements.txt
+
+python backend/start.py            # runs from backend/.venv, launches :8002 with .venv-forecast
 ```
 
-Requirements: **Node 18+** (see `.nvmrc`), **Python 3.10+**.
+Requirements: **Node 18+** (see `.nvmrc`), **Python 3.11** specifically.
 
 ---
 
@@ -56,7 +70,7 @@ backend/
   models/         Trained artifacts + vendored Quartz forecast service
   tests/          pytest suite
 tests/            Jest suite (unit, hooks, components, api)
-database/         Supabase schema + seed SQL
+database/         Supabase schema (+ legacy SQLite dump in legacy/)
 docs/             Detailed documentation (see below)
 ```
 

@@ -10,6 +10,18 @@ Two FastAPI services, started together by `backend/start.py`:
 Config comes from `.env.local` at the repository root (loaded explicitly by
 `main.py`). See [environment.md](environment.md).
 
+Each service has its own virtualenv because their pins conflict (pydantic 2.6.2
+vs 2.9.2, xarray 2022.12 vs latest):
+
+| Venv | Python | Install |
+| --- | --- | --- |
+| `backend/.venv` | 3.11 | `pip install -r backend/requirements.txt` |
+| `backend/.venv-forecast` | 3.11 | `pip install -r backend/models/quartz-solar-forecast/requirements.txt` |
+
+`start.py` runs itself from `backend/.venv` and launches the forecast service
+with `backend/.venv-forecast/Scripts/python.exe` when that venv exists. Python
+3.11 is required: `pv-site-prediction` declares `<3.12`.
+
 ## Main API (`backend/main.py`)
 
 | Method | Path | Called by frontend | Purpose |

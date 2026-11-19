@@ -7,10 +7,17 @@ The Python services never authenticate and never touch the database.
 
 1. Create a Supabase project.
 2. Put the URL and anon key in `.env.local` (see [environment.md](environment.md)).
-3. Run `database/schema.sql` in the Supabase SQL editor. It creates `profiles`,
-   `pv_systems`, `batteries`, `load_profiles`, `energy_snapshots`, forecasts,
-   `alerts` and `energy_recommendations`, enables RLS on all of them, and adds a
-   trigger that creates a `profiles` row on signup.
+3. Create the schema. Either `npm run db:apply` (needs `SUPABASE_DB_URL` from
+   Dashboard → Database → Connection string; see [environment.md](environment.md)),
+   or paste `database/schema.sql` into the Supabase SQL editor. It creates
+   `profiles`, `pv_systems`, `batteries`, `load_profiles`, `energy_snapshots`,
+   forecasts, `alerts` and `energy_recommendations`, enables RLS on all of them,
+   and adds a trigger that creates a `profiles` row on signup. It is the only
+   schema file — there is no SQLite fallback — and it is safe to re-run.
+   `npm run db:apply` also backfills a `profiles` row for accounts that signed
+   up before the schema existed; if you paste the SQL manually, run the same
+   `INSERT INTO public.profiles … SELECT … FROM auth.users ON CONFLICT DO NOTHING`
+   from `scripts/apply-schema.mjs` afterwards.
 4. Optional: enable Google/GitHub providers and anonymous sign-ins in
    Supabase → Authentication.
 
