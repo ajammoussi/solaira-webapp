@@ -4,6 +4,13 @@ const path = require('path');
 module.exports = {
   reactStrictMode: true,
 
+  experimental: {
+    // Keep ESM-only packages bundled: Next 12 otherwise emits
+    // `import("@supabase/supabase-js")` into the server build, and Node 18
+    // cannot load that package's ESM wrapper (its .js files are CJS).
+    esmExternals: false,
+  },
+
   i18n: {
     locales: ['en'],
     defaultLocale: 'en',
