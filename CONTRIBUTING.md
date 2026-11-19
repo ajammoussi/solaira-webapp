@@ -2,7 +2,7 @@
 
 ## Local setup
 
-Follow the quick start in [README.md](README.md). You need Node 18+ and
+Follow the quick start in [README.md](README.md). You need Node 22+ and
 Python 3.11 (not 3.12 — `pv-site-prediction` pins `<3.12`). Copy `.env.example`
 to `.env.local`, fill in Supabase, then `npm run db:apply` once to create the
 schema (or paste `database/schema.sql` into the Supabase SQL editor).
@@ -17,8 +17,8 @@ backend/.venv/Scripts/python.exe -m pip install -r backend/requirements-ci.txt
 ## Before you push
 
 ```bash
-npm run lint:ci        # 0 errors required
-npm run format:check   # prettier, new + refactored files
+npm run lint:ci        # 0 errors; warnings capped at 94 (ratchet down only)
+npm run format:check   # prettier over the whole repo (.prettierignore decides)
 npm run test:ci        # frontend
 npm run build          # production build must succeed
 

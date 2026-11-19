@@ -74,7 +74,7 @@ spaces (`My Files`, `TSYP 2025`) corrupts `PATH` during activation, so `python`
 then disappears. The commands above call the interpreter by path and avoid the
 problem entirely.
 
-Requirements: **Node 18+** (see `.nvmrc`), **Python 3.11** specifically.
+Requirements: **Node 22+** (see `.nvmrc`), **Python 3.11** specifically.
 
 ---
 

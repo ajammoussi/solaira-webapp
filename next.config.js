@@ -4,6 +4,12 @@ const path = require('path');
 module.exports = {
   reactStrictMode: true,
 
+  // `next build` otherwise re-runs ESLint; CI already has an explicit lint
+  // step, so keep the build to compile + type-check only.
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   experimental: {
     // Keep ESM-only packages bundled: Next 12 otherwise emits
     // `import("@supabase/supabase-js")` into the server build, and Node 18
