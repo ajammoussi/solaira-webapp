@@ -35,18 +35,38 @@ npm run db:apply                  # idempotent; also backfills profile rows
 # 4. Frontend (http://localhost:3000)
 npm run dev
 
-# 4. Backend (http://localhost:8001 and :8002)
-# Use Python 3.11: pv-site-prediction (forecast service) requires <3.12.
+# 5. Backend (http://localhost:8001 and :8002)
+# Python 3.11 exactly: pv-site-prediction (forecast service) requires <3.12.
+# No activation needed — call the venv interpreter directly (works the same in
+# Git Bash, PowerShell and cmd, and survives paths that contain spaces).
 py -3.11 -m venv backend/.venv
-backend/.venv/Scripts/activate     # Windows
-pip install -r backend/requirements.txt
+backend/.venv/Scripts/python.exe -m pip install -r backend/requirements.txt
 
 # The forecast service pins older packages, so it gets its own venv.
 py -3.11 -m venv backend/.venv-forecast
-backend/.venv-forecast/Scripts/pip install -r backend/models/quartz-solar-forecast/requirements.txt
+backend/.venv-forecast/Scripts/python.exe -m pip install -r backend/models/quartz-solar-forecast/requirements.txt
 
-python backend/start.py            # runs from backend/.venv, launches :8002 with .venv-forecast
+backend/.venv/Scripts/python.exe backend/start.py
 ```
+
+No Python 3.11 installed? `uv python install 3.11`, then build both venvs with uv:
+
+```bash
+uv venv --python 3.11 --seed backend/.venv
+uv venv --python 3.11 --seed backend/.venv-forecast
+uv pip install --python backend/.venv/Scripts/python.exe -r backend/requirements.txt
+uv pip install --python backend/.venv-forecast/Scripts/python.exe -r backend/models/quartz-solar-forecast/requirements.txt
+```
+
+`--seed` adds `pip`; plain `uv venv` venvs have no pip, so the `python.exe -m pip`
+lines above would fail there.
+
+Do **not** rely on `activate` in this repository. From a shell already inside
+`backend/`, the command is `.venv/Scripts/activate` (with `source` in Git Bash),
+not `backend/.venv/Scripts/activate`. And under Git Bash a checkout path with
+spaces (`My Files`, `TSYP 2025`) corrupts `PATH` during activation, so `python`
+then disappears. The commands above call the interpreter by path and avoid the
+problem entirely.
 
 Requirements: **Node 18+** (see `.nvmrc`), **Python 3.11** specifically.
 

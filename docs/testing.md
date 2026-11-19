@@ -12,9 +12,9 @@ npm run test:ci         # CI mode with coverage + threshold
 
 # Backend (pytest)
 # pytest/ruff are not in requirements.txt (serving deps only):
-pip install -r backend/requirements-ci.txt   # adds pytest, ruff, pyyaml
-python -m pytest backend -q
-ruff check backend      # lint
+backend/.venv/Scripts/python.exe -m pip install -r backend/requirements-ci.txt
+backend/.venv/Scripts/python.exe -m pytest backend -q
+backend/.venv/Scripts/python.exe -m ruff check backend
 ```
 
 ## Frontend

@@ -15,8 +15,8 @@ vs 2.9.2, xarray 2022.12 vs latest):
 
 | Venv | Python | Install |
 | --- | --- | --- |
-| `backend/.venv` | 3.11 | `pip install -r backend/requirements.txt` |
-| `backend/.venv-forecast` | 3.11 | `pip install -r backend/models/quartz-solar-forecast/requirements.txt` |
+| `backend/.venv` | 3.11 | `backend/.venv/Scripts/python.exe -m pip install -r backend/requirements.txt` |
+| `backend/.venv-forecast` | 3.11 | `backend/.venv-forecast/Scripts/python.exe -m pip install -r backend/models/quartz-solar-forecast/requirements.txt` |
 
 `start.py` runs itself from `backend/.venv` and launches the forecast service
 with `backend/.venv-forecast/Scripts/python.exe` when that venv exists. Python

@@ -11,7 +11,7 @@ Backend tests and lint need the CI dependency set, which `backend/requirements.t
 does not include:
 
 ```bash
-pip install -r backend/requirements-ci.txt
+backend/.venv/Scripts/python.exe -m pip install -r backend/requirements-ci.txt
 ```
 
 ## Before you push
@@ -22,8 +22,9 @@ npm run format:check   # prettier, new + refactored files
 npm run test:ci        # frontend
 npm run build          # production build must succeed
 
-python -m pytest backend -q   # backend, if you touched backend/
-ruff check backend            # backend lint
+# Backend, if you touched backend/
+backend/.venv/Scripts/python.exe -m pytest backend -q
+backend/.venv/Scripts/python.exe -m ruff check backend
 ```
 
 Everything above is exactly what CI runs, so a green local run means a green PR.
