@@ -1,5 +1,5 @@
-import React from 'react'
-import styles from './styles.module.css'
+import React from 'react';
+import styles from './styles.module.css';
 
 const TrustBadge = ({
   icon1,
@@ -26,14 +26,12 @@ const TrustBadge = ({
         </div>
       </div>
       {dividerImage && (
-        <img
-          src={dividerImage}
-          alt={dividerAlt}
-          className={styles.verticalDivider}
-        />
+        <img src={dividerImage} alt={dividerAlt} className={styles.verticalDivider} />
       )}
       <div className={styles.container116}>
-        {icon2 && <div className={styles.trophy} style={{ backgroundImage: `url(${icon2})` }}></div>}
+        {icon2 && (
+          <div className={styles.trophy} style={{ backgroundImage: `url(${icon2})` }}></div>
+        )}
         <div className={styles.margin17}>
           <div className={styles.paragraph2}>
             <span className={styles.text144}>{text2Part1}</span>
@@ -42,8 +40,7 @@ const TrustBadge = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TrustBadge
-
+export default TrustBadge;

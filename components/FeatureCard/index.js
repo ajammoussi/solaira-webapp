@@ -2,28 +2,16 @@
 import React, { useState } from 'react';
 import styles from './styles.module.css';
 
-const FeatureCard = ({ 
-  icon,
-  title, 
-  description,
-  image,
-  iconColor = '#00d084'
-}) => {
+const FeatureCard = ({ icon, title, description, image, iconColor = '#00d084' }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div 
-      className={styles.card}
-      onClick={() => setIsExpanded(!isExpanded)}
-    >
+    <div className={styles.card} onClick={() => setIsExpanded(!isExpanded)}>
       {/* Decorative dots pattern */}
       <div className={styles.dots}></div>
-      
+
       {/* Plus button */}
-      <div 
-        className={styles.plusButton}
-        aria-label={isExpanded ? "Collapse" : "Expand"}
-      >
+      <div className={styles.plusButton} aria-label={isExpanded ? 'Collapse' : 'Expand'}>
         <span className={`${styles.plusIcon} ${isExpanded ? styles.rotated : ''}`}>+</span>
       </div>
 

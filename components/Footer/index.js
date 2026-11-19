@@ -1,6 +1,6 @@
-import React from 'react'
-import Link from 'next/link'
-import styles from './styles.module.css'
+import React from 'react';
+import Link from 'next/link';
+import styles from './styles.module.css';
 
 const Footer = ({
   logoImage,
@@ -15,23 +15,23 @@ const Footer = ({
   designedByText,
   designerName,
 }) => {
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
 
   // Helper to get correct href
   const getHref = (linkText) => {
     const map = {
       'About Us': '/about',
-      'Blog': '/blog',
-      'Contact': '/contact',
-      'Pricing': '/pricing',
-      'Product': '/pricing', // Assuming Product maps to Pricing or similar, or # if not exists
-      'Home': '/',
-      'Sign In': '/signin'
+      Blog: '/blog',
+      Contact: '/contact',
+      Pricing: '/pricing',
+      Product: '/pricing', // Assuming Product maps to Pricing or similar, or # if not exists
+      Home: '/',
+      'Sign In': '/signin',
     };
-    
+
     // If it's in the map, return it
     if (map[linkText]) return map[linkText];
-    
+
     // Otherwise return # to prevent 404
     return '#';
   };
@@ -48,11 +48,7 @@ const Footer = ({
                 <div className={styles.link5}>
                   <div className={styles.logo2}>
                     {logoImage && (
-                      <img
-                        src={logoImage}
-                        alt={logoAlt}
-                        className={styles.logoImage}
-                      />
+                      <img src={logoImage} alt={logoAlt} className={styles.logoImage} />
                     )}
                   </div>
                 </div>
@@ -92,10 +88,7 @@ const Footer = ({
                 {aboutLinks.map((link, index) => (
                   <div key={index} className={styles[`linkmargin${16 + index}`]}>
                     <div className={styles[`component${216 + index}`]}>
-                      <Link 
-                        href={getHref(link)}
-                        className={styles[`text${386 + index}`]}
-                      >
+                      <Link href={getHref(link)} className={styles[`text${386 + index}`]}>
                         {link}
                       </Link>
                     </div>
@@ -113,10 +106,7 @@ const Footer = ({
                 {supportLinks.map((link, index) => (
                   <div key={index} className={styles[`linkmargin${21 + index}`]}>
                     <div className={styles[`component${221 + index}`]}>
-                      <Link 
-                        href={getHref(link)}
-                        className={styles[`text${392 + index}`]}
-                      >
+                      <Link href={getHref(link)} className={styles[`text${392 + index}`]}>
                         {link}
                       </Link>
                     </div>
@@ -134,11 +124,7 @@ const Footer = ({
                 {connectLinks.map((link, index) => (
                   <div key={index} className={styles[`linkmargin${24 + index}`]}>
                     <div className={styles[`component${224 + index}`]}>
-                      <a 
-                        href="#" 
-                        className={styles[`text${396 + index}`]}
-                        aria-label={link}
-                      >
+                      <a href="#" className={styles[`text${396 + index}`]} aria-label={link}>
                         {link}
                       </a>
                     </div>
@@ -184,12 +170,7 @@ const Footer = ({
           left: 0;
           right: 0;
           height: 4px;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            #00ad62 50%,
-            transparent
-          );
+          background: linear-gradient(90deg, transparent, #00ad62 50%, transparent);
         }
 
         .footer-content {
@@ -412,7 +393,9 @@ const Footer = ({
         .text398 {
           color: #666666;
           text-decoration: none;
-          transition: color 0.2s ease, transform 0.2s ease;
+          transition:
+            color 0.2s ease,
+            transform 0.2s ease;
           display: inline-block;
         }
 
@@ -482,7 +465,7 @@ const Footer = ({
         }
       `}</style>
     </>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

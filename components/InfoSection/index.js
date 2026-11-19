@@ -3,7 +3,7 @@ import React from 'react';
 import Button from '../Button';
 import styles from './styles.module.css';
 
-const InfoSection = ({ 
+const InfoSection = ({
   title,
   highlightedTitle,
   description,
@@ -11,8 +11,8 @@ const InfoSection = ({
   buttonLink,
   image,
   logo,
-  logoAlt = "Logo",
-  reverse = false
+  logoAlt = 'Logo',
+  reverse = false,
 }) => {
   return (
     <section className={styles.section}>
@@ -22,11 +22,9 @@ const InfoSection = ({
           <div className={styles.textContent}>
             <h2 className={styles.title}>
               {title}{' '}
-              {highlightedTitle && (
-                <span className={styles.highlight}>{highlightedTitle}</span>
-              )}
+              {highlightedTitle && <span className={styles.highlight}>{highlightedTitle}</span>}
             </h2>
-            
+
             <p className={styles.description}>{description}</p>
 
             {logo && (

@@ -25,7 +25,7 @@ import {
 export default function SignIn() {
   const router = useRouter();
   const { user, loading: authLoading, signIn, signInWithOAuth } = useAuth();
-  
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -49,39 +49,39 @@ export default function SignIn() {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
     // Clear field error on change
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
     setGeneralError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setLoading(true);
     setGeneralError('');
 
@@ -139,10 +139,7 @@ export default function SignIn() {
 
       <AuthContainer>
         <AuthLogo subtitle="PV Energy Management" />
-        <AuthHeader
-          title="Welcome back"
-          subtitle="Sign in to your account to continue"
-        />
+        <AuthHeader title="Welcome back" subtitle="Sign in to your account to continue" />
 
         <ErrorMessage message={generalError} />
 
@@ -182,23 +179,14 @@ export default function SignIn() {
             <TextLink href="/forgot-password">Forgot password?</TextLink>
           </LinkRow>
 
-          <PrimaryButton loading={loading}>
-            Sign In
-          </PrimaryButton>
+          <PrimaryButton loading={loading}>Sign In</PrimaryButton>
         </form>
 
         <Divider text="or continue with" />
 
-        <OAuthButtons
-          onGoogleClick={() => handleOAuthSignIn('google')}
-          loading={loading}
-        />
+        <OAuthButtons onGoogleClick={() => handleOAuthSignIn('google')} loading={loading} />
 
-        <AuthFooter
-          text="Don't have an account?"
-          linkText="Sign up"
-          linkHref="/signup"
-        />
+        <AuthFooter text="Don't have an account?" linkText="Sign up" linkHref="/signup" />
       </AuthContainer>
 
       <style jsx>{`
@@ -211,12 +199,14 @@ export default function SignIn() {
           width: 32px;
           height: 32px;
           border: 3px solid #e2e2e2;
-          border-top-color: #00D9A3;
+          border-top-color: #00d9a3;
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
         }
         @keyframes spin {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
       `}</style>
     </>

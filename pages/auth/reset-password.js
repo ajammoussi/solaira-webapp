@@ -20,7 +20,7 @@ import {
 
 export default function ResetPassword() {
   const router = useRouter();
-  
+
   const [formData, setFormData] = useState({
     password: '',
     confirmPassword: '',
@@ -41,24 +41,27 @@ export default function ResetPassword() {
         const accessToken = hashParams.get('access_token');
         const refreshToken = hashParams.get('refresh_token');
         const type = hashParams.get('type');
-        
-        console.log('Reset password: Checking for recovery params', { type, hasAccessToken: !!accessToken });
-        
+
+        console.log('Reset password: Checking for recovery params', {
+          type,
+          hasAccessToken: !!accessToken,
+        });
+
         // If this is a recovery type, we have the tokens
         if (type === 'recovery' && accessToken) {
           console.log('Reset password: Recovery type detected, setting session');
-          
+
           // Set the session using the tokens from the URL
           const { data, error } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken,
           });
-          
+
           if (error) {
             console.error('Reset password: Error setting session', error);
             throw error;
           }
-          
+
           if (data?.session) {
             console.log('Reset password: Session established successfully');
             setIsValidToken(true);
@@ -69,10 +72,13 @@ export default function ResetPassword() {
           }
         } else {
           // No recovery tokens in URL, check if we already have a valid session
-          const { data: { session }, error } = await supabase.auth.getSession();
-          
+          const {
+            data: { session },
+            error,
+          } = await supabase.auth.getSession();
+
           if (error) throw error;
-          
+
           if (session) {
             console.log('Reset password: Existing session found');
             setIsValidToken(true);
@@ -97,7 +103,7 @@ export default function ResetPassword() {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
@@ -105,41 +111,41 @@ export default function ResetPassword() {
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
       newErrors.password = 'Password must contain uppercase, lowercase, and number';
     }
-    
+
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
     setGeneralError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setLoading(true);
     setGeneralError('');
     setSuccess('');
 
     try {
       console.log('Reset password: Updating password...');
-      
+
       // Update password directly via Supabase
       const { data, error } = await supabase.auth.updateUser({
-        password: formData.password
+        password: formData.password,
       });
 
       if (error) {
@@ -149,7 +155,7 @@ export default function ResetPassword() {
 
       console.log('Reset password: Password updated successfully');
       setSuccess('Password updated successfully! Redirecting to sign in...');
-      
+
       // Sign out and redirect after a short delay
       setTimeout(async () => {
         await supabase.auth.signOut();
@@ -177,12 +183,14 @@ export default function ResetPassword() {
             width: 32px;
             height: 32px;
             border: 3px solid #e2e2e2;
-            border-top-color: #00D9A3;
+            border-top-color: #00d9a3;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
           }
           @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+              transform: rotate(360deg);
+            }
           }
         `}</style>
       </AuthContainer>
@@ -202,9 +210,9 @@ export default function ResetPassword() {
             title="Reset Link Expired"
             subtitle="This password reset link is no longer valid"
           />
-          
+
           <ErrorMessage message={generalError} />
-          
+
           <div style={{ marginTop: '24px' }}>
             <SecondaryButton onClick={() => router.push('/forgot-password')}>
               Request New Reset Link
@@ -224,10 +232,7 @@ export default function ResetPassword() {
 
       <AuthContainer>
         <AuthLogo subtitle="PV Energy Management" />
-        <AuthHeader
-          title="Set new password"
-          subtitle="Create a new password for your account"
-        />
+        <AuthHeader title="Set new password" subtitle="Create a new password for your account" />
 
         <ErrorMessage message={generalError} />
         <SuccessMessage message={success} />

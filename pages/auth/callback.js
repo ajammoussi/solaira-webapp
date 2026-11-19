@@ -19,11 +19,12 @@ export default function AuthCallback() {
         // Check for error in URL params
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const errorParam = hashParams.get('error') || router.query.error;
-        const errorDescription = hashParams.get('error_description') || router.query.error_description;
+        const errorDescription =
+          hashParams.get('error_description') || router.query.error_description;
 
         if (errorParam) {
-          const errorMsg = errorDescription 
-            ? decodeURIComponent(errorDescription) 
+          const errorMsg = errorDescription
+            ? decodeURIComponent(errorDescription)
             : 'Authentication failed';
           setError(errorMsg);
           setTimeout(() => router.replace('/signin'), 3000);
@@ -36,7 +37,7 @@ export default function AuthCallback() {
           console.log('Exchanging code for session...');
           try {
             const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-            
+
             if (exchangeError) {
               // Only throw if it's not a code verifier error (which happens on page refresh)
               if (!exchangeError.message?.includes('code verifier')) {
@@ -59,11 +60,14 @@ export default function AuthCallback() {
         if (accessToken) {
           // Supabase client should pick up the session automatically
           // Wait a moment for it to process
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
         }
 
         // Try to get the session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
 
         if (sessionError) {
           throw sessionError;
@@ -98,7 +102,7 @@ export default function AuthCallback() {
 
       <AuthContainer>
         <AuthLogo subtitle="PV Energy Management" />
-        
+
         {error ? (
           <>
             <ErrorMessage message={error} />
@@ -109,9 +113,7 @@ export default function AuthCallback() {
         ) : (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
             <div className="spinner" style={{ margin: '0 auto' }} />
-            <p style={{ marginTop: '16px', color: '#696e78' }}>
-              Completing sign in...
-            </p>
+            <p style={{ marginTop: '16px', color: '#696e78' }}>Completing sign in...</p>
           </div>
         )}
       </AuthContainer>
@@ -121,12 +123,14 @@ export default function AuthCallback() {
           width: 40px;
           height: 40px;
           border: 3px solid #e2e2e2;
-          border-top-color: #00D9A3;
+          border-top-color: #00d9a3;
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
         }
         @keyframes spin {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
       `}</style>
     </>

@@ -19,9 +19,7 @@ export function PredictionTable({ predictions }) {
             {Object.keys(predictions).map((datetime) => (
               <tr key={datetime}>
                 <td>{new Date(datetime).toLocaleString()}</td>
-                <td style={{ textAlign: 'right' }}>
-                  {predictions[datetime].toFixed(4)}
-                </td>
+                <td style={{ textAlign: 'right' }}>{predictions[datetime].toFixed(4)}</td>
               </tr>
             ))}
           </tbody>

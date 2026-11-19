@@ -9,13 +9,13 @@ import { withApiAuth } from '../../lib/auth/apiMiddleware';
 
 function pickAllowedUpdates(body) {
   const allowedKeys = [
-    'display_name', 
-    'phone_number', 
+    'display_name',
+    'phone_number',
     'timezone',
     'consumption_profile',
     'current_system',
     'battery_size',
-    'preferences'
+    'preferences',
   ];
   const updates = {};
 

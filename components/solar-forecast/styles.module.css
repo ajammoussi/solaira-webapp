@@ -2,7 +2,7 @@
   background: white;
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   margin-bottom: 24px;
 }
 
@@ -34,7 +34,7 @@
 
 .input {
   padding: 8px 12px;
-  border: 1px solid #D1D5DB;
+  border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 0.875rem;
   transition: border-color 0.2s;
@@ -42,12 +42,12 @@
 
 .input:focus {
   outline: none;
-  border-color: #00D9A3;
+  border-color: #00d9a3;
   box-shadow: 0 0 0 2px rgba(0, 217, 163, 0.2);
 }
 
 .button {
-  background: #00D9A3;
+  background: #00d9a3;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -58,13 +58,13 @@
 }
 
 .button:hover {
-  background: #00B386;
+  background: #00b386;
 }
 
 .toggleButton {
   background: none;
   border: none;
-  color: #6B7280;
+  color: #6b7280;
   font-size: 0.875rem;
   cursor: pointer;
   text-decoration: underline;
@@ -81,7 +81,7 @@
 .durationButton {
   flex: 1;
   padding: 8px;
-  border: 1px solid #D1D5DB;
+  border: 1px solid #d1d5db;
   background: white;
   border-radius: 6px;
   cursor: pointer;
@@ -91,13 +91,13 @@
 }
 
 .durationButton:hover {
-  background: #F3F4F6;
+  background: #f3f4f6;
 }
 
 .durationButtonActive {
-  background: #ECFDF5;
-  border-color: #00D9A3;
-  color: #00D9A3;
+  background: #ecfdf5;
+  border-color: #00d9a3;
+  color: #00d9a3;
   font-weight: 500;
 }
 
@@ -110,7 +110,7 @@
 .tableContainer {
   margin-top: 24px;
   overflow-x: auto;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
 }
 
@@ -120,14 +120,15 @@
   font-size: 0.875rem;
 }
 
-.table th, .table td {
+.table th,
+.table td {
   padding: 12px 16px;
   text-align: left;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .table th {
-  background: #F9FAFB;
+  background: #f9fafb;
   font-weight: 600;
   color: #374151;
 }
@@ -148,7 +149,7 @@
 
 .durationButton {
   padding: 8px 16px;
-  border: 1px solid #D1D5DB;
+  border: 1px solid #d1d5db;
   background: white;
   border-radius: 6px;
   font-size: 0.875rem;
@@ -159,11 +160,11 @@
 }
 
 .durationButton:hover {
-  background: #F3F4F6;
+  background: #f3f4f6;
 }
 
 .durationButtonActive {
-  background: #ECFDF5;
-  border-color: #00D9A3;
-  color: #00D9A3;
+  background: #ecfdf5;
+  border-color: #00d9a3;
+  color: #00d9a3;
 }

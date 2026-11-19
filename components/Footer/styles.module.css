@@ -2,7 +2,7 @@
   width: 100%;
   display: flex;
   padding: 40px 5% 24px;
-  position: relative;  /* Changed from absolute */
+  position: relative; /* Changed from absolute */
   align-items: flex-start;
   flex-shrink: 0;
   flex-direction: column;
@@ -282,7 +282,7 @@
     height: auto;
     min-width: 140px;
   }
-  
+
   .linkmargin13 {
     padding-bottom: 20px;
   }
@@ -293,11 +293,10 @@
     flex-direction: column;
     gap: 32px;
   }
-  
+
   .container270,
   .container272,
   .container274 {
     width: 100%;
   }
 }
-

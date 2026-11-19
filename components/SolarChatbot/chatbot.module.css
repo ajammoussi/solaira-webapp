@@ -7,7 +7,7 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
   border: none;
   box-shadow: 0 4px 12px rgba(255, 165, 0, 0.4);
   cursor: pointer;
@@ -29,13 +29,27 @@
 }
 
 @keyframes shake {
-  0% { transform: scale(1) rotate(0deg); }
-  10% { transform: scale(1) rotate(10deg); }
-  20% { transform: scale(1) rotate(-10deg); }
-  30% { transform: scale(1) rotate(10deg); }
-  40% { transform: scale(1) rotate(-10deg); }
-  50% { transform: scale(1) rotate(0deg); }
-  100% { transform: scale(1) rotate(0deg); }
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  10% {
+    transform: scale(1) rotate(10deg);
+  }
+  20% {
+    transform: scale(1) rotate(-10deg);
+  }
+  30% {
+    transform: scale(1) rotate(10deg);
+  }
+  40% {
+    transform: scale(1) rotate(-10deg);
+  }
+  50% {
+    transform: scale(1) rotate(0deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
 }
 
 .sunButtonActive {
@@ -55,7 +69,7 @@
   right: 2px;
   width: 12px;
   height: 12px;
-  background-color: #EF4444;
+  background-color: #ef4444;
   border-radius: 50%;
   border: 2px solid white;
 }
@@ -78,12 +92,18 @@
 }
 
 @keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .chatHeader {
-  background: linear-gradient(135deg, #00D9A3 0%, #00B386 100%);
+  background: linear-gradient(135deg, #00d9a3 0%, #00b386 100%);
   padding: 16px;
   display: flex;
   justify-content: space-between;
@@ -158,12 +178,12 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  border-bottom: 1px solid #F3F4F6;
+  border-bottom: 1px solid #f3f4f6;
 }
 
 .quickActionsLabel {
   font-size: 12px;
-  color: #6B7280;
+  color: #6b7280;
   font-weight: 600;
   margin-bottom: 4px;
   padding-left: 4px;
@@ -184,18 +204,18 @@
   white-space: nowrap;
   padding: 6px 12px;
   border-radius: 16px;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #e5e7eb;
   background: white;
-  color: #4B5563;
+  color: #4b5563;
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .quickActions button:hover {
-  background: #F9FAFB;
-  border-color: #00D9A3;
-  color: #00D9A3;
+  background: #f9fafb;
+  border-color: #00d9a3;
+  color: #00d9a3;
 }
 
 .messagesContainer {
@@ -205,7 +225,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  background: #F9FAFB;
+  background: #f9fafb;
 }
 
 .message {
@@ -223,7 +243,8 @@
   align-self: flex-start;
 }
 
-.botAvatarContainer, .userAvatarContainer {
+.botAvatarContainer,
+.userAvatarContainer {
   display: flex;
   align-items: flex-start;
   padding-top: 4px;
@@ -232,7 +253,7 @@
 .botAvatar {
   width: 32px;
   height: 32px;
-  background: #E6FFFA;
+  background: #e6fffa;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -245,7 +266,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #00D9A3 0%, #00F5B8 100%);
+  background: linear-gradient(135deg, #00d9a3 0%, #00f5b8 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -275,7 +296,7 @@
 }
 
 .userMessage .messageText {
-  background: #00D9A3;
+  background: #00d9a3;
   color: white;
   border-top-right-radius: 4px;
 }
@@ -289,12 +310,12 @@
 
 .messageTime {
   font-size: 10px;
-  color: #9CA3AF;
+  color: #9ca3af;
 }
 
 .messageStatus {
   font-size: 10px;
-  color: #00D9A3;
+  color: #00d9a3;
   opacity: 0.8;
 }
 
@@ -311,23 +332,33 @@
 .typingIndicator span {
   width: 6px;
   height: 6px;
-  background: #D1D5DB;
+  background: #d1d5db;
   border-radius: 50%;
   animation: bounce 1.4s infinite ease-in-out both;
 }
 
-.typingIndicator span:nth-child(1) { animation-delay: -0.32s; }
-.typingIndicator span:nth-child(2) { animation-delay: -0.16s; }
+.typingIndicator span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+.typingIndicator span:nth-child(2) {
+  animation-delay: -0.16s;
+}
 
 @keyframes bounce {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1); }
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
 }
 
 .inputArea {
   padding: 16px;
   background: white;
-  border-top: 1px solid #E5E7EB;
+  border-top: 1px solid #e5e7eb;
   display: flex;
   gap: 8px;
 }
@@ -340,7 +371,7 @@
 .input {
   width: 100%;
   padding: 10px 36px 10px 16px;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #e5e7eb;
   border-radius: 24px;
   outline: none;
   font-size: 14px;
@@ -348,7 +379,7 @@
 }
 
 .input:focus {
-  border-color: #00D9A3;
+  border-color: #00d9a3;
 }
 
 .clearInputButton {
@@ -358,7 +389,7 @@
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #9CA3AF;
+  color: #9ca3af;
   cursor: pointer;
   font-size: 14px;
   width: 20px;
@@ -371,15 +402,15 @@
 }
 
 .clearInputButton:hover {
-  background: #E5E7EB;
-  color: #6B7280;
+  background: #e5e7eb;
+  color: #6b7280;
 }
 
 .sendButton {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #00D9A3;
+  background: #00d9a3;
   border: none;
   color: white;
   display: flex;
@@ -390,12 +421,12 @@
 }
 
 .sendButton:hover:not(:disabled) {
-  background: #00B386;
+  background: #00b386;
   transform: scale(1.05);
 }
 
 .sendButton:disabled {
-  background: #E5E7EB;
+  background: #e5e7eb;
   cursor: not-allowed;
 }
 
@@ -409,7 +440,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .sendIcon {
@@ -419,14 +452,14 @@
 
 .chatFooter {
   padding: 8px 16px;
-  background: #F9FAFB;
-  border-top: 1px solid #E5E7EB;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
   text-align: center;
 }
 
 .footerText {
   font-size: 11px;
-  color: #6B7280;
+  color: #6b7280;
   font-style: italic;
 }
 

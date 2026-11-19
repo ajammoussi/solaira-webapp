@@ -47,23 +47,19 @@ const Header = () => {
           </Link>
 
           {/* Mobile Menu Toggle Button */}
-          <button 
-            className={styles.mobileMenuBtn} 
+          <button
+            className={styles.mobileMenuBtn}
             onClick={toggleMobileMenu}
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? (
-              <LucideIcons.X size={24} />
-            ) : (
-              <LucideIcons.Menu size={24} />
-            )}
+            {mobileMenuOpen ? <LucideIcons.X size={24} /> : <LucideIcons.Menu size={24} />}
           </button>
 
           {/* Navigation Menu */}
           <div className={`${styles.navWrapper} ${mobileMenuOpen ? styles.navWrapperOpen : ''}`}>
             <nav className={styles.navigation}>
               <Link href="/about">
-                <a 
+                <a
                   className={`${styles.navLink} ${isActive('/about') ? styles.active : ''}`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
@@ -71,7 +67,7 @@ const Header = () => {
                 </a>
               </Link>
               <Link href="/pricing">
-                <a 
+                <a
                   className={`${styles.navLink} ${isActive('/pricing') ? styles.active : ''}`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
@@ -79,7 +75,7 @@ const Header = () => {
                 </a>
               </Link>
               <Link href="/blog">
-                <a 
+                <a
                   className={`${styles.navLink} ${isActive('/blog') ? styles.active : ''}`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
@@ -87,7 +83,7 @@ const Header = () => {
                 </a>
               </Link>
               <Link href="/contact">
-                <a 
+                <a
                   className={`${styles.navLink} ${isActive('/contact') ? styles.active : ''}`}
                   onClick={() => setMobileMenuOpen(false)}
                 >

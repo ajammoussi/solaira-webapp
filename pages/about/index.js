@@ -29,11 +29,11 @@ const AboutPage = () => {
 
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('resize', updateHeaderHeight);
-    
+
     // Initial measurement
     updateHeaderHeight();
     handleScroll(); // Calculate progress immediately
-    
+
     // Check again after a short delay to ensure styles are applied
     setTimeout(updateHeaderHeight, 100);
 
@@ -47,45 +47,76 @@ const AboutPage = () => {
     { label: 'Happy Customers', value: '400+' },
     { label: 'Energy Saved (MWh)', value: '2,500+' },
     { label: 'CO₂ Reduced (tons)', value: '1,200+' },
-    { label: 'Years Experience', value: '5+' }
+    { label: 'Years Experience', value: '5+' },
   ];
 
   const values = [
     {
       title: 'Innovation',
-      description: 'We continuously develop cutting-edge energy solutions that push the boundaries of what\'s possible.',
-      icon: <LucideIcons.Lightbulb size={24} />
+      description:
+        "We continuously develop cutting-edge energy solutions that push the boundaries of what's possible.",
+      icon: <LucideIcons.Lightbulb size={24} />,
     },
     {
       title: 'Sustainability',
-      description: 'Our commitment to the environment drives every decision we make, ensuring a cleaner future.',
-      icon: <LucideIcons.Leaf size={24} />
+      description:
+        'Our commitment to the environment drives every decision we make, ensuring a cleaner future.',
+      icon: <LucideIcons.Leaf size={24} />,
     },
     {
       title: 'Reliability',
       description: 'We deliver consistent, dependable energy solutions that you can trust 24/7.',
-      icon: <LucideIcons.Shield size={24} />
+      icon: <LucideIcons.Shield size={24} />,
     },
     {
       title: 'Customer Focus',
-      description: 'Your energy independence and satisfaction are at the heart of everything we do.',
-      icon: <LucideIcons.Users size={24} />
-    }
+      description:
+        'Your energy independence and satisfaction are at the heart of everything we do.',
+      icon: <LucideIcons.Users size={24} />,
+    },
   ];
 
   const vision = [
-    { year: '2026', goal: 'Regional Expansion', description: 'Establish operations in 3 additional North African countries', icon: <LucideIcons.Globe size={32} /> },
-    { year: '2027', goal: 'Smart Grid Integration', description: 'Launch vehicle-to-grid technology for electric vehicles', icon: <LucideIcons.Zap size={32} /> },
-    { year: '2028', goal: '10,000 Homes Powered', description: 'Reach 10,000+ households with clean energy solutions', icon: <LucideIcons.Home size={32} /> },
-    { year: '2029', goal: 'Carbon Neutral Operations', description: 'Achieve 100% carbon-neutral manufacturing and operations', icon: <LucideIcons.TreeDeciduous size={32} /> },
-    { year: '2030', goal: 'Energy Independence', description: 'Help 50,000 families achieve complete energy independence', icon: <LucideIcons.Flag size={32} /> }
+    {
+      year: '2026',
+      goal: 'Regional Expansion',
+      description: 'Establish operations in 3 additional North African countries',
+      icon: <LucideIcons.Globe size={32} />,
+    },
+    {
+      year: '2027',
+      goal: 'Smart Grid Integration',
+      description: 'Launch vehicle-to-grid technology for electric vehicles',
+      icon: <LucideIcons.Zap size={32} />,
+    },
+    {
+      year: '2028',
+      goal: '10,000 Homes Powered',
+      description: 'Reach 10,000+ households with clean energy solutions',
+      icon: <LucideIcons.Home size={32} />,
+    },
+    {
+      year: '2029',
+      goal: 'Carbon Neutral Operations',
+      description: 'Achieve 100% carbon-neutral manufacturing and operations',
+      icon: <LucideIcons.TreeDeciduous size={32} />,
+    },
+    {
+      year: '2030',
+      goal: 'Energy Independence',
+      description: 'Help 50,000 families achieve complete energy independence',
+      icon: <LucideIcons.Flag size={32} />,
+    },
   ];
 
   return (
     <>
       <Head>
         <title>About Us - Solaira</title>
-        <meta name="description" content="Learn about Solaira's mission to make clean, intelligent energy accessible to every household in Tunisia" />
+        <meta
+          name="description"
+          content="Learn about Solaira's mission to make clean, intelligent energy accessible to every household in Tunisia"
+        />
       </Head>
 
       <div className={styles['about-page']}>
@@ -99,14 +130,8 @@ const AboutPage = () => {
         />
 
         {/* Progress Bar */}
-        <div 
-          className={styles['progress-bar-container']}
-          style={{ top: `${headerHeight}px` }}
-        >
-          <div 
-            className={styles['progress-bar']}
-            style={{ width: `${scrollProgress}%` }}
-          />
+        <div className={styles['progress-bar-container']} style={{ top: `${headerHeight}px` }}>
+          <div className={styles['progress-bar']} style={{ width: `${scrollProgress}%` }} />
         </div>
 
         {/* Hero Section */}
@@ -116,7 +141,8 @@ const AboutPage = () => {
               About <span className={styles['highlight']}>Solaira</span>
             </h1>
             <p className={styles['about-subtitle']}>
-              We're on a mission to make clean, intelligent energy accessible to every household in Tunisia and beyond.
+              We're on a mission to make clean, intelligent energy accessible to every household in
+              Tunisia and beyond.
             </p>
 
             {/* Stats Grid */}
@@ -136,9 +162,9 @@ const AboutPage = () => {
           <div className={styles['mission-card']}>
             <h2 className={styles['mission-title']}>Our Mission</h2>
             <p className={styles['mission-text']}>
-              To empower every Tunisian household with intelligent energy solutions that reduce costs, 
-              increase independence, and protect our planet. We believe energy should be smart, clean, 
-              and accessible to all.
+              To empower every Tunisian household with intelligent energy solutions that reduce
+              costs, increase independence, and protect our planet. We believe energy should be
+              smart, clean, and accessible to all.
             </p>
           </div>
         </section>
@@ -148,10 +174,8 @@ const AboutPage = () => {
           <h2 className={styles['section-title']}>
             Our <span className={styles['highlight']}>Values</span>
           </h2>
-          <p className={styles['section-subtitle']}>
-            The principles that guide everything we do
-          </p>
-          
+          <p className={styles['section-subtitle']}>The principles that guide everything we do</p>
+
           <div className={styles['values-grid']}>
             {values.map((value, idx) => (
               <div key={idx} className={styles['value-card']}>
@@ -186,16 +210,12 @@ const AboutPage = () => {
 
         {/* CTA Section */}
         <section className={styles['cta-section']}>
-          <h2 className={styles['cta-title']}>
-            Ready to Join the Energy Revolution?
-          </h2>
+          <h2 className={styles['cta-title']}>Ready to Join the Energy Revolution?</h2>
           <p className={styles['cta-text']}>
             Discover how Solaira can transform your home's energy independence
           </p>
           <Link href="/signin">
-            <button className={styles['cta-button']}>
-              Get Started Today →
-            </button>
+            <button className={styles['cta-button']}>Get Started Today →</button>
           </Link>
         </section>
 

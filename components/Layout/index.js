@@ -26,30 +26,31 @@ const Layout = ({ children }) => {
   const accountMenuRef = useRef(null);
 
   // Get display name from user/profile
-  const displayName = profile?.display_name 
-    || user?.user_metadata?.full_name 
-    || user?.user_metadata?.name
-    || user?.email?.split('@')[0] 
-    || 'User';
-  
+  const displayName =
+    profile?.display_name ||
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.email?.split('@')[0] ||
+    'User';
+
   // Get initials for avatar
   const initials = displayName
     .split(' ')
-    .map(n => n[0])
+    .map((n) => n[0])
     .join('')
     .toUpperCase()
     .slice(0, 2);
 
   const handleSignOut = async () => {
     setSignOutLoading(true);
-    
+
     try {
       // Trigger sign out immediately without waiting for network
       signOut();
-      
+
       // Signal other tabs to logout
       localStorage.setItem(LOGOUT_EVENT_KEY, Date.now().toString());
-      
+
       // Navigate immediately to home
       router.push('/');
     } catch (error) {
@@ -136,20 +137,24 @@ const Layout = ({ children }) => {
         <div className={styles.mainNav}>
           {/* Vertical Divider between Toggle and Search */}
           <div className={styles.headerVerticalDivider}></div>
-          
+
           <div className={styles.navContainer}>
             {/* Logo */}
             <Link href="/dashboard">
               <a className={styles.logoLink}>
                 <div className={styles.logo}>
-                  <img src="/solaria-small-logo1.png" alt="Solaira Logo" className={styles.logoImage} />
+                  <img
+                    src="/solaria-small-logo1.png"
+                    alt="Solaira Logo"
+                    className={styles.logoImage}
+                  />
                   <span className={styles.logoText}>Solaira</span>
                 </div>
               </a>
             </Link>
 
             {/* Toggle Button */}
-            <button 
+            <button
               className={styles.headerToggleButton}
               onClick={toggleSidebar}
               aria-label="Toggle sidebar"
@@ -160,8 +165,8 @@ const Layout = ({ children }) => {
             {/* Search Bar */}
             <div className={styles.headerSearchContainer}>
               <LucideIcons.Search size={18} className={styles.headerSearchIcon} />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="Search"
                 className={styles.headerSearchInput}
                 value={searchQuery}
@@ -173,7 +178,11 @@ const Layout = ({ children }) => {
             <div style={{ flex: 1 }}></div>
 
             {/* CTA Button */}
-            <Button className={styles.headerButton} onClick={handleSignOut} disabled={signOutLoading}>
+            <Button
+              className={styles.headerButton}
+              onClick={handleSignOut}
+              disabled={signOutLoading}
+            >
               <span>{signOutLoading ? 'Logging out...' : 'Log Out'}</span>
             </Button>
           </div>
@@ -183,7 +192,9 @@ const Layout = ({ children }) => {
       {/* Main Layout with Sidebar */}
       <div className={styles.mainLayout}>
         {/* Vertical Sidebar */}
-        <aside className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''} ${!isLoaded ? styles.sidebarNoTransition : ''}`}>
+        <aside
+          className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''} ${!isLoaded ? styles.sidebarNoTransition : ''}`}
+        >
           {/* Divider at top */}
           <div className={styles.divider}></div>
 
@@ -193,16 +204,14 @@ const Layout = ({ children }) => {
               const IconComponent = item.icon;
               return (
                 <Link key={item.href} href={item.href}>
-                  <a 
+                  <a
                     className={`${styles.sidebarLink} ${isActive(item.href) ? styles.sidebarLinkActive : ''}`}
                     title={item.label}
                   >
                     <span className={styles.sidebarIcon}>
                       <IconComponent size={20} strokeWidth={2} />
                     </span>
-                    {!sidebarCollapsed && (
-                      <span className={styles.sidebarLabel}>{item.label}</span>
-                    )}
+                    {!sidebarCollapsed && <span className={styles.sidebarLabel}>{item.label}</span>}
                   </a>
                 </Link>
               );
@@ -210,11 +219,14 @@ const Layout = ({ children }) => {
           </nav>
 
           {/* Account Section at Bottom */}
-          <div style={{ padding: '12px', borderTop: '1px solid #E5E7EB', position: 'relative' }} ref={accountMenuRef}>
+          <div
+            style={{ padding: '12px', borderTop: '1px solid #E5E7EB', position: 'relative' }}
+            ref={accountMenuRef}
+          >
             <button
               onClick={() => setAccountMenuOpen(!accountMenuOpen)}
-              style={{ 
-                border: 'none', 
+              style={{
+                border: 'none',
                 background: 'transparent',
                 cursor: 'pointer',
                 width: '100%',
@@ -224,87 +236,108 @@ const Layout = ({ children }) => {
                 justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
                 gap: '12px',
                 borderRadius: '8px',
-                transition: 'background-color 0.15s ease'
+                transition: 'background-color 0.15s ease',
               }}
               title="Account"
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F3F4F6'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F3F4F6')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
             >
               {loading ? (
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  minWidth: '40px',
-                  minHeight: '40px',
-                  borderRadius: '50%',
-                  backgroundColor: '#E5E7EB',
-                  flexShrink: 0
-                }} />
+                <div
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    minWidth: '40px',
+                    minHeight: '40px',
+                    borderRadius: '50%',
+                    backgroundColor: '#E5E7EB',
+                    flexShrink: 0,
+                  }}
+                />
               ) : (
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  minWidth: '40px',
-                  minHeight: '40px',
-                  borderRadius: '50%',
-                  backgroundColor: '#00D9A3',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                  fontSize: '15px',
-                  fontWeight: '600',
-                  flexShrink: 0
-                }}>
+                <div
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    minWidth: '40px',
+                    minHeight: '40px',
+                    borderRadius: '50%',
+                    backgroundColor: '#00D9A3',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#FFFFFF',
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    flexShrink: 0,
+                  }}
+                >
                   {initials}
                 </div>
               )}
-              {!sidebarCollapsed && (
-                loading ? (
-                  <div style={{ flex: 1, height: '16px', backgroundColor: '#E5E7EB', borderRadius: '4px' }} />
+              {!sidebarCollapsed &&
+                (loading ? (
+                  <div
+                    style={{
+                      flex: 1,
+                      height: '16px',
+                      backgroundColor: '#E5E7EB',
+                      borderRadius: '4px',
+                    }}
+                  />
                 ) : (
-                  <span style={{ flex: 1, textAlign: 'left', fontSize: '14px', color: '#374151', fontWeight: '500' }}>
+                  <span
+                    style={{
+                      flex: 1,
+                      textAlign: 'left',
+                      fontSize: '14px',
+                      color: '#374151',
+                      fontWeight: '500',
+                    }}
+                  >
                     {displayName}
                   </span>
-                )
-              )}
+                ))}
               {!sidebarCollapsed && (
-                <LucideIcons.ChevronUp 
-                  size={16} 
+                <LucideIcons.ChevronUp
+                  size={16}
                   color="#6B7280"
-                  style={{ 
+                  style={{
                     transition: 'transform 0.2s ease',
-                    transform: accountMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)'
-                  }} 
+                    transform: accountMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  }}
                 />
               )}
             </button>
 
             {/* Dropdown Menu */}
             {accountMenuOpen && (
-              <div style={{
-                position: 'absolute',
-                bottom: '100%',
-                left: sidebarCollapsed ? '70px' : '12px',
-                right: sidebarCollapsed ? 'auto' : '12px',
-                marginBottom: '8px',
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #E5E7EB',
-                borderRadius: '10px',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                overflow: 'hidden',
-                minWidth: sidebarCollapsed ? '180px' : 'auto',
-                zIndex: 1000
-              }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '100%',
+                  left: sidebarCollapsed ? '70px' : '12px',
+                  right: sidebarCollapsed ? 'auto' : '12px',
+                  marginBottom: '8px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '10px',
+                  boxShadow:
+                    '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                  overflow: 'hidden',
+                  minWidth: sidebarCollapsed ? '180px' : 'auto',
+                  zIndex: 1000,
+                }}
+              >
                 <Link href="/account">
-                  <a 
+                  <a
                     className={styles.sidebarLink}
-                    style={{ 
+                    style={{
                       borderRadius: '0',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '12px',
-                      padding: '12px 16px'
+                      padding: '12px 16px',
                     }}
                     onClick={() => setAccountMenuOpen(false)}
                   >
@@ -319,7 +352,7 @@ const Layout = ({ children }) => {
                     handleSignOut();
                   }}
                   className={styles.sidebarLink}
-                  style={{ 
+                  style={{
                     border: 'none',
                     background: 'transparent',
                     cursor: 'pointer',
@@ -329,7 +362,7 @@ const Layout = ({ children }) => {
                     alignItems: 'center',
                     gap: '12px',
                     padding: '12px 16px',
-                    textAlign: 'left'
+                    textAlign: 'left',
                   }}
                   disabled={signOutLoading}
                 >
@@ -345,9 +378,7 @@ const Layout = ({ children }) => {
         <div className={styles.verticalDivider}></div>
 
         {/* Main Content Area */}
-        <main className={styles.content}>
-          {children}
-        </main>
+        <main className={styles.content}>{children}</main>
       </div>
     </div>
   );

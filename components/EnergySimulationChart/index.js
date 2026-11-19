@@ -1,12 +1,12 @@
 /**
  * Energy Simulation Chart Component
- * 
+ *
  * Displays comprehensive energy flow visualization including:
  * - PV Energy Production
  * - Wind Energy Production
  * - Total Consumption
  * - Battery State of Charge (SOC)
- * 
+ *
  * Similar to the Visualization.py output but as an interactive React component
  */
 
@@ -29,10 +29,10 @@ const EnergySimulationChart = ({ data, loading, error }) => {
   // Transform API data for Recharts with daily aggregation for weekly/monthly views
   const chartData = useMemo(() => {
     if (!data || !data.timestamps) return [];
-    
+
     const totalHours = data.timestamps.length;
     const shouldAggregate = totalHours > 48; // Aggregate for weekly/monthly views
-    
+
     if (!shouldAggregate) {
       // Hourly data for daily/48h views
       return data.timestamps.map((timestamp, index) => {
@@ -40,14 +40,14 @@ const EnergySimulationChart = ({ data, loading, error }) => {
         const hour = date.getHours();
         const day = date.getDate();
         const month = date.getMonth() + 1;
-        
+
         let timeLabel;
         if (totalHours <= 24) {
           timeLabel = `${hour.toString().padStart(2, '0')}:00`;
         } else {
           timeLabel = `${month}/${day} ${hour.toString().padStart(2, '0')}h`;
         }
-        
+
         return {
           time: timeLabel,
           hour: hour,
@@ -62,14 +62,14 @@ const EnergySimulationChart = ({ data, loading, error }) => {
         };
       });
     }
-    
+
     // Daily aggregation for weekly/monthly views
     const dailyData = {};
-    
+
     data.timestamps.forEach((timestamp, index) => {
       const date = new Date(timestamp);
       const dateKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-      
+
       if (!dailyData[dateKey]) {
         dailyData[dateKey] = {
           date: date,
@@ -79,10 +79,10 @@ const EnergySimulationChart = ({ data, loading, error }) => {
           wasted_sum: 0,
           deficit_sum: 0,
           soc_values: [],
-          count: 0
+          count: 0,
         };
       }
-      
+
       dailyData[dateKey].pv_sum += data.pv_energy_kwh[index] || 0;
       dailyData[dateKey].wind_sum += data.wind_energy_kwh[index] || 0;
       dailyData[dateKey].consumption_sum += data.consumption_kwh[index] || 0;
@@ -91,44 +91,46 @@ const EnergySimulationChart = ({ data, loading, error }) => {
       dailyData[dateKey].soc_values.push(data.battery_soc_percent[index]);
       dailyData[dateKey].count += 1;
     });
-    
+
     // Convert to array and format
-    return Object.keys(dailyData).sort().map(dateKey => {
-      const dayData = dailyData[dateKey];
-      const date = dayData.date;
-      const month = date.getMonth() + 1;
-      const day = date.getDate();
-      
-      // Calculate average SOC for the day
-      const avgSOC = dayData.soc_values.reduce((a, b) => a + b, 0) / dayData.soc_values.length;
-      
-      return {
-        time: `${month}/${day}`,
-        timestamp: dateKey,
-        pv_energy: dayData.pv_sum,
-        wind_energy: dayData.wind_sum,
-        consumption: dayData.consumption_sum,
-        battery_soc: avgSOC,
-        wasted: dayData.wasted_sum,
-        deficit: dayData.deficit_sum,
-      };
-    });
+    return Object.keys(dailyData)
+      .sort()
+      .map((dateKey) => {
+        const dayData = dailyData[dateKey];
+        const date = dayData.date;
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+
+        // Calculate average SOC for the day
+        const avgSOC = dayData.soc_values.reduce((a, b) => a + b, 0) / dayData.soc_values.length;
+
+        return {
+          time: `${month}/${day}`,
+          timestamp: dateKey,
+          pv_energy: dayData.pv_sum,
+          wind_energy: dayData.wind_sum,
+          consumption: dayData.consumption_sum,
+          battery_soc: avgSOC,
+          wasted: dayData.wasted_sum,
+          deficit: dayData.deficit_sum,
+        };
+      });
   }, [data]);
 
   // Calculate statistics
   const stats = useMemo(() => {
     if (!data || !data.summary) return null;
-    
+
     // If showing aggregated data, recalculate stats from chart data to match visualization
     const isAggregated = data.timestamps && data.timestamps.length > 48;
-    
+
     if (isAggregated && chartData.length > 0) {
       // Recalculate from aggregated chart data for consistency
-      const socs = chartData.map(d => d.battery_soc);
+      const socs = chartData.map((d) => d.battery_soc);
       const minSOC = Math.min(...socs);
       const maxSOC = Math.max(...socs);
       const avgSOC = socs.reduce((a, b) => a + b, 0) / socs.length;
-      
+
       return {
         totalPV: data.summary.total_pv_energy_kwh,
         totalWind: data.summary.total_wind_energy_kwh,
@@ -142,7 +144,7 @@ const EnergySimulationChart = ({ data, loading, error }) => {
         energyBalance: data.summary.energy_balance_kwh,
       };
     }
-    
+
     // Use raw API summary for hourly data
     return {
       totalPV: data.summary.total_pv_energy_kwh,
@@ -209,8 +211,11 @@ const EnergySimulationChart = ({ data, loading, error }) => {
           </div>
           <div className={styles.statCard}>
             <div className={styles.statLabel}>Energy Balance</div>
-            <div className={`${styles.statValue} ${stats.energyBalance >= 0 ? styles.positive : styles.negative}`}>
-              {stats.energyBalance >= 0 ? '+' : ''}{stats.energyBalance.toFixed(2)} kWh
+            <div
+              className={`${styles.statValue} ${stats.energyBalance >= 0 ? styles.positive : styles.negative}`}
+            >
+              {stats.energyBalance >= 0 ? '+' : ''}
+              {stats.energyBalance.toFixed(2)} kWh
             </div>
           </div>
         </div>
@@ -220,66 +225,74 @@ const EnergySimulationChart = ({ data, loading, error }) => {
       <div className={styles.chartWrapper}>
         <h3 className={styles.chartTitle}>
           Energy Production, Consumption & Battery SOC
-          {chartData.length > 48 && <span style={{ fontSize: '0.85em', color: '#666', marginLeft: '10px' }}>(Daily Aggregated)</span>}
+          {chartData.length > 48 && (
+            <span style={{ fontSize: '0.85em', color: '#666', marginLeft: '10px' }}>
+              (Daily Aggregated)
+            </span>
+          )}
         </h3>
-        
+
         <ResponsiveContainer width="100%" height={450}>
-          <ComposedChart
-            data={chartData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-          >
+          <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-            
+
             {/* X-Axis: Time */}
-            <XAxis 
-              dataKey="time" 
-              label={{ 
-                value: chartData.length > 48 ? 'Date (Daily Totals)' : chartData.length > 24 ? 'Date & Time' : 'Time (Hour)', 
-                position: 'insideBottom', 
-                offset: -10 
+            <XAxis
+              dataKey="time"
+              label={{
+                value:
+                  chartData.length > 48
+                    ? 'Date (Daily Totals)'
+                    : chartData.length > 24
+                      ? 'Date & Time'
+                      : 'Time (Hour)',
+                position: 'insideBottom',
+                offset: -10,
               }}
               tick={{ fontSize: 12 }}
-              interval={chartData.length > 60 ? Math.floor(chartData.length / 30) : chartData.length > 30 ? Math.floor(chartData.length / 15) : 0}
+              interval={
+                chartData.length > 60
+                  ? Math.floor(chartData.length / 30)
+                  : chartData.length > 30
+                    ? Math.floor(chartData.length / 15)
+                    : 0
+              }
               angle={chartData.length > 30 ? -45 : 0}
               textAnchor={chartData.length > 30 ? 'end' : 'middle'}
               height={chartData.length > 30 ? 80 : 60}
             />
-            
+
             {/* Left Y-Axis: Energy (kWh) */}
-            <YAxis 
+            <YAxis
               yAxisId="energy"
               label={{ value: 'Energy (kWh)', angle: -90, position: 'insideLeft' }}
               tick={{ fontSize: 12 }}
             />
-            
+
             {/* Right Y-Axis: Battery SOC (%) */}
-            <YAxis 
+            <YAxis
               yAxisId="soc"
               orientation="right"
               domain={[0, 100]}
               label={{ value: 'Battery SOC (%)', angle: 90, position: 'insideRight' }}
               tick={{ fontSize: 12 }}
             />
-            
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
                 border: '1px solid #ccc',
                 borderRadius: '8px',
-                padding: '12px'
+                padding: '12px',
               }}
               formatter={(value, name) => {
                 if (name === 'Battery SOC') return `${value.toFixed(1)}%`;
                 return `${value.toFixed(3)} kWh`;
               }}
             />
-            
-            <Legend 
-              verticalAlign="top" 
-              height={36}
-              wrapperStyle={{ paddingBottom: '20px' }}
-            />
-            
+
+            <Legend verticalAlign="top" height={36} wrapperStyle={{ paddingBottom: '20px' }} />
+
             {/* Production Lines */}
             <Line
               yAxisId="energy"
@@ -291,7 +304,7 @@ const EnergySimulationChart = ({ data, loading, error }) => {
               dot={false}
               isAnimationActive={false}
             />
-            
+
             <Line
               yAxisId="energy"
               type="monotone"
@@ -302,7 +315,7 @@ const EnergySimulationChart = ({ data, loading, error }) => {
               dot={false}
               isAnimationActive={false}
             />
-            
+
             {/* Consumption Line */}
             <Line
               yAxisId="energy"
@@ -314,7 +327,7 @@ const EnergySimulationChart = ({ data, loading, error }) => {
               dot={false}
               isAnimationActive={false}
             />
-            
+
             {/* Battery SOC Line */}
             <Line
               yAxisId="soc"
@@ -326,7 +339,7 @@ const EnergySimulationChart = ({ data, loading, error }) => {
               dot={false}
               isAnimationActive={false}
             />
-            
+
             {/* 50% SOC Reference Line */}
             <Line
               yAxisId="soc"
@@ -383,35 +396,35 @@ const EnergySimulationChart = ({ data, loading, error }) => {
                 PV Energy
               </div>
               <div className={styles.breakdownBar}>
-                <div 
+                <div
                   className={styles.breakdownFill}
-                  style={{ 
-                    width: `${(stats.totalPV / stats.totalProduction * 100).toFixed(1)}%`,
-                    backgroundColor: '#FFD700'
+                  style={{
+                    width: `${((stats.totalPV / stats.totalProduction) * 100).toFixed(1)}%`,
+                    backgroundColor: '#FFD700',
                   }}
                 ></div>
               </div>
               <div className={styles.breakdownPercent}>
-                {(stats.totalPV / stats.totalProduction * 100).toFixed(1)}%
+                {((stats.totalPV / stats.totalProduction) * 100).toFixed(1)}%
               </div>
             </div>
-            
+
             <div className={styles.breakdownItem}>
               <div className={styles.breakdownLabel}>
                 <span className={styles.breakdownDot} style={{ backgroundColor: '#4A90E2' }}></span>
                 Wind Energy
               </div>
               <div className={styles.breakdownBar}>
-                <div 
+                <div
                   className={styles.breakdownFill}
-                  style={{ 
-                    width: `${(stats.totalWind / stats.totalProduction * 100).toFixed(1)}%`,
-                    backgroundColor: '#4A90E2'
+                  style={{
+                    width: `${((stats.totalWind / stats.totalProduction) * 100).toFixed(1)}%`,
+                    backgroundColor: '#4A90E2',
                   }}
                 ></div>
               </div>
               <div className={styles.breakdownPercent}>
-                {(stats.totalWind / stats.totalProduction * 100).toFixed(1)}%
+                {((stats.totalWind / stats.totalProduction) * 100).toFixed(1)}%
               </div>
             </div>
           </div>

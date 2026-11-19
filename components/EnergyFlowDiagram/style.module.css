@@ -22,8 +22,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 20% 50%, rgba(0, 217, 163, 0.03) 0%, transparent 50%),
-              radial-gradient(circle at 80% 50%, rgba(93, 173, 226, 0.03) 0%, transparent 50%);
+  background:
+    radial-gradient(circle at 20% 50%, rgba(0, 217, 163, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(93, 173, 226, 0.03) 0%, transparent 50%);
   border-radius: 16px;
   pointer-events: none;
 }
@@ -50,7 +51,8 @@
 
 /* Animated flow effect */
 @keyframes flowPulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.6;
   }
   50% {
@@ -76,11 +78,21 @@
 /* Node text styling */
 .nodeText {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
 }
 
 .nodeLabelText {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   font-weight: 500;
   letter-spacing: 0.01em;
   fill: #333;
@@ -102,8 +114,15 @@
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   padding: 14px 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   pointer-events: none;
   backdrop-filter: blur(8px);
   background: rgba(255, 255, 255, 0.98);
@@ -118,7 +137,7 @@
 }
 
 .tooltipValue {
-  color: #00D9A3;
+  color: #00d9a3;
   font-weight: 600;
   font-size: 14px;
   letter-spacing: 0.02em;
@@ -129,7 +148,12 @@
   font-size: 12px;
   font-weight: 500;
   fill: #6b7280;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
 }
 
 /* Enhanced node colors with gradients */
@@ -147,7 +171,8 @@
 
 /* Glow effects for active flows */
 @keyframes flowGlow {
-  0%, 100% {
+  0%,
+  100% {
     filter: drop-shadow(0 0 4px rgba(0, 217, 163, 0.4));
   }
   50% {
@@ -212,7 +237,7 @@
   width: 40px;
   height: 40px;
   border: 3px solid #e5e7eb;
-  border-top-color: #00D9A3;
+  border-top-color: #00d9a3;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -231,8 +256,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: 
-    radial-gradient(circle at 2px 2px, rgba(0, 0, 0, 0.015) 1px, transparent 0);
+  background-image: radial-gradient(circle at 2px 2px, rgba(0, 0, 0, 0.015) 1px, transparent 0);
   background-size: 32px 32px;
   border-radius: 16px;
   pointer-events: none;
@@ -241,12 +265,12 @@
 
 /* Accessibility - Focus states */
 .flowPath:focus-visible {
-  outline: 2px solid #00D9A3;
+  outline: 2px solid #00d9a3;
   outline-offset: 2px;
 }
 
 .energyNode:focus-visible {
-  outline: 2px solid #00D9A3;
+  outline: 2px solid #00d9a3;
   outline-offset: 4px;
 }
 
@@ -278,10 +302,8 @@
   z-index: 1;
 }
 
-
 /* Hide ApexSankey Branding and Watermark */
 .sankeyWrapper :global(.apexgantt-watermark),
 .sankeyWrapper :global(.apexsankey-watermark) {
   display: none !important;
 }
-

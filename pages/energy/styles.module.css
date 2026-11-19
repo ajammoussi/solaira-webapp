@@ -19,18 +19,20 @@
 
 .pageSubtitle {
   font-size: 14px;
-  color: #6B7280;
+  color: #6b7280;
   margin: 0;
 }
 
 /* Section Styling */
 .section {
-  background: #FFFFFF;
+  background: #ffffff;
   border-radius: 16px;
   padding: 32px;
   margin-bottom: 32px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .section:hover {
@@ -47,7 +49,7 @@
 .sectionIcon {
   width: 24px;
   height: 24px;
-  color: #00D9A3;
+  color: #00d9a3;
 }
 
 .sectionTitle {
@@ -59,13 +61,13 @@
 
 .sectionDescription {
   font-size: 14px;
-  color: #6B7280;
+  color: #6b7280;
   margin: 0 0 32px 0;
 }
 
 /* Solar Production Section */
 .chartContainer {
-  background: #F9FAFB;
+  background: #f9fafb;
   border-radius: 12px;
   padding: 24px;
 }
@@ -79,38 +81,38 @@
 
 .timeRangeButton {
   padding: 8px 16px;
-  border: 1px solid #E5E7EB;
-  background: #FFFFFF;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
   border-radius: 8px;
   font-size: 14px;
-  color: #6B7280;
+  color: #6b7280;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .timeRangeButton:hover {
-  border-color: #00D9A3;
-  color: #00D9A3;
+  border-color: #00d9a3;
+  color: #00d9a3;
 }
 
 .timeRangeButton.active {
-  background: #00D9A3;
-  color: #FFFFFF;
-  border-color: #00D9A3;
+  background: #00d9a3;
+  color: #ffffff;
+  border-color: #00d9a3;
 }
 
 .chartPlaceholder {
-  background: #FFFFFF;
+  background: #ffffff;
   border-radius: 12px;
   padding: 48px 24px;
   text-align: center;
-  border: 2px dashed #E5E7EB;
+  border: 2px dashed #e5e7eb;
 }
 
 .chartIcon {
   width: 64px;
   height: 64px;
-  color: #00D9A3;
+  color: #00d9a3;
   margin-bottom: 16px;
 }
 
@@ -129,7 +131,7 @@
 .dataLabel {
   display: block;
   font-size: 12px;
-  color: #6B7280;
+  color: #6b7280;
   margin-bottom: 4px;
 }
 
@@ -148,7 +150,7 @@
 }
 
 .heatmapContainer {
-  background: #F9FAFB;
+  background: #f9fafb;
   border-radius: 12px;
   padding: 24px;
 }
@@ -169,7 +171,7 @@
 
 .legend {
   font-size: 12px;
-  color: #6B7280;
+  color: #6b7280;
 }
 
 .heatmap {
@@ -195,11 +197,11 @@
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
   font-size: 12px;
-  color: #6B7280;
+  color: #6b7280;
 }
 
 .statsContainer {
-  background: #F9FAFB;
+  background: #f9fafb;
   border-radius: 12px;
   padding: 24px;
 }
@@ -218,19 +220,19 @@
 }
 
 .statCard {
-  background: #FFFFFF;
+  background: #ffffff;
   border-radius: 12px;
   padding: 20px;
   display: flex;
   align-items: center;
   gap: 16px;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #e5e7eb;
 }
 
 .statIcon {
   width: 24px;
   height: 24px;
-  color: #00D9A3;
+  color: #00d9a3;
 }
 
 .statContent {
@@ -246,7 +248,7 @@
 
 .statLabel {
   font-size: 12px;
-  color: #6B7280;
+  color: #6b7280;
 }
 
 /* Energy Distribution */
@@ -257,7 +259,7 @@
 }
 
 .sankeyDiagram {
-  background: #F9FAFB;
+  background: #f9fafb;
   border-radius: 12px;
   padding: 24px;
   position: relative;
@@ -266,8 +268,8 @@
 
 .sankeyNode {
   position: absolute;
-  background: #FFFFFF;
-  border: 2px solid #00D9A3;
+  background: #ffffff;
+  border: 2px solid #00d9a3;
   border-radius: 8px;
   padding: 12px 16px;
   text-align: center;
@@ -278,7 +280,7 @@
 
 .nodeLabel {
   font-size: 12px;
-  color: #6B7280;
+  color: #6b7280;
   margin-bottom: 4px;
 }
 
@@ -291,12 +293,12 @@
 .sankeyFlow {
   position: absolute;
   height: 4px;
-  background: linear-gradient(90deg, #00D9A3, #00B8D4);
+  background: linear-gradient(90deg, #00d9a3, #00b8d4);
   border-radius: 2px;
 }
 
 .distributionStats {
-  background: #F9FAFB;
+  background: #f9fafb;
   border-radius: 12px;
   padding: 24px;
 }
@@ -319,12 +321,12 @@
   justify-content: space-between;
   align-items: center;
   padding-bottom: 12px;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .distributionLabel {
   font-size: 14px;
-  color: #6B7280;
+  color: #6b7280;
 }
 
 .distributionValue {
@@ -347,7 +349,7 @@
 }
 
 .gridCard {
-  background: #F9FAFB;
+  background: #f9fafb;
   border-radius: 16px;
   padding: 32px;
   display: flex;
@@ -361,11 +363,11 @@
 }
 
 .exportCard {
-  border: 2px solid #00D9A3;
+  border: 2px solid #00d9a3;
 }
 
 .importCard {
-  border: 2px solid #6366F1;
+  border: 2px solid #6366f1;
 }
 
 .gridIcon {
@@ -374,11 +376,11 @@
 }
 
 .exportCard .gridIcon {
-  color: #00D9A3;
+  color: #00d9a3;
 }
 
 .importCard .gridIcon {
-  color: #6366F1;
+  color: #6366f1;
 }
 
 .gridCardContent {
@@ -394,17 +396,17 @@
 
 .gridCardLabel {
   font-size: 14px;
-  color: #6B7280;
+  color: #6b7280;
   margin-bottom: 8px;
 }
 
 .gridCardSub {
   font-size: 12px;
-  color: #6B7280;
+  color: #6b7280;
 }
 
 .balanceContainer {
-  background: #F9FAFB;
+  background: #f9fafb;
   border-radius: 12px;
   padding: 32px;
 }
@@ -422,7 +424,7 @@
 
 .balanceScale {
   height: 8px;
-  background: linear-gradient(90deg, #6366F1, #FFFFFF 50%, #00D9A3);
+  background: linear-gradient(90deg, #6366f1, #ffffff 50%, #00d9a3);
   border-radius: 4px;
   position: relative;
   margin-bottom: 8px;
@@ -442,8 +444,8 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  border: 2px solid #FFFFFF;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .indicatorLabel {
@@ -461,7 +463,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  color: #6B7280;
+  color: #6b7280;
 }
 
 .netStats {
@@ -473,15 +475,15 @@
   flex: 1;
   text-align: center;
   padding: 16px;
-  background: #FFFFFF;
+  background: #ffffff;
   border-radius: 8px;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #e5e7eb;
 }
 
 .netLabel {
   display: block;
   font-size: 12px;
-  color: #6B7280;
+  color: #6b7280;
   margin-bottom: 4px;
 }
 
@@ -489,7 +491,7 @@
   display: block;
   font-size: 20px;
   font-weight: 600;
-  color: #00D9A3;
+  color: #00d9a3;
 }
 
 /* Responsive */
@@ -499,7 +501,7 @@
   .gridContainer {
     grid-template-columns: 1fr;
   }
-  
+
   .statsGrid {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -509,27 +511,27 @@
   .pageTitle {
     font-size: 24px;
   }
-  
+
   .section {
     padding: 24px;
   }
-  
+
   .sectionTitle {
     font-size: 20px;
   }
-  
+
   .statsGrid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .gridCard {
     padding: 24px;
   }
-  
+
   .gridCardValue {
     font-size: 24px;
   }
-  
+
   .netStats {
     flex-direction: column;
     gap: 16px;
@@ -541,11 +543,11 @@
     flex-direction: column;
     gap: 24px;
   }
-  
+
   .statsGrid {
     grid-template-columns: 1fr;
   }
-  
+
   .heatmap {
     grid-template-rows: repeat(7, 16px);
     gap: 1px;
@@ -559,15 +561,15 @@
   align-items: center;
   min-height: 400px;
   font-size: 16px;
-  color: #6B7280;
+  color: #6b7280;
 }
 /* Placeholder / Coming Soon Sections */
 .placeholder {
-  background: #FFFFFF;
+  background: #ffffff;
   border-radius: 12px;
   padding: 64px 32px;
   text-align: center;
-  border: 2px dashed #E5E7EB;
+  border: 2px dashed #e5e7eb;
   margin-top: 32px;
   display: flex;
   flex-direction: column;
@@ -576,7 +578,7 @@
 }
 
 .placeholderIcon {
-  color: #D1D5DB;
+  color: #d1d5db;
   margin-bottom: 24px;
 }
 
@@ -589,7 +591,7 @@
 
 .placeholderText {
   font-size: 16px;
-  color: #6B7280;
+  color: #6b7280;
   margin: 0 0 32px 0;
   max-width: 500px;
 }
@@ -606,13 +608,13 @@
   position: relative;
   padding-left: 24px;
   margin-bottom: 12px;
-  color: #4B5563;
+  color: #4b5563;
   font-size: 15px;
 }
 
 .featureList li::before {
   content: '✓';
-  color: #00D9A3;
+  color: #00d9a3;
   font-weight: bold;
   position: absolute;
   left: 0;
@@ -635,7 +637,7 @@
 }
 
 .co2Card {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -652,15 +654,15 @@
 }
 
 .co2Card.avoided {
-  border-left-color: #00A86B; /* Green for avoided emissions */
+  border-left-color: #00a86b; /* Green for avoided emissions */
 }
 
 .co2Card.produced {
-  border-left-color: #F44336; /* Red for produced emissions */
+  border-left-color: #f44336; /* Red for produced emissions */
 }
 
 .co2Card.net {
-  border-left-color: #2196F3; /* Blue for net emissions */
+  border-left-color: #2196f3; /* Blue for net emissions */
 }
 
 .co2CardHeader {
@@ -695,12 +697,12 @@
 .co2Unit {
   font-size: 18px;
   font-weight: 500;
-  color: #6B7280;
+  color: #6b7280;
 }
 
 .co2Subtitle {
   font-size: 14px;
-  color: #6B7280;
+  color: #6b7280;
   margin: 0 0 16px 0;
   min-height: 20px; /* Reduced from 21px */
 }
@@ -717,13 +719,13 @@
   justify-content: space-between;
   align-items: center;
   padding-bottom: 6px; /* Reduced from 8px */
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid #e5e7eb;
   min-height: 32px; /* Reduced from 37px */
 }
 
 .co2DetailLabel {
   font-size: 13px;
-  color: #6B7280;
+  color: #6b7280;
 }
 
 .co2DetailValue {
@@ -746,17 +748,17 @@
 }
 
 .co2Trend.positive {
-  color: #00A86B;
+  color: #00a86b;
 }
 
 .co2Trend.negative {
-  color: #F44336;
+  color: #f44336;
 }
 
 .co2Progress {
   width: 100%;
   height: 6px;
-  background-color: #E5E7EB;
+  background-color: #e5e7eb;
   border-radius: 3px;
   overflow: hidden;
   margin-top: 16px;
@@ -769,15 +771,15 @@
 }
 
 .co2ProgressFill.green {
-  background: linear-gradient(90deg, #00A86B 0%, #00D9A3 100%);
+  background: linear-gradient(90deg, #00a86b 0%, #00d9a3 100%);
 }
 
 .co2ProgressFill.red {
-  background: linear-gradient(90deg, #F44336 0%, #FF9800 100%);
+  background: linear-gradient(90deg, #f44336 0%, #ff9800 100%);
 }
 
 .co2ProgressFill.blue {
-  background: linear-gradient(90deg, #2196F3 0%, #03A9F4 100%);
+  background: linear-gradient(90deg, #2196f3 0%, #03a9f4 100%);
 }
 
 @media (max-width: 768px) {
@@ -785,7 +787,7 @@
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .co2Value {
     font-size: 28px;
   }
@@ -799,7 +801,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #F97316;
+  color: #f97316;
   padding: 8px;
   display: inline-flex;
   align-items: center;
@@ -810,8 +812,8 @@
 }
 
 .infoButton:hover {
-  color: #EA580C;
-  background-color: #FFF7ED;
+  color: #ea580c;
+  background-color: #fff7ed;
   border-radius: 50%;
 }
 
@@ -831,8 +833,12 @@
 }
 
 @keyframes overlayFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modalContent {
@@ -844,7 +850,9 @@
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   will-change: transform, opacity;
 }
@@ -867,7 +875,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #9CA3AF;
+  color: #9ca3af;
   transition: color 0.2s;
   padding: 4px;
   border-radius: 50%;
@@ -875,7 +883,7 @@
 
 .modalClose:hover {
   color: #374151;
-  background-color: #F3F4F6;
+  background-color: #f3f4f6;
 }
 
 .modalTitle {
@@ -888,7 +896,7 @@
 .modalText {
   font-size: 16px;
   line-height: 1.6;
-  color: #4B5563;
+  color: #4b5563;
   margin-bottom: 16px;
 }
 
@@ -896,7 +904,7 @@
   list-style-type: disc;
   padding-left: 24px;
   margin-bottom: 24px;
-  color: #4B5563;
+  color: #4b5563;
 }
 
 .modalSubtitle {
@@ -905,4 +913,3 @@
   color: #374151;
   margin: 24px 0 12px 0;
 }
-

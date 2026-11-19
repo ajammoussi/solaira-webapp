@@ -7,9 +7,7 @@ const FeaturesSection = ({ children }) => {
   return (
     <section className={styles.section}>
       <div className={styles.container}>
-        <div className={styles.grid}>
-          {children}
-        </div>
+        <div className={styles.grid}>{children}</div>
       </div>
     </section>
   );

@@ -20,14 +20,10 @@ const PricingPage = () => {
         'Mobile App Access',
         'Email Support',
         '2-Year Warranty',
-        'Standard Installation'
+        'Standard Installation',
       ],
-      notIncluded: [
-        'AI Optimization',
-        'Priority Support',
-        'Advanced Analytics'
-      ],
-      popular: false
+      notIncluded: ['AI Optimization', 'Priority Support', 'Advanced Analytics'],
+      popular: false,
     },
     {
       name: 'Smart Home',
@@ -43,13 +39,10 @@ const PricingPage = () => {
         '24/7 System Monitoring',
         'Premium Installation',
         '5-Year Warranty',
-        'Predictive Maintenance'
+        'Predictive Maintenance',
       ],
-      notIncluded: [
-        'Dedicated Account Manager',
-        'Custom Integration'
-      ],
-      popular: true
+      notIncluded: ['Dedicated Account Manager', 'Custom Integration'],
+      popular: true,
     },
     {
       name: 'Premium',
@@ -67,37 +60,40 @@ const PricingPage = () => {
         'White-Glove Installation',
         '10-Year Warranty',
         'Quarterly System Optimization',
-        'Priority Service Calls'
+        'Priority Service Calls',
       ],
       notIncluded: [],
-      popular: false
-    }
+      popular: false,
+    },
   ];
 
   const faqs = [
     {
       q: 'What is included in the installation?',
-      a: 'Professional installation includes battery setup, system configuration, safety inspections, and a complete walkthrough of your system.'
+      a: 'Professional installation includes battery setup, system configuration, safety inspections, and a complete walkthrough of your system.',
     },
     {
       q: 'How long does installation take?',
-      a: 'Typical installation takes 1-2 days depending on your home setup and chosen system.'
+      a: 'Typical installation takes 1-2 days depending on your home setup and chosen system.',
     },
     {
       q: 'Can I upgrade my plan later?',
-      a: 'Yes! You can upgrade to a higher capacity system at any time. Contact us for upgrade options.'
+      a: 'Yes! You can upgrade to a higher capacity system at any time. Contact us for upgrade options.',
     },
     {
       q: 'What about maintenance?',
-      a: 'All plans include remote system monitoring. Premium plans include quarterly optimization visits.'
-    }
+      a: 'All plans include remote system monitoring. Premium plans include quarterly optimization visits.',
+    },
   ];
 
   return (
     <>
       <Head>
         <title>Pricing - Solaira</title>
-        <meta name="description" content="Choose the perfect energy solution for your home with Solaira's transparent pricing" />
+        <meta
+          name="description"
+          content="Choose the perfect energy solution for your home with Solaira's transparent pricing"
+        />
       </Head>
 
       <div className={styles['pricing-page']}>
@@ -117,7 +113,8 @@ const PricingPage = () => {
               Simple, <span className={styles['highlight']}>Transparent Pricing</span>
             </h1>
             <p className={styles['pricing-subtitle']}>
-              Choose the perfect energy solution for your home. All plans include installation, monitoring, and support.
+              Choose the perfect energy solution for your home. All plans include installation,
+              monitoring, and support.
             </p>
 
             {/* Billing Toggle */}
@@ -147,18 +144,14 @@ const PricingPage = () => {
                 key={idx}
                 className={`${styles['pricing-card']} ${plan.popular ? styles['popular'] : ''}`}
               >
-                {plan.popular && (
-                  <div className={styles['popular-badge']}>MOST POPULAR</div>
-                )}
+                {plan.popular && <div className={styles['popular-badge']}>MOST POPULAR</div>}
 
                 <div className={styles['card-header']}>
                   <h3 className={styles['plan-name']}>{plan.name}</h3>
                   <p className={styles['plan-description']}>{plan.description}</p>
-                  
+
                   <div className={styles['price-container']}>
-                    <span className={styles['price']}>
-                      {plan.price[billingCycle]}
-                    </span>
+                    <span className={styles['price']}>{plan.price[billingCycle]}</span>
                     <span className={styles['currency']}>TND</span>
                     <span className={styles['billing-period']}>
                       /{billingCycle === 'monthly' ? 'month' : 'year'}
@@ -177,7 +170,9 @@ const PricingPage = () => {
                 </div>
 
                 <div className={styles['card-body']}>
-                  <button className={`${styles['get-started-btn']} ${plan.popular ? styles['popular-btn'] : ''}`}>
+                  <button
+                    className={`${styles['get-started-btn']} ${plan.popular ? styles['popular-btn'] : ''}`}
+                  >
                     Get Started
                   </button>
 
@@ -189,13 +184,20 @@ const PricingPage = () => {
                         <span className={styles['feature-text']}>{feature}</span>
                       </div>
                     ))}
-                    
+
                     {plan.notIncluded.length > 0 && (
                       <>
                         <div className={styles['features-divider']}></div>
-                        <div className={`${styles['features-heading']} ${styles['not-included-heading']}`}>Not included:</div>
+                        <div
+                          className={`${styles['features-heading']} ${styles['not-included-heading']}`}
+                        >
+                          Not included:
+                        </div>
                         {plan.notIncluded.map((feature, i) => (
-                          <div key={i} className={`${styles['feature-item']} ${styles['not-included']}`}>
+                          <div
+                            key={i}
+                            className={`${styles['feature-item']} ${styles['not-included']}`}
+                          >
                             <span className={styles['crossmark']}>✕</span>
                             <span className={styles['feature-text']}>{feature}</span>
                           </div>
@@ -226,13 +228,13 @@ const PricingPage = () => {
                   className={styles['faq-question']}
                 >
                   <span>{faq.q}</span>
-                  <span className={`${styles['faq-icon']} ${openFaq === idx ? styles['open'] : ''}`}>›</span>
+                  <span
+                    className={`${styles['faq-icon']} ${openFaq === idx ? styles['open'] : ''}`}
+                  >
+                    ›
+                  </span>
                 </button>
-                {openFaq === idx && (
-                  <div className={styles['faq-answer']}>
-                    {faq.a}
-                  </div>
-                )}
+                {openFaq === idx && <div className={styles['faq-answer']}>{faq.a}</div>}
               </div>
             ))}
           </div>
@@ -245,7 +247,9 @@ const PricingPage = () => {
             Our energy experts are here to help you choose the perfect plan
           </p>
           <div className={styles['cta-buttons']}>
-            <button className={`${styles['cta-btn']} ${styles['primary']}`}>Call (+216) 99-999-999</button>
+            <button className={`${styles['cta-btn']} ${styles['primary']}`}>
+              Call (+216) 99-999-999
+            </button>
             <button className={`${styles['cta-btn']} ${styles['secondary']}`}>Email Us</button>
           </div>
         </section>

@@ -6,18 +6,22 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts';
 import styles from './styles.module.css';
 
 const CustomizedTick = (props) => {
   const { x, y, payload } = props;
-  const [date, time] = payload.value.split("T");
+  const [date, time] = payload.value.split('T');
   return (
     <g transform={`translate(${x},${y})`}>
       <text x={0} y={0} dy={16} textAnchor="middle" fill="#666" fontSize={10}>
-        <tspan x="0" dy="0">{time.slice(0, 5)}</tspan>
-        <tspan x="0" dy="12">{date}</tspan>
+        <tspan x="0" dy="0">
+          {time.slice(0, 5)}
+        </tspan>
+        <tspan x="0" dy="12">
+          {date}
+        </tspan>
       </text>
     </g>
   );
@@ -51,14 +55,18 @@ export function PredictionChart({ predictions }) {
               tickLine={false}
               tickMargin={8}
               label={{
-                value: "Power (kW)",
+                value: 'Power (kW)',
                 angle: -90,
-                position: "insideLeft",
-                style: { textAnchor: 'middle', fill: '#666' }
+                position: 'insideLeft',
+                style: { textAnchor: 'middle', fill: '#666' },
               }}
             />
-            <Tooltip 
-              contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+            <Tooltip
+              contentStyle={{
+                borderRadius: '8px',
+                border: 'none',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              }}
               labelFormatter={(label) => new Date(label).toLocaleString()}
             />
             <Line

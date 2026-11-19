@@ -3,9 +3,24 @@ import React, { useEffect, useRef } from 'react';
 import styles from './styles.module.css';
 
 const DEFAULT_DATA = [21, 22, 10, 28, 16, 21, 13, 30, 25, 18, 24, 19, 22, 26];
-const DEFAULT_CATEGORIES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DEFAULT_CATEGORIES = [
+  'Mon',
+  'Tue',
+  'Wed',
+  'Thu',
+  'Fri',
+  'Sat',
+  'Sun',
+  'Mon',
+  'Tue',
+  'Wed',
+  'Thu',
+  'Fri',
+  'Sat',
+  'Sun',
+];
 
-const BarChart = ({ 
+const BarChart = ({
   title = '',
   subtitle = '',
   data = DEFAULT_DATA,
@@ -13,7 +28,7 @@ const BarChart = ({
   color = '#00E396',
   unit = 'm³',
   yAxisTitle = 'Usage',
-  card = true
+  card = true,
 }) => {
   const chartRef = useRef(null);
   const chartInstanceRef = useRef(null);
@@ -29,87 +44,89 @@ const BarChart = ({
           console.warn('BarChart: chartRef not ready');
           return;
         }
-        
+
         const ApexCharts = (await import('apexcharts')).default;
 
         if (!isMounted) return;
 
         const options = {
-          series: [{
-            name: title,
-            data: data
-          }],
+          series: [
+            {
+              name: title,
+              data: data,
+            },
+          ],
           states: {
             active: {
               allowMultipleDataPointsSelection: false,
               filter: {
                 type: 'none',
-                value: 0
-              }
+                value: 0,
+              },
             },
             hover: {
               filter: {
                 type: 'none',
-                value: 0
-              }
-            }
+                value: 0,
+              },
+            },
           },
           plotOptions: {
             bar: {
               borderRadius: 8,
               columnWidth: '70%',
-              distributed: false
-            }
+              distributed: false,
+            },
           },
           chart: {
             type: 'bar',
             height: 300,
             toolbar: {
-              show: false
+              show: false,
             },
             animations: {
-              enabled: false
+              enabled: false,
             },
             selection: {
-              enabled: false
+              enabled: false,
             },
             events: {
-              click: function(event, chartContext, config) {
+              click: function (event, chartContext, config) {
                 return false;
-              }
-            }
+              },
+            },
           },
           colors: [color],
           dataLabels: {
-            enabled: false
+            enabled: false,
           },
           xaxis: {
             categories: categories,
             title: {
-              text: 'Day'
-            }
+              text: 'Day',
+            },
           },
           yaxis: {
             title: {
-              text: yAxisTitle
-            }
+              text: yAxisTitle,
+            },
           },
           grid: {
             borderColor: '#e0e0e0',
-            strokeDashArray: 3
+            strokeDashArray: 3,
           },
           tooltip: {
             y: {
-              formatter: function(val) {
-                return val + " " + unit;
-              }
+              formatter: function (val) {
+                return val + ' ' + unit;
+              },
             },
             fixed: {
-              enabled: false
+              enabled: false,
             },
             offsetY: -20,
-            offsetX: 20
-          }
+            offsetX: 20,
+          },
         };
 
         if (chartRef.current) {
@@ -131,7 +148,7 @@ const BarChart = ({
 
           observer.observe(chartRef.current, {
             childList: true,
-            subtree: true
+            subtree: true,
           });
         }
       }
@@ -139,14 +156,14 @@ const BarChart = ({
 
     const attachHoverEffects = () => {
       if (!chartRef.current) return;
-      
+
       const bars = chartRef.current.querySelectorAll('.apexcharts-bar-area');
       const dayCategories = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      
+
       bars.forEach((bar, barIndex) => {
-        bar.addEventListener('mouseenter', function() {
+        bar.addEventListener('mouseenter', function () {
           const hoveredDay = dayCategories[barIndex % 7];
-          
+
           bars.forEach((b, idx) => {
             const currentDay = dayCategories[idx % 7];
             if (currentDay !== hoveredDay) {
@@ -156,9 +173,9 @@ const BarChart = ({
             }
           });
         });
-        
-        bar.addEventListener('mouseleave', function() {
-          bars.forEach(b => {
+
+        bar.addEventListener('mouseleave', function () {
+          bars.forEach((b) => {
             b.style.opacity = '1';
           });
         });

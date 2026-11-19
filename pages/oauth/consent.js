@@ -24,17 +24,23 @@ export default function OAuthConsent() {
 
         // Check for error in URL
         const errorParam = hashParams.get('error') || queryParams.error;
-        const errorDescription = hashParams.get('error_description') || queryParams.error_description;
+        const errorDescription =
+          hashParams.get('error_description') || queryParams.error_description;
 
         if (errorParam) {
-          setError(errorDescription ? decodeURIComponent(errorDescription) : 'OAuth authorization failed');
+          setError(
+            errorDescription ? decodeURIComponent(errorDescription) : 'OAuth authorization failed'
+          );
           setProcessing(false);
           setTimeout(() => router.replace('/signin'), 3000);
           return;
         }
 
         // Try to get session (tokens might be in URL hash)
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
 
         if (sessionError) {
           throw sessionError;
@@ -51,11 +57,11 @@ export default function OAuthConsent() {
         if (code) {
           // Exchange code for session
           const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-          
+
           if (exchangeError) {
             throw exchangeError;
           }
-          
+
           router.replace('/dashboard');
           return;
         }
@@ -73,7 +79,6 @@ export default function OAuthConsent() {
         setError('No authorization data received');
         setProcessing(false);
         setTimeout(() => router.replace('/signin'), 3000);
-
       } catch (err) {
         console.error('OAuth consent error:', err);
         setError(err.message || 'Authentication failed');
@@ -96,21 +101,21 @@ export default function OAuthConsent() {
 
       <AuthContainer>
         <AuthLogo subtitle="PV Energy Management" />
-        
+
         {error ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <div style={{ 
-              background: '#fee2e2', 
-              color: '#dc2626', 
-              padding: '12px 16px', 
-              borderRadius: '8px',
-              marginBottom: '16px'
-            }}>
+            <div
+              style={{
+                background: '#fee2e2',
+                color: '#dc2626',
+                padding: '12px 16px',
+                borderRadius: '8px',
+                marginBottom: '16px',
+              }}
+            >
               {error}
             </div>
-            <p style={{ color: '#696e78' }}>
-              Redirecting to sign in...
-            </p>
+            <p style={{ color: '#696e78' }}>Redirecting to sign in...</p>
           </div>
         ) : (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
@@ -127,12 +132,14 @@ export default function OAuthConsent() {
           width: 40px;
           height: 40px;
           border: 3px solid #e2e2e2;
-          border-top-color: #00D9A3;
+          border-top-color: #00d9a3;
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
         }
         @keyframes spin {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
       `}</style>
     </>

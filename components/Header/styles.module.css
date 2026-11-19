@@ -167,7 +167,8 @@
 
 /* Large Tablets / Small Desktops */
 @media (max-width: 1200px) {
-  .navWrapper, .navigation {
+  .navWrapper,
+  .navigation {
     gap: 20px;
   }
   .navLink {
@@ -203,7 +204,7 @@
     transition: right 0.3s ease-in-out;
     z-index: 1001;
     padding: 20px;
-    box-shadow: -5px 0 15px rgba(0,0,0,0.05);
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.05);
     box-sizing: border-box; /* Ensure padding doesn't overflow width */
   }
 
@@ -229,7 +230,7 @@
     display: flex;
     justify-content: center;
   }
-  
+
   .headerButton {
     width: 100%;
     justify-content: center;
@@ -251,7 +252,7 @@
   .topBannerRight {
     padding: 0;
   }
-  
+
   .topBannerText {
     font-size: 12px;
   }
@@ -260,11 +261,11 @@
   /* .navContainer {
     padding: 15px 20px;
   } */
-  
+
   .logoText {
     font-size: clamp(22px, 6vw, 28px); /* Match Layout component */
   }
-  
+
   .logoImage {
     height: clamp(40px, 10vw, 50px); /* Match Layout component */
   }

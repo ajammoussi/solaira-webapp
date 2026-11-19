@@ -4,7 +4,7 @@ import styles from './chatbot.module.css';
 // API call function (you can also import from lib/chatbot-api.js)
 async function sendChatMessage(message, userId, energyData = null) {
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
-  
+
   try {
     const response = await fetch(`${API_BASE_URL}/api/chat`, {
       method: 'POST',
@@ -23,7 +23,7 @@ async function sendChatMessage(message, userId, energyData = null) {
     }
 
     const data = await response.json();
-    
+
     if (data.error) {
       throw new Error(data.error);
     }
@@ -40,9 +40,10 @@ const SolarChatbot = ({ energyData, userId = 'default_user' }) => {
   const [messages, setMessages] = useState([
     {
       type: 'bot',
-      content: '☀️ Hello! I\'m Solaira, your Solar AI Assistant. I can help you with energy optimization, anomaly detection, and consumption reports. How can I assist you today?',
-      timestamp: new Date()
-    }
+      content:
+        "☀️ Hello! I'm Solaira, your Solar AI Assistant. I can help you with energy optimization, anomaly detection, and consumption reports. How can I assist you today?",
+      timestamp: new Date(),
+    },
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -108,39 +109,35 @@ const SolarChatbot = ({ energyData, userId = 'default_user' }) => {
     const userMessage = {
       type: 'user',
       content: inputValue,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
     setIsTyping(true);
     setError(null);
 
     try {
       // Call the backend API
-      const response = await sendChatMessage(
-        inputValue,
-        userId,
-        energyData
-      );
+      const response = await sendChatMessage(inputValue, userId, energyData);
 
       const botMessage = {
         type: 'bot',
         content: response.response,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
-      
-      setMessages(prev => [...prev, botMessage]);
+
+      setMessages((prev) => [...prev, botMessage]);
     } catch (err) {
       setError(err.message || 'Failed to get response. Please try again.');
-      
+
       const errorMessage = {
         type: 'bot',
         content: '❌ Sorry, I encountered an error. Please try again or check your connection.',
-        timestamp: new Date()
+        timestamp: new Date(),
       };
-      
-      setMessages(prev => [...prev, errorMessage]);
+
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsTyping(false);
     }
@@ -154,15 +151,24 @@ const SolarChatbot = ({ energyData, userId = 'default_user' }) => {
   return (
     <>
       {/* Floating Sun Icon Button */}
-      <button 
+      <button
         className={`${styles.sunButton} ${isOpen ? styles.sunButtonActive : ''} ${isShaking ? styles.shake : ''}`}
         onClick={handleToggle}
         aria-label="Solar AI Assistant"
       >
-        <svg className={styles.sunIcon} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="12" cy="12" r="4" fill="currentColor"/>
-          <path d="M12 2V4M12 20V22M22 12H20M4 12H2M19.07 4.93L17.66 6.34M6.34 17.66L4.93 19.07M19.07 19.07L17.66 17.66M6.34 6.34L4.93 4.93" 
-                stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        <svg
+          className={styles.sunIcon}
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx="12" cy="12" r="4" fill="currentColor" />
+          <path
+            d="M12 2V4M12 20V22M22 12H20M4 12H2M19.07 4.93L17.66 6.34M6.34 17.66L4.93 19.07M19.07 19.07L17.66 17.66M6.34 6.34L4.93 4.93"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
         </svg>
         {!isOpen && <span className={styles.notificationDot}></span>}
       </button>
@@ -203,13 +209,11 @@ const SolarChatbot = ({ energyData, userId = 'default_user' }) => {
           {/* Messages */}
           <div className={styles.messagesContainer}>
             {messages.map((message, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`${styles.message} ${message.type === 'user' ? styles.userMessage : styles.botMessage}`}
               >
-                {message.type === 'bot' && (
-                  <div className={styles.botAvatar}>☀️</div>
-                )}
+                {message.type === 'bot' && <div className={styles.botAvatar}>☀️</div>}
                 <div className={styles.messageContent}>
                   <div className={styles.messageText}>
                     {message.content.split('\n').map((line, i) => (
@@ -217,12 +221,15 @@ const SolarChatbot = ({ energyData, userId = 'default_user' }) => {
                     ))}
                   </div>
                   <span className={styles.messageTime}>
-                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {message.timestamp.toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                   </span>
                 </div>
               </div>
             ))}
-            
+
             {isTyping && (
               <div className={`${styles.message} ${styles.botMessage}`}>
                 <div className={styles.botAvatar}>☀️</div>
@@ -247,13 +254,19 @@ const SolarChatbot = ({ energyData, userId = 'default_user' }) => {
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
               className={styles.input}
             />
-            <button 
+            <button
               onClick={handleSendMessage}
               className={styles.sendButton}
               disabled={!inputValue.trim()}
             >
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path
+                  d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
           </div>

@@ -24,7 +24,7 @@ import {
 export default function SignUp() {
   const router = useRouter();
   const { user, isGuest, loading: authLoading, signUp, signInWithOAuth } = useAuth();
-  
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -50,17 +50,17 @@ export default function SignUp() {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.fullName.trim()) {
       newErrors.fullName = 'Full name is required';
     }
-    
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
@@ -68,30 +68,30 @@ export default function SignUp() {
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
       newErrors.password = 'Password must contain uppercase, lowercase, and number';
     }
-    
+
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
+
     if (!formData.acceptTerms) {
       newErrors.acceptTerms = 'You must accept the terms and conditions';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
     // Clear field error on change
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
     setGeneralError('');
     setSuccess('');
@@ -99,9 +99,9 @@ export default function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setLoading(true);
     setGeneralError('');
     setSuccess('');
@@ -170,10 +170,7 @@ export default function SignUp() {
 
       <AuthContainer>
         <AuthLogo subtitle="PV Energy Management" />
-        <AuthHeader
-          title="Create an account"
-          subtitle="Start managing your energy today"
-        />
+        <AuthHeader title="Create an account" subtitle="Start managing your energy today" />
 
         <ErrorMessage message={generalError} />
         <SuccessMessage message={success} />
@@ -236,27 +233,21 @@ export default function SignUp() {
               onChange={handleChange}
               label={
                 <>
-                  I agree to the{' '}
-                  <span style={{ color: '#00D9A3' }}>
-                    Terms of Service
-                  </span>{' '}
-                  and{' '}
-                  <span style={{ color: '#00D9A3' }}>
-                    Privacy Policy
-                  </span>
+                  I agree to the <span style={{ color: '#00D9A3' }}>Terms of Service</span> and{' '}
+                  <span style={{ color: '#00D9A3' }}>Privacy Policy</span>
                 </>
               }
             />
             {errors.acceptTerms && (
-              <span style={{ fontSize: '12px', color: '#d20d0d', marginTop: '4px', display: 'block' }}>
+              <span
+                style={{ fontSize: '12px', color: '#d20d0d', marginTop: '4px', display: 'block' }}
+              >
                 {errors.acceptTerms}
               </span>
             )}
           </div>
 
-          <PrimaryButton loading={loading}>
-            Create Account
-          </PrimaryButton>
+          <PrimaryButton loading={loading}>Create Account</PrimaryButton>
         </form>
 
         <Divider text="or continue with" />
@@ -267,11 +258,7 @@ export default function SignUp() {
           loading={loading}
         />
 
-        <AuthFooter
-          text="Already have an account?"
-          linkText="Sign in"
-          linkHref="/signin"
-        />
+        <AuthFooter text="Already have an account?" linkText="Sign in" linkHref="/signin" />
       </AuthContainer>
 
       <style jsx>{`
@@ -284,12 +271,14 @@ export default function SignUp() {
           width: 32px;
           height: 32px;
           border: 3px solid #e2e2e2;
-          border-top-color: #00D9A3;
+          border-top-color: #00d9a3;
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
         }
         @keyframes spin {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
       `}</style>
     </>

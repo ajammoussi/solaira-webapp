@@ -28,12 +28,12 @@ export function PVForecastForm({ updatePredictions, user }) {
             .select('latitude, longitude')
             .eq('id', user.id)
             .single();
-            
+
           if (data && data.latitude != null && data.longitude != null) {
-            setFormData(prev => ({
+            setFormData((prev) => ({
               ...prev,
               latitude: data.latitude,
-              longitude: data.longitude
+              longitude: data.longitude,
             }));
           }
         } catch (err) {
@@ -46,9 +46,9 @@ export function PVForecastForm({ updatePredictions, user }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: parseFloat(value)
+      [name]: parseFloat(value),
     }));
   };
 
@@ -64,10 +64,10 @@ export function PVForecastForm({ updatePredictions, user }) {
         const lat = parseFloat(position.coords.latitude.toFixed(4));
         const lon = parseFloat(position.coords.longitude.toFixed(4));
 
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
           latitude: lat,
-          longitude: lon
+          longitude: lon,
         }));
 
         // Save to Supabase profile
@@ -173,7 +173,7 @@ export function PVForecastForm({ updatePredictions, user }) {
               borderRadius: '6px',
               cursor: locating ? 'wait' : 'pointer',
               fontWeight: 500,
-              transition: 'all 0.2s'
+              transition: 'all 0.2s',
             }}
           >
             <MapPin size={14} />

@@ -23,7 +23,7 @@
 
 .pageSubtitle {
   font-size: 14px;
-  color: #6B7280; /* Medium gray */
+  color: #6b7280; /* Medium gray */
   margin: 0;
 }
 
@@ -44,30 +44,32 @@
 .loadingSpinner {
   width: 48px;
   height: 48px;
-  border: 4px solid #E5E7EB;
-  border-top-color: #00D9A3; /* Teal spinner */
+  border: 4px solid #e5e7eb;
+  border-top-color: #00d9a3; /* Teal spinner */
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loadingText {
   font-size: 16px;
-  color: #6B7280;
+  color: #6b7280;
 }
 
 .errorText {
   font-size: 16px;
-  color: #F44336;
+  color: #f44336;
 }
 
 .retryButton {
   padding: 10px 24px;
-  background-color: #00D9A3; /* Teal button */
-  color: #FFFFFF;
+  background-color: #00d9a3; /* Teal button */
+  color: #ffffff;
   border: none;
   border-radius: 24px; /* Rounded button (Solaira spec) */
   font-size: 14px;
@@ -77,7 +79,7 @@
 }
 
 .retryButton:hover {
-  background-color: #00F5B8; /* Lighter teal on hover */
+  background-color: #00f5b8; /* Lighter teal on hover */
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 217, 163, 0.3);
 }
@@ -87,12 +89,14 @@
    ============================================================================ */
 
 .section {
-  background: #FFFFFF;
+  background: #ffffff;
   border-radius: 16px;
   padding: 32px;
   margin-bottom: 32px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .section:hover {
@@ -109,11 +113,11 @@
 .sectionIcon {
   width: 24px;
   height: 24px;
-  color: #00D9A3;
+  color: #00d9a3;
 }
 
 .sectionDescription {
-  color: #6B7280;
+  color: #6b7280;
   margin-bottom: 24px;
   font-size: 14px;
 }
@@ -133,7 +137,7 @@
 }
 
 .metricCard {
-  background-color: #FFFFFF; /* White card */
+  background-color: #ffffff; /* White card */
   border-radius: 12px; /* Solaira rounded style */
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -159,7 +163,7 @@
 .metricLabel {
   font-size: 14px;
   font-weight: 600;
-  color: #6B7280; /* Medium gray */
+  color: #6b7280; /* Medium gray */
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -175,7 +179,7 @@
 .metricUnit {
   font-size: 18px;
   font-weight: 500;
-  color: #9CA3AF;
+  color: #9ca3af;
   margin-left: 4px;
 }
 
@@ -188,15 +192,15 @@
 
 .metricTrend {
   font-weight: 600;
-  color: #00A86B; /* Green for positive trend */
+  color: #00a86b; /* Green for positive trend */
 }
 
 .metricCompare {
-  color: #9CA3AF;
+  color: #9ca3af;
 }
 
 .metricStatus {
-  color: #00D9A3; /* Teal status */
+  color: #00d9a3; /* Teal status */
   font-weight: 600;
 }
 
@@ -204,14 +208,14 @@
 .batteryIndicator {
   width: 100%;
   height: 8px;
-  background-color: #E5E7EB;
+  background-color: #e5e7eb;
   border-radius: 4px;
   overflow: hidden;
 }
 
 .batteryFill {
   height: 100%;
-  background: linear-gradient(90deg, #00A86B 0%, #00D9A3 100%); /* Green to teal gradient */
+  background: linear-gradient(90deg, #00a86b 0%, #00d9a3 100%); /* Green to teal gradient */
   border-radius: 4px;
   transition: width 0.5s ease;
 }
@@ -245,12 +249,14 @@
 }
 
 .summaryCard {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border-left: 4px solid #00D9A3; /* Teal accent border */
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-left: 4px solid #00d9a3; /* Teal accent border */
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .summaryCard:hover {
@@ -264,7 +270,7 @@
   color: #333333;
   margin-bottom: 20px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .summaryStats {
@@ -281,7 +287,7 @@
 
 .summaryStatLabel {
   font-size: 14px;
-  color: #6B7280;
+  color: #6b7280;
   font-weight: 500;
 }
 
@@ -311,7 +317,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #FFFFFF;
+  background: #ffffff;
   border-radius: 12px;
   padding: 20px;
   overflow: hidden;
@@ -324,7 +330,9 @@
 
 .flowPath {
   cursor: pointer;
-  transition: opacity 0.2s ease, filter 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    filter 0.2s ease;
 }
 
 .flowPath:hover {
@@ -380,7 +388,7 @@
 .tooltipTitle {
   font-size: 13px;
   font-weight: 600;
-  color: #FFFFFF;
+  color: #ffffff;
   margin-bottom: 4px;
   text-align: center;
 }
@@ -388,7 +396,7 @@
 .tooltipValue {
   font-size: 15px;
   font-weight: 700;
-  color: #00D9A3;
+  color: #00d9a3;
   text-align: center;
 }
 
@@ -402,12 +410,12 @@
 
 .flowPlaceholder,
 .chartPlaceholder {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border-radius: 12px;
   padding: 60px 32px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   text-align: center;
-  border: 2px dashed #E5E7EB;
+  border: 2px dashed #e5e7eb;
 }
 
 .placeholderText {
@@ -419,7 +427,7 @@
 
 .placeholderSubtext {
   font-size: 14px;
-  color: #9CA3AF;
+  color: #9ca3af;
   margin: 0;
 }
 
@@ -508,7 +516,7 @@
 }
 
 .co2Card {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -525,15 +533,15 @@
 }
 
 .co2Card.avoided {
-  border-left-color: #00A86B; /* Green for avoided emissions */
+  border-left-color: #00a86b; /* Green for avoided emissions */
 }
 
 .co2Card.produced {
-  border-left-color: #F44336; /* Red for produced emissions */
+  border-left-color: #f44336; /* Red for produced emissions */
 }
 
 .co2Card.net {
-  border-left-color: #2196F3; /* Blue for net emissions */
+  border-left-color: #2196f3; /* Blue for net emissions */
 }
 
 .co2CardHeader {
@@ -568,12 +576,12 @@
 .co2Unit {
   font-size: 18px;
   font-weight: 500;
-  color: #6B7280;
+  color: #6b7280;
 }
 
 .co2Subtitle {
   font-size: 14px;
-  color: #6B7280;
+  color: #6b7280;
   margin: 0 0 16px 0;
   min-height: 20px; /* Reduced from 21px */
 }
@@ -590,13 +598,13 @@
   justify-content: space-between;
   align-items: center;
   padding-bottom: 6px; /* Reduced from 8px */
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid #e5e7eb;
   min-height: 32px; /* Reduced from 37px */
 }
 
 .co2DetailLabel {
   font-size: 13px;
-  color: #6B7280;
+  color: #6b7280;
 }
 
 .co2DetailValue {
@@ -619,17 +627,17 @@
 }
 
 .co2Trend.positive {
-  color: #00A86B;
+  color: #00a86b;
 }
 
 .co2Trend.negative {
-  color: #F44336;
+  color: #f44336;
 }
 
 .co2Progress {
   width: 100%;
   height: 6px;
-  background-color: #E5E7EB;
+  background-color: #e5e7eb;
   border-radius: 3px;
   overflow: hidden;
   margin-top: 16px;
@@ -642,20 +650,20 @@
 }
 
 .co2ProgressFill.green {
-  background: linear-gradient(90deg, #00A86B 0%, #00D9A3 100%);
+  background: linear-gradient(90deg, #00a86b 0%, #00d9a3 100%);
 }
 
 .co2ProgressFill.red {
-  background: linear-gradient(90deg, #F44336 0%, #FF9800 100%);
+  background: linear-gradient(90deg, #f44336 0%, #ff9800 100%);
 }
 
 .co2ProgressFill.blue {
-  background: linear-gradient(90deg, #2196F3 0%, #03A9F4 100%);
+  background: linear-gradient(90deg, #2196f3 0%, #03a9f4 100%);
 }
 
 /* CO₂ Savings Visualization */
 .co2Visualization {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -672,7 +680,7 @@
 
 .co2Bar {
   flex: 1;
-  background-color: #E5E7EB;
+  background-color: #e5e7eb;
   border-radius: 4px 4px 0 0;
   position: relative;
   transition: height 0.5s ease;
@@ -697,18 +705,18 @@
   right: 0;
   text-align: center;
   font-size: 12px;
-  color: #6B7280;
+  color: #6b7280;
 }
 @media (max-width: 768px) {
   .co2Grid {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .co2Value {
     font-size: 28px;
   }
-  
+
   .co2ChartContainer {
     gap: 8px;
   }
@@ -719,7 +727,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #F97316; /* Orange color */
+  color: #f97316; /* Orange color */
   padding: 8px;
   display: inline-flex;
   align-items: center;
@@ -730,8 +738,8 @@
 }
 
 .helpButton:hover {
-  color: #EA580C;
-  background-color: #FFF7ED;
+  color: #ea580c;
+  background-color: #fff7ed;
   border-radius: 50%;
 }
 
@@ -752,8 +760,12 @@
 }
 
 @keyframes overlayFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modalContent {
@@ -765,7 +777,9 @@
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   will-change: transform, opacity;
 }
@@ -788,7 +802,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #9CA3AF;
+  color: #9ca3af;
   transition: color 0.2s;
   padding: 4px;
   border-radius: 50%;
@@ -796,7 +810,7 @@
 
 .modalClose:hover {
   color: #374151;
-  background-color: #F3F4F6;
+  background-color: #f3f4f6;
 }
 
 .modalTitle {
@@ -816,7 +830,7 @@
 .modalText {
   font-size: 16px;
   line-height: 1.6;
-  color: #4B5563;
+  color: #4b5563;
   margin-bottom: 16px;
 }
 
@@ -824,11 +838,10 @@
   list-style-type: disc;
   padding-left: 24px;
   margin-bottom: 24px;
-  color: #4B5563;
+  color: #4b5563;
 }
 
 .modalList li {
   margin-bottom: 8px;
   line-height: 1.5;
 }
-

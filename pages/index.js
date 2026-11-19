@@ -1,21 +1,21 @@
-import React from 'react'
-import Head from 'next/head'
-import Link from 'next/link'
-import FeaturesSection from '../components/FeaturesSection'
-import FeatureCard from '../components/FeatureCard'
-import { useTranslations } from 'next-intl'
-import { SITE_URL } from '../lib/config/env'
-import Header from '../components/Header'
-import Button from '../components/Button'
-import TrustBadge from '../components/TrustBadge'
-import Footer from '../components/Footer'
-import CookieBanner from '../components/CookieBanner'
-import SectionHeading from '../components/SectionHeading'
-import InfoSection from '../components/InfoSection'
+import React from 'react';
+import Head from 'next/head';
+import Link from 'next/link';
+import FeaturesSection from '../components/FeaturesSection';
+import FeatureCard from '../components/FeatureCard';
+import { useTranslations } from 'next-intl';
+import { SITE_URL } from '../lib/config/env';
+import Header from '../components/Header';
+import Button from '../components/Button';
+import TrustBadge from '../components/TrustBadge';
+import Footer from '../components/Footer';
+import CookieBanner from '../components/CookieBanner';
+import SectionHeading from '../components/SectionHeading';
+import InfoSection from '../components/InfoSection';
 import dynamic from 'next/dynamic';
 import * as LucideIcons from 'lucide-react';
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
-import solairaHouseAnimation from "../public/solaira_house.json";
+import solairaHouseAnimation from '../public/solaira_house.json';
 
 const Frame1920wlight = (props) => {
   return (
@@ -23,11 +23,14 @@ const Frame1920wlight = (props) => {
       <div className="frame1920wlight-container100">
         <Head>
           <title>Solaira - Smart Energy Solutions</title>
-          <meta name="description" content="Solaira provides intelligent home battery systems. Save up to 1200 TND every month with clean, smart energy." />
+          <meta
+            name="description"
+            content="Solaira provides intelligent home battery systems. Save up to 1200 TND every month with clean, smart energy."
+          />
           <meta property="og:title" content="Solaira - Smart Energy Solutions" />
           <link rel="canonical" href={SITE_URL} />
         </Head>
-        
+
         <div className="frame1920wlight-frame1920wlight">
           <div className="frame1920wlight-frame1">
             <Header
@@ -36,78 +39,60 @@ const Frame1920wlight = (props) => {
               phone="(+216) 99-999-999"
               logoImage="flag_of_Tunisia.svg"
               logoAlt="SVG6578a5b54fa1fa278cef6591footerlogosvgfill1666"
-              navItems={[
-                'Home Battery',
-                'Solar Panels',
-                'About Us',
-                'Blog',
-                'Contact',
-              ]}
+              navItems={['Home Battery', 'Solar Panels', 'About Us', 'Blog', 'Contact']}
               contactButtonText="Contact"
             />
-            
+
             <div className="frame1920wlight-group2">
               <div className="frame1920wlight-container104">
                 {/* Updated button with navigation */}
                 <Link href="/contact">
-                  <Button className="frame1920wlight-component12">
-                    Contact
-                  </Button>
+                  <Button className="frame1920wlight-component12">Contact</Button>
                 </Link>
               </div>
-              
+
               <div className="frame1920wlight-group1">
                 <div className="frame1920wlight-section1">
                   <div className="frame1920wlight-container108">
                     <div className="frame1920wlight-heading1margin">
                       <div className="frame1920wlight-heading1">
                         <span className="frame1920wlight-text122 www.solaira.tnSemanticHeading1">
-                          <span className="frame1920wlight-text123">
-                            Solaira,
-                          </span>
+                          <span className="frame1920wlight-text123">Solaira,</span>
                           <br></br>
                           <span className="frame1920wlight-text125">
-                            Where Energy Becomes <span style={{ color: '#00ad62' }}>Intelligent</span>.
+                            Where Energy Becomes{' '}
+                            <span style={{ color: '#00ad62' }}>Intelligent</span>.
                           </span>
                           <br></br>
                         </span>
                       </div>
                     </div>
-                    
+
                     <div className="frame1920wlight-margin14">
                       <span className="frame1920wlight-text128 www.solaira.tnOutfitLight8">
                         <span className="frame1920wlight-text129">
                           With Solaira,
                           <span dangerouslySetInnerHTML={{ __html: ' ' }} />
                         </span>
-                        <span className="frame1920wlight-text130">
-                          households save up to
-                        </span>
-                        <span className="frame1920wlight-text131">
-                          {' '}
-                          1200 TND every 
-                        </span>
+                        <span className="frame1920wlight-text130">households save up to</span>
+                        <span className="frame1920wlight-text131"> 1200 TND every</span>
                         <br></br>
                         <span className="frame1920wlight-text133">
                           month while moving
                           <span dangerouslySetInnerHTML={{ __html: ' ' }} />
                         </span>
-                        <span className="frame1920wlight-text134">
-                          toward cleaner,
-                        </span>
+                        <span className="frame1920wlight-text134">toward cleaner,</span>
                         <span> smarter energy.</span>
                         <br></br>
                         <span>Take control of your energy. Power your future.</span>
                       </span>
                     </div>
-                    
+
                     <div className="frame1920wlight-margin15">
                       <div className="frame1920wlight-container109">
                         {/* Updated button with navigation to Contact page */}
                         <Link href="/contact">
-                          <Button className="frame1920wlight-component13">
-                            Contact 
-                          </Button>
+                          <Button className="frame1920wlight-component13">Contact</Button>
                         </Link>
 
                         <div className="frame1920wlight-container111">
@@ -115,7 +100,7 @@ const Frame1920wlight = (props) => {
                             or
                           </span>
                         </div>
-                        
+
                         <div className="frame1920wlight-container112">
                           <div className="frame1920wlight-container113">
                             <span className="frame1920wlight-text140 www.solaira.tnOutfitLight2">
@@ -132,7 +117,7 @@ const Frame1920wlight = (props) => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <TrustBadge
                       icon1=""
                       icon1Alt=""
@@ -147,7 +132,7 @@ const Frame1920wlight = (props) => {
                       className="frame1920wlight-container114"
                     />
                   </div>
-                  
+
                   <div className="frame1920wlight-container117">
                     <div className="frame1920wlight-component310">
                       <Lottie
@@ -158,7 +143,7 @@ const Frame1920wlight = (props) => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="frame1920wlight-section2">
                   <div className="frame1920wlight-heading21">
                     <span className="frame1920wlight-text146 www.solaira.tnSemanticHeading22">
@@ -166,39 +151,34 @@ const Frame1920wlight = (props) => {
                         Why do I need a
                         <span dangerouslySetInnerHTML={{ __html: ' ' }} />
                       </span>
-                      <span className="frame1920wlight-text148">
-                        home battery
-                      </span>
+                      <span className="frame1920wlight-text148">home battery</span>
                       <span> system?</span>
                     </span>
                   </div>
-                  
+
                   <div className="frame1920wlight-container118">
                     <div className="frame1920wlight-container119">
                       <span className="frame1920wlight-text150 www.solaira.tnOutfitLight6">
                         <span>
-                          Solaira is ready for everyone who wants to
-                          take back control of their energy. Our smart
-                          home battery protects you against
+                          Solaira is ready for everyone who wants to take back control of their
+                          energy. Our smart home battery protects you against
                         </span>
                         <br></br>
                         <span>
-                          the phase-out of net metering, makes solar panels
-                          even more profitable, and handles energy in a completely
-                          autonomous way to
+                          the phase-out of net metering, makes solar panels even more profitable,
+                          and handles energy in a completely autonomous way to
                         </span>
                         <br></br>
                         <span>
-                          save you money at all times. Want to know more about
-                          how our smart home battery buys and sells
-                          energy? Read more
+                          save you money at all times. Want to know more about how our smart home
+                          battery buys and sells energy? Read more
                         </span>
                         <br></br>
                         <span>below.</span>
                       </span>
                     </div>
                   </div>
-                  
+
                   <FeaturesSection>
                     <FeatureCard
                       icon={<LucideIcons.Zap color="#FFD700" size={24} />}
@@ -229,7 +209,7 @@ const Frame1920wlight = (props) => {
                       image="https://images.unsplash.com/photo-1585347110442-1d1599db0db6?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                     />
                   </FeaturesSection>
-                  
+
                   <InfoSection
                     title="Achieve complete energy independence with"
                     highlightedTitle="Solaira"
@@ -238,14 +218,14 @@ const Frame1920wlight = (props) => {
                     buttonLink="/energy"
                     image="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                   />
-                  
-                  <SectionHeading 
+
+                  <SectionHeading
                     text="What makes Solaira the"
                     highlightedText="best performing home battery"
                     subtitle="Discover how Solaira's innovative home batteries are revolutionizing sustainable energy storage"
                   />
                 </div>
-                
+
                 <Footer
                   logoAlt="Solaira Logo"
                   phone="(+216) 99-999-999"
@@ -267,354 +247,353 @@ const Frame1920wlight = (props) => {
           </div>
         </div>
       </div>
-       
+
       <style jsx>
-      {`
-        /* Add phone link styling */
-        .phone-link {
-          color: rgba(20, 20, 20, 1);
-          text-decoration: none;
-          transition: color 0.2s ease;
-        }
+        {`
+          /* Add phone link styling */
+          .phone-link {
+            color: rgba(20, 20, 20, 1);
+            text-decoration: none;
+            transition: color 0.2s ease;
+          }
 
-        .phone-link:hover {
-          color: rgba(0, 173, 98, 1);
-        }
+          .phone-link:hover {
+            color: rgba(0, 173, 98, 1);
+          }
 
-        /* Top-level container */
-        .frame1920wlight-container100 {
-          width: 100%;
-          display: flex;
-          min-height: 100vh;
-          align-items: center;
-          flex-direction: column;
-          box-sizing: border-box;
-        }
-        
-        .frame1920wlight-frame1920wlight {
-          width: 100%;
-          display: flex;
-          position: relative;
-          align-items: flex-start;
-          flex-shrink: 0;
-          background-color: #ffffff;
-          box-sizing: border-box;
-        }
-
-        
-        .frame1920wlight-frame1 {
-          width: 100%;
-          display: flex;
-          position: relative;
-          align-items: flex-start;
-          flex-shrink: 0;
-          flex-direction: column;
-        }
-        
-        /* Header-related */
-        .frame1920wlight-group3 {
-          width: 100%;
-          display: flex;
-          position: relative;
-          align-items: flex-start;
-        }
-        
-        .frame1920wlight-group2 {
-          width: 100%;
-          display: flex;
-          position: relative;
-          align-items: flex-start;
-          flex-direction: column;
-        }
-        
-        .frame1920wlight-container104 {
-          width: 100%;
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 20px 20px 40px;
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-        
-        .frame1920wlight-component12 {
-          display: inline-flex;
-          padding: 13px 59px 13px 33px;
-          align-items: center;
-          border-radius: 8px;
-          border: 1px solid rgba(81, 81, 81, 1);
-          cursor: pointer;
-          width: fit-content;
-        }
-        
-        /* Group 1 Section */
-        .frame1920wlight-group1 {
-          width: 100%;
-          display: flex;
-          position: relative;
-          align-items: flex-start;
-          flex-direction: column;
-        }
-        
-        .frame1920wlight-section1 {
-          width: 100%;
-          max-width: 1400px;
-          margin: 0 auto;
-          display: flex;
-          padding: 60px 20px;
-          flex-direction: row;
-          align-items: flex-start;
-          justify-content: space-between;
-          gap: 60px;
-        }
-        
-        .frame1920wlight-container108 {
-          flex: 1;
-          width: 100%;
-          max-width: 600px;
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-        
-        .frame1920wlight-heading1margin {
-          margin-bottom: 20px;
-        }
-        
-        .frame1920wlight-heading1 {
-          display: flex;
-          flex-direction: column;
-        }
-        
-        .frame1920wlight-text122 {
-          font-size: 66px;
-          font-family: Outfit, sans-serif;
-          font-weight: 350;
-          line-height: 78px;
-        }
-        
-        .frame1920wlight-text123,
-        .frame1920wlight-text125 {
-          color: rgba(20, 20, 20, 1);
-        }
-        
-        .frame1920wlight-margin14 {
-          margin-bottom: 20px;
-        }
-        
-        .frame1920wlight-text128 {
-          font-size: 22px;
-          font-family: Outfit, sans-serif;
-          font-weight: 300;
-          line-height: 30px;
-        }
-        
-        .frame1920wlight-text129,
-        .frame1920wlight-text131,
-        .frame1920wlight-text133 {
-          color: rgba(20, 20, 20, 1);
-        }
-        
-        .frame1920wlight-text130,
-        .frame1920wlight-text134 {
-          color: rgba(0, 173, 98, 1);
-        }
-        
-        .frame1920wlight-margin15 {
-          margin-bottom: 30px;
-        }
-        
-        .frame1920wlight-container109 {
-          display: flex;
-          align-items: center;
-          gap: 14px;
-          flex-wrap: nowrap;
-        }
-        
-        .frame1920wlight-component13 {
-          display: inline-flex;
-          padding: 13px 59px 13px 33px;
-          align-items: center;
-          border-radius: 8px;
-          border: 1px solid rgba(0, 173, 98, 1);
-          background-color: rgba(0, 173, 98, 1);
-          color: white;
-          cursor: pointer;
-        }
-        
-        .frame1920wlight-container111 {
-          display: flex;
-          flex-direction: column;
-        }
-        
-        .frame1920wlight-text139,
-        .frame1920wlight-text140,
-        .frame1920wlight-text141 {
-          font-size: 18px;
-          font-family: Outfit, sans-serif;
-          font-weight: 300;
-          color: rgba(20, 20, 20, 1);
-        }
-        
-        .frame1920wlight-container112 {
-          display: flex;
-          flex-direction: column;
-          gap: 3px;
-        }
-        
-        .frame1920wlight-container113 {
-          display: flex;
-          flex-direction: column;
-        }
-        
-        .frame1920wlight-component211 {
-          display: flex;
-          align-items: center;
-        }
-        
-        .frame1920wlight-container114 {
-          display: flex;
-          gap: 20px;
-          align-items: center;
-        }
-        
-        .frame1920wlight-container117 {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          width: 100%;
-        }
-        
-        .frame1920wlight-component310 {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        
-        .frame1920wlight-hero-image {
-          width: 100%;
-          max-width: 700px;
-          height: auto;
-          object-fit: contain;
-        }
-        
-        /* Section 2 */
-        .frame1920wlight-section2 {
-          width: 100%;
-          display: flex;
-          padding: 60px 20px 20px 20px;
-          flex-direction: column;
-          align-items: center;
-          gap: 40px;
-          margin-bottom: 0;
-        }
-        
-        .frame1920wlight-section2 > :last-child {
-          margin-bottom: 0;
-        }
-        
-        .frame1920wlight-heading21 {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        
-        .frame1920wlight-text146 {
-          font-size: 48px;
-          font-family: Outfit, sans-serif;
-          font-weight: 300;
-          text-align: center;
-        }
-        
-        .frame1920wlight-text147 {
-          color: rgba(20, 20, 20, 1);
-        }
-        
-        .frame1920wlight-text148 {
-          color: rgba(0, 173, 98, 1);
-        }
-        
-        .frame1920wlight-container118 {
-          width: 100%;
-          max-width: 1200px;
-          display: flex;
-          flex-direction: column;
-          gap: 30px;
-        }
-        
-        .frame1920wlight-container119 {
-          display: flex;
-          flex-direction: column;
-        }
-        
-        .frame1920wlight-text150 {
-          font-size: 18px;
-          font-family: Outfit, sans-serif;
-          font-weight: 300;
-          line-height: 1.6;
-        }
-        
-        /* Responsive styles */
-        @media (max-width: 1024px) {
-          .frame1920wlight-section1 {
-            flex-direction: column;
+          /* Top-level container */
+          .frame1920wlight-container100 {
+            width: 100%;
+            display: flex;
+            min-height: 100vh;
             align-items: center;
-          }
-          
-          .frame1920wlight-container108 {
-            width: 100%;
-            max-width: 100%;
-          }
-          
-          .frame1920wlight-container117 {
-            width: 100%;
-          }
-        }
-        
-        @media (max-width: 768px) {
-          .frame1920wlight-container104 {
-            padding: 40px 15px 30px;
-          }
-          
-          .frame1920wlight-section1,
-          .frame1920wlight-section2 {
-            padding: 40px 15px;
-          }
-          
-          .frame1920wlight-text122 {
-            font-size: 40px;
-            line-height: 1.2;
-            word-break: break-word;
-          }
-          
-          .frame1920wlight-text146 {
-            font-size: 32px;
-            word-break: break-word;
-          }
-          
-          .frame1920wlight-hero-image {
-            max-width: 100%;
-          }
-          
-          .frame1920wlight-container109 {
             flex-direction: column;
-            align-items: flex-start;
+            box-sizing: border-box;
+          }
+
+          .frame1920wlight-frame1920wlight {
             width: 100%;
+            display: flex;
+            position: relative;
+            align-items: flex-start;
+            flex-shrink: 0;
+            background-color: #ffffff;
+            box-sizing: border-box;
+          }
+
+          .frame1920wlight-frame1 {
+            width: 100%;
+            display: flex;
+            position: relative;
+            align-items: flex-start;
+            flex-shrink: 0;
+            flex-direction: column;
+          }
+
+          /* Header-related */
+          .frame1920wlight-group3 {
+            width: 100%;
+            display: flex;
+            position: relative;
+            align-items: flex-start;
+          }
+
+          .frame1920wlight-group2 {
+            width: 100%;
+            display: flex;
+            position: relative;
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .frame1920wlight-container104 {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 20px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+          }
+
+          .frame1920wlight-component12 {
+            display: inline-flex;
+            padding: 13px 59px 13px 33px;
+            align-items: center;
+            border-radius: 8px;
+            border: 1px solid rgba(81, 81, 81, 1);
+            cursor: pointer;
+            width: fit-content;
+          }
+
+          /* Group 1 Section */
+          .frame1920wlight-group1 {
+            width: 100%;
+            display: flex;
+            position: relative;
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .frame1920wlight-section1 {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            padding: 60px 20px;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 60px;
+          }
+
+          .frame1920wlight-container108 {
+            flex: 1;
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+          }
+
+          .frame1920wlight-heading1margin {
+            margin-bottom: 20px;
+          }
+
+          .frame1920wlight-heading1 {
+            display: flex;
+            flex-direction: column;
+          }
+
+          .frame1920wlight-text122 {
+            font-size: 66px;
+            font-family: Outfit, sans-serif;
+            font-weight: 350;
+            line-height: 78px;
+          }
+
+          .frame1920wlight-text123,
+          .frame1920wlight-text125 {
+            color: rgba(20, 20, 20, 1);
+          }
+
+          .frame1920wlight-margin14 {
+            margin-bottom: 20px;
+          }
+
+          .frame1920wlight-text128 {
+            font-size: 22px;
+            font-family: Outfit, sans-serif;
+            font-weight: 300;
+            line-height: 30px;
+          }
+
+          .frame1920wlight-text129,
+          .frame1920wlight-text131,
+          .frame1920wlight-text133 {
+            color: rgba(20, 20, 20, 1);
+          }
+
+          .frame1920wlight-text130,
+          .frame1920wlight-text134 {
+            color: rgba(0, 173, 98, 1);
+          }
+
+          .frame1920wlight-margin15 {
+            margin-bottom: 30px;
+          }
+
+          .frame1920wlight-container109 {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: nowrap;
           }
 
           .frame1920wlight-component13 {
-            width: 100%;
-            justify-content: center;
-            padding: 13px 20px;
+            display: inline-flex;
+            padding: 13px 59px 13px 33px;
+            align-items: center;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 173, 98, 1);
+            background-color: rgba(0, 173, 98, 1);
+            color: white;
+            cursor: pointer;
           }
-        }
-      `}
+
+          .frame1920wlight-container111 {
+            display: flex;
+            flex-direction: column;
+          }
+
+          .frame1920wlight-text139,
+          .frame1920wlight-text140,
+          .frame1920wlight-text141 {
+            font-size: 18px;
+            font-family: Outfit, sans-serif;
+            font-weight: 300;
+            color: rgba(20, 20, 20, 1);
+          }
+
+          .frame1920wlight-container112 {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+          }
+
+          .frame1920wlight-container113 {
+            display: flex;
+            flex-direction: column;
+          }
+
+          .frame1920wlight-component211 {
+            display: flex;
+            align-items: center;
+          }
+
+          .frame1920wlight-container114 {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+          }
+
+          .frame1920wlight-container117 {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+          }
+
+          .frame1920wlight-component310 {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .frame1920wlight-hero-image {
+            width: 100%;
+            max-width: 700px;
+            height: auto;
+            object-fit: contain;
+          }
+
+          /* Section 2 */
+          .frame1920wlight-section2 {
+            width: 100%;
+            display: flex;
+            padding: 60px 20px 20px 20px;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 0;
+          }
+
+          .frame1920wlight-section2 > :last-child {
+            margin-bottom: 0;
+          }
+
+          .frame1920wlight-heading21 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+
+          .frame1920wlight-text146 {
+            font-size: 48px;
+            font-family: Outfit, sans-serif;
+            font-weight: 300;
+            text-align: center;
+          }
+
+          .frame1920wlight-text147 {
+            color: rgba(20, 20, 20, 1);
+          }
+
+          .frame1920wlight-text148 {
+            color: rgba(0, 173, 98, 1);
+          }
+
+          .frame1920wlight-container118 {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+          }
+
+          .frame1920wlight-container119 {
+            display: flex;
+            flex-direction: column;
+          }
+
+          .frame1920wlight-text150 {
+            font-size: 18px;
+            font-family: Outfit, sans-serif;
+            font-weight: 300;
+            line-height: 1.6;
+          }
+
+          /* Responsive styles */
+          @media (max-width: 1024px) {
+            .frame1920wlight-section1 {
+              flex-direction: column;
+              align-items: center;
+            }
+
+            .frame1920wlight-container108 {
+              width: 100%;
+              max-width: 100%;
+            }
+
+            .frame1920wlight-container117 {
+              width: 100%;
+            }
+          }
+
+          @media (max-width: 768px) {
+            .frame1920wlight-container104 {
+              padding: 40px 15px 30px;
+            }
+
+            .frame1920wlight-section1,
+            .frame1920wlight-section2 {
+              padding: 40px 15px;
+            }
+
+            .frame1920wlight-text122 {
+              font-size: 40px;
+              line-height: 1.2;
+              word-break: break-word;
+            }
+
+            .frame1920wlight-text146 {
+              font-size: 32px;
+              word-break: break-word;
+            }
+
+            .frame1920wlight-hero-image {
+              max-width: 100%;
+            }
+
+            .frame1920wlight-container109 {
+              flex-direction: column;
+              align-items: flex-start;
+              width: 100%;
+            }
+
+            .frame1920wlight-component13 {
+              width: 100%;
+              justify-content: center;
+              padding: 13px 20px;
+            }
+          }
+        `}
       </style>
     </>
-  )
+  );
 };
 
-export default Frame1920wlight
+export default Frame1920wlight;

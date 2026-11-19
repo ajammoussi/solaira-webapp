@@ -11,7 +11,7 @@ const ContactPage = () => {
     phone: '',
     subject: 'general',
     message: '',
-    preferredContact: 'email'
+    preferredContact: 'email',
   });
 
   const [formStatus, setFormStatus] = useState(null);
@@ -19,7 +19,7 @@ const ContactPage = () => {
 
   const handleSubmit = () => {
     setIsSubmitting(true);
-    
+
     // Simulate form submission
     setTimeout(() => {
       setFormStatus('success');
@@ -30,9 +30,9 @@ const ContactPage = () => {
         phone: '',
         subject: 'general',
         message: '',
-        preferredContact: 'email'
+        preferredContact: 'email',
       });
-      
+
       setTimeout(() => setFormStatus(null), 5000);
     }, 1500);
   };
@@ -40,7 +40,7 @@ const ContactPage = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -48,23 +48,23 @@ const ContactPage = () => {
     {
       title: 'Phone',
       detail: '(+216) 99-999-999',
-      description: 'Mon-Fri 8am-6pm CET'
+      description: 'Mon-Fri 8am-6pm CET',
     },
     {
       title: 'Email',
       detail: 'info@solaira.tn',
-      description: 'We reply within 24 hours'
+      description: 'We reply within 24 hours',
     },
     {
       title: 'Visit Us',
       detail: 'Centre Urbain Nord',
-      description: '676 CUN BP, Tunis 1080'
+      description: '676 CUN BP, Tunis 1080',
     },
     {
       title: 'Business Hours',
       detail: 'Mon-Fri: 8am-6pm',
-      description: 'Sat: 9am-1pm'
-    }
+      description: 'Sat: 9am-1pm',
+    },
   ];
 
   const subjects = [
@@ -72,14 +72,17 @@ const ContactPage = () => {
     { value: 'pricing', label: 'Pricing & Plans' },
     { value: 'technical', label: 'Technical Support' },
     { value: 'installation', label: 'Installation Request' },
-    { value: 'partnership', label: 'Partnership Opportunity' }
+    { value: 'partnership', label: 'Partnership Opportunity' },
   ];
 
   return (
     <>
       <Head>
         <title>Contact Us - Solaira</title>
-        <meta name="description" content="Get in touch with Solaira for energy solutions, support, and inquiries" />
+        <meta
+          name="description"
+          content="Get in touch with Solaira for energy solutions, support, and inquiries"
+        />
       </Head>
 
       <div className={styles['contact-page']}>
@@ -99,7 +102,8 @@ const ContactPage = () => {
               Get in <span className={styles['highlight']}>Touch</span>
             </h1>
             <p className={styles['contact-subtitle']}>
-              Have questions about our energy solutions? We're here to help you make the switch to smart, clean energy.
+              Have questions about our energy solutions? We're here to help you make the switch to
+              smart, clean energy.
             </p>
           </div>
         </section>
@@ -234,18 +238,17 @@ const ContactPage = () => {
                   disabled={isSubmitting}
                   className={`${styles['submit-button']} ${isSubmitting ? styles['submitting'] : ''}`}
                 >
-                  {isSubmitting ? (
-                    <span>Sending...</span>
-                  ) : (
-                    <span>Send Message →</span>
-                  )}
+                  {isSubmitting ? <span>Sending...</span> : <span>Send Message →</span>}
                 </button>
 
                 {/* Success Message */}
                 {formStatus === 'success' && (
                   <div className={styles['success-message']}>
                     <span className={styles['success-icon']}>✓</span>
-                    <p>Thank you! Your message has been sent successfully. We'll get back to you soon.</p>
+                    <p>
+                      Thank you! Your message has been sent successfully. We'll get back to you
+                      soon.
+                    </p>
                   </div>
                 )}
               </div>
@@ -258,7 +261,8 @@ const ContactPage = () => {
                 <div className={styles['map-content']}>
                   <h3 className={styles['map-title']}>Visit Our Office</h3>
                   <p className={styles['map-address']}>
-                    Centre Urbain Nord<br />
+                    Centre Urbain Nord
+                    <br />
                     676 CUN BP, Tunis 1080
                   </p>
                   <button className={styles['directions-button']}>Get Directions</button>

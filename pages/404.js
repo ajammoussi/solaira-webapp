@@ -1,7 +1,7 @@
-import React from 'react'
-import Head from 'next/head'
+import React from 'react';
+import Head from 'next/head';
 
-import { useTranslations } from 'next-intl'
+import { useTranslations } from 'next-intl';
 
 const NotFound = (props) => {
   return (
@@ -69,7 +69,7 @@ const NotFound = (props) => {
         `}
       </style>
     </>
-  )
-}
+  );
+};
 
-export default NotFound
+export default NotFound;

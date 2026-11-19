@@ -11,7 +11,13 @@ import Link from 'next/link';
 import { useAuth } from '../../lib/hooks/useAuth';
 import { supabase } from '../../lib/supabase';
 import Layout from '../../components/Layout';
-import { Input, PasswordInput, PrimaryButton, ErrorMessage, SuccessMessage } from '../../components/Auth';
+import {
+  Input,
+  PasswordInput,
+  PrimaryButton,
+  ErrorMessage,
+  SuccessMessage,
+} from '../../components/Auth';
 import styles from '../../components/Auth/styles.module.css';
 
 const TIMEZONE_OPTIONS = [
@@ -30,8 +36,16 @@ const TIMEZONE_OPTIONS = [
   { value: 'UTC-02:00', label: 'UTC-02:00 - South Georgia and the South Sandwich Islands' },
   { value: 'UTC-01:00', label: 'UTC-01:00 - Cape Verde, Azores' },
   { value: 'UTC+00:00', label: 'UTC+00:00 - Greenwich Mean Time, Dublin, Lisbon, London, Morocco' },
-  { value: 'UTC+01:00', label: 'UTC+01:00 - Central European Time (Paris, Berlin, Rome), Tunisia, Algeria, Libya, West Africa' },
-  { value: 'UTC+02:00', label: 'UTC+02:00 - Eastern European Time (Cairo, Athens, Jerusalem), Egypt, South Africa, Sudan' },
+  {
+    value: 'UTC+01:00',
+    label:
+      'UTC+01:00 - Central European Time (Paris, Berlin, Rome), Tunisia, Algeria, Libya, West Africa',
+  },
+  {
+    value: 'UTC+02:00',
+    label:
+      'UTC+02:00 - Eastern European Time (Cairo, Athens, Jerusalem), Egypt, South Africa, Sudan',
+  },
   { value: 'UTC+03:00', label: 'UTC+03:00 - Moscow, Istanbul, Riyadh, Kenya, Ethiopia, Somalia' },
   { value: 'UTC+03:30', label: 'UTC+03:30 - Tehran' },
   { value: 'UTC+04:00', label: 'UTC+04:00 - Dubai, Baku, Mauritius' },
@@ -61,12 +75,60 @@ const CONSUMPTION_PROFILES = [
 ];
 
 const SOLAR_SYSTEMS = [
-  { value: '2', panelCount: 2, capacity: '~0.9 kWp', capacity_kw: 0.9, avgDailyYield: '5.5 kWh', pctCovered: '27%', verdict: 'Too Small. Minimal impact on bills.' },
-  { value: '4', panelCount: 4, capacity: '~1.8 kWp', capacity_kw: 1.8, avgDailyYield: '11.1 kWh', pctCovered: '55%', verdict: 'Entry Level. Good for day usage.' },
-  { value: '8', panelCount: 8, capacity: '~3.5 kWp', capacity_kw: 3.5, avgDailyYield: '22.1 kWh', pctCovered: '110%', verdict: 'Economic. Neutral over a year, but winter-dependent.' },
-  { value: '10', panelCount: 10, capacity: '~4.4 kWp', capacity_kw: 4.4, avgDailyYield: '27.7 kWh', pctCovered: '138%', verdict: 'High Performance. Great for large families.' },
-  { value: '12', panelCount: 12, capacity: '~5.3 kWp', capacity_kw: 5.3, avgDailyYield: '33.2 kWh', pctCovered: '165%', verdict: 'Off-Grid Choice. Recommended for 90%+ independence.' },
-  { value: '16', panelCount: 16, capacity: '~7.0 kWp', capacity_kw: 7.0, avgDailyYield: '44.2 kWh', pctCovered: '220%', verdict: 'EV Ready. Best for those with electric vehicles.' },
+  {
+    value: '2',
+    panelCount: 2,
+    capacity: '~0.9 kWp',
+    capacity_kw: 0.9,
+    avgDailyYield: '5.5 kWh',
+    pctCovered: '27%',
+    verdict: 'Too Small. Minimal impact on bills.',
+  },
+  {
+    value: '4',
+    panelCount: 4,
+    capacity: '~1.8 kWp',
+    capacity_kw: 1.8,
+    avgDailyYield: '11.1 kWh',
+    pctCovered: '55%',
+    verdict: 'Entry Level. Good for day usage.',
+  },
+  {
+    value: '8',
+    panelCount: 8,
+    capacity: '~3.5 kWp',
+    capacity_kw: 3.5,
+    avgDailyYield: '22.1 kWh',
+    pctCovered: '110%',
+    verdict: 'Economic. Neutral over a year, but winter-dependent.',
+  },
+  {
+    value: '10',
+    panelCount: 10,
+    capacity: '~4.4 kWp',
+    capacity_kw: 4.4,
+    avgDailyYield: '27.7 kWh',
+    pctCovered: '138%',
+    verdict: 'High Performance. Great for large families.',
+  },
+  {
+    value: '12',
+    panelCount: 12,
+    capacity: '~5.3 kWp',
+    capacity_kw: 5.3,
+    avgDailyYield: '33.2 kWh',
+    pctCovered: '165%',
+    verdict: 'Off-Grid Choice. Recommended for 90%+ independence.',
+  },
+  {
+    value: '16',
+    panelCount: 16,
+    capacity: '~7.0 kWp',
+    capacity_kw: 7.0,
+    avgDailyYield: '44.2 kWh',
+    pctCovered: '220%',
+    verdict: 'EV Ready. Best for those with electric vehicles.',
+  },
 ];
 
 const BATTERY_SIZE_KWH = 13.5; // Default battery size (kWh)
@@ -74,7 +136,7 @@ const BATTERY_SIZE_KWH = 13.5; // Default battery size (kWh)
 export default function Account() {
   const router = useRouter();
   const { user, profile, isGuest, loading: authLoading, refreshProfile } = useAuth();
-  
+
   const [profileData, setProfileData] = useState({
     display_name: '',
     phone_number: '',
@@ -107,7 +169,9 @@ export default function Account() {
 
   // Dynamic lists for systems and batteries (so linked devices can add items)
   const [solarSystems, setSolarSystems] = useState(SOLAR_SYSTEMS);
-  const [batteryOptions, setBatteryOptions] = useState([{ value: '13.5', label: '13.5 kWh (Home battery)', size: 13.5 }]);
+  const [batteryOptions, setBatteryOptions] = useState([
+    { value: '13.5', label: '13.5 kWh (Home battery)', size: 13.5 },
+  ]);
 
   // Redirect logic: guest mode -> dashboard, not logged in -> signin
   useEffect(() => {
@@ -130,7 +194,7 @@ export default function Account() {
         phone_number: profile.phone_number || '',
         timezone: profile.timezone || 'UTC+01:00',
       });
-      
+
       // Load solar configuration directly from profile columns
       setSolarConfig({
         consumption_profile: profile.consumption_profile || 'home',
@@ -142,7 +206,7 @@ export default function Account() {
 
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
-    setProfileData(prev => ({ ...prev, [name]: value }));
+    setProfileData((prev) => ({ ...prev, [name]: value }));
     setProfileError('');
     setProfileSuccess('');
   };
@@ -179,9 +243,9 @@ export default function Account() {
 
     // Regular update
     if (name === 'battery') {
-      setSolarConfig(prev => ({ ...prev, battery_size: value }));
+      setSolarConfig((prev) => ({ ...prev, battery_size: value }));
     } else {
-      setSolarConfig(prev => ({ ...prev, [name]: value }));
+      setSolarConfig((prev) => ({ ...prev, [name]: value }));
     }
 
     setSolarError('');
@@ -190,7 +254,7 @@ export default function Account() {
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
-    setPasswordData(prev => ({ ...prev, [name]: value }));
+    setPasswordData((prev) => ({ ...prev, [name]: value }));
     setPasswordError('');
     setPasswordSuccess('');
   };
@@ -275,7 +339,9 @@ export default function Account() {
     setSolarSuccess('');
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const accessToken = session?.access_token;
       if (!accessToken) throw new Error('Missing access token');
 
@@ -289,7 +355,7 @@ export default function Account() {
         body: JSON.stringify({
           consumption_profile: solarConfig.consumption_profile,
           current_system: solarConfig.current_system,
-          battery_size: solarConfig.battery_size
+          battery_size: solarConfig.battery_size,
         }),
       });
 
@@ -313,12 +379,12 @@ export default function Account() {
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (passwordData.newPassword.length < 8) {
       setPasswordError('Password must be at least 8 characters');
       return;
     }
-    
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setPasswordError('Passwords do not match');
       return;
@@ -364,19 +430,29 @@ export default function Account() {
   if (authLoading || !user || isGuest) {
     return (
       <Layout>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 122px)', background: '#f0f5f5' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: 'calc(100vh - 122px)',
+            background: '#f0f5f5',
+          }}
+        >
           <div className="spinner" />
           <style jsx>{`
             .spinner {
               width: 40px;
               height: 40px;
               border: 3px solid #e2e2e2;
-              border-top-color: #00D9A3;
+              border-top-color: #00d9a3;
               border-radius: 50%;
               animation: spin 0.8s linear infinite;
             }
             @keyframes spin {
-              to { transform: rotate(360deg); }
+              to {
+                transform: rotate(360deg);
+              }
             }
           `}</style>
         </div>
@@ -385,11 +461,16 @@ export default function Account() {
   }
 
   const displayName = profileData.display_name || user.email?.split('@')[0] || 'User';
-  const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-  
-  const selectedSystem = solarSystems.find(s => s.value === solarConfig.current_system);
-  const selectedBattery = batteryOptions.find(b => b.value === solarConfig.battery_size);
-  
+  const initials = displayName
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
+  const selectedSystem = solarSystems.find((s) => s.value === solarConfig.current_system);
+  const selectedBattery = batteryOptions.find((b) => b.value === solarConfig.battery_size);
+
   // Helper to format estimated daily production when capacity_kw available
   const estimateDaily = (sys) => {
     if (!sys) return null;
@@ -397,7 +478,6 @@ export default function Account() {
     if (!kw) return null;
     return `${(kw * 4.5).toFixed(1)} - ${(kw * 6.0).toFixed(1)} kWh`;
   };
-
 
   return (
     <>
@@ -408,14 +488,16 @@ export default function Account() {
 
       <Layout>
         <div style={{ maxWidth: '800px', padding: '40px 24px', margin: '0 auto' }}>
-          <h1 style={{ fontSize: '28px', fontWeight: '600', color: '#191818', marginBottom: '32px' }}>
+          <h1
+            style={{ fontSize: '28px', fontWeight: '600', color: '#191818', marginBottom: '32px' }}
+          >
             Account Settings
           </h1>
 
           {/* Profile Section */}
           <section className={styles.accountSection}>
             <h2 className={styles.sectionTitle}>Profile</h2>
-            
+
             <div className={styles.profileInfo}>
               <div className={styles.avatar}>{initials}</div>
               <div className={styles.profileDetails}>
@@ -427,7 +509,7 @@ export default function Account() {
             <form onSubmit={handleProfileSubmit}>
               <ErrorMessage message={profileError} />
               <SuccessMessage message={profileSuccess} />
-              
+
               <div className={styles.formGrid}>
                 <Input
                   label="Display Name"
@@ -462,18 +544,11 @@ export default function Account() {
                     ))}
                   </select>
                 </div>
-                <Input
-                  label="Email"
-                  type="email"
-                  value={user.email || ''}
-                  disabled
-                />
+                <Input label="Email" type="email" value={user.email || ''} disabled />
               </div>
 
               <div style={{ marginTop: '24px' }}>
-                <PrimaryButton loading={profileLoading}>
-                  Save Changes
-                </PrimaryButton>
+                <PrimaryButton loading={profileLoading}>Save Changes</PrimaryButton>
               </div>
             </form>
           </section>
@@ -482,18 +557,26 @@ export default function Account() {
           <section className={styles.accountSection}>
             <h2 className={styles.sectionTitle}>Solar System Configuration</h2>
             <p style={{ color: '#696e78', marginBottom: '24px', fontSize: '14px' }}>
-              Configure your energy consumption profile and current solar panel setup for accurate analytics and predictions.
+              Configure your energy consumption profile and current solar panel setup for accurate
+              analytics and predictions.
             </p>
-            
+
             <form onSubmit={handleSolarSubmit}>
               <ErrorMessage message={solarError} />
               <SuccessMessage message={solarSuccess} />
-              
+
               <div className={styles.formGrid}>
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>
                     Consumption Profile
-                    <span style={{ color: '#696e78', fontWeight: '400', fontSize: '13px', marginLeft: '8px' }}>
+                    <span
+                      style={{
+                        color: '#696e78',
+                        fontWeight: '400',
+                        fontSize: '13px',
+                        marginLeft: '8px',
+                      }}
+                    >
                       (Your typical energy usage)
                     </span>
                   </label>
@@ -516,7 +599,14 @@ export default function Account() {
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>
                     Current Solar System
-                    <span style={{ color: '#696e78', fontWeight: '400', fontSize: '13px', marginLeft: '8px' }}>
+                    <span
+                      style={{
+                        color: '#696e78',
+                        fontWeight: '400',
+                        fontSize: '13px',
+                        marginLeft: '8px',
+                      }}
+                    >
                       (Installed panels)
                     </span>
                   </label>
@@ -529,7 +619,11 @@ export default function Account() {
                     style={{ height: '42px', backgroundColor: '#F9FAFB' }}
                   >
                     {solarSystems.map((option) => (
-                      <option key={option.value} value={option.value} title={`${option.panelCount} panels — ${option.capacity} — ${option.avgDailyYield} • ${option.pctCovered} — ${option.verdict}`}>
+                      <option
+                        key={option.value}
+                        value={option.value}
+                        title={`${option.panelCount} panels — ${option.capacity} — ${option.avgDailyYield} • ${option.pctCovered} — ${option.verdict}`}
+                      >
                         {option.panelCount} panels — {option.capacity} — {option.verdict}
                       </option>
                     ))}
@@ -547,8 +641,10 @@ export default function Account() {
                     className={styles.input}
                     style={{ height: '42px', backgroundColor: '#F9FAFB' }}
                   >
-                    {batteryOptions.map(opt => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    {batteryOptions.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
                     ))}
                     <option value="link-battery">+ Link battery via Raspberry Pi</option>
                   </select>
@@ -556,24 +652,28 @@ export default function Account() {
               </div>
 
               {showLinkModal && (
-                <div style={{
-                  position: 'fixed',
-                  inset: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'rgba(0, 0, 0, 0.6)',
-                  zIndex: 1100,
-                  padding: '20px',
-                }}>
-                  <div style={{
-                    width: '100%',
-                    maxWidth: '440px',
-                    background: 'white',
-                    borderRadius: '12px',
-                    padding: '24px',
-                    position: 'relative',
-                  }}>
+                <div
+                  style={{
+                    position: 'fixed',
+                    inset: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'rgba(0, 0, 0, 0.6)',
+                    zIndex: 1100,
+                    padding: '20px',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '100%',
+                      maxWidth: '440px',
+                      background: 'white',
+                      borderRadius: '12px',
+                      padding: '24px',
+                      position: 'relative',
+                    }}
+                  >
                     <button
                       onClick={closeLinkModal}
                       style={{
@@ -591,36 +691,56 @@ export default function Account() {
                       ×
                     </button>
 
-                    <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#191818', marginBottom: '8px', marginTop: 0 }}>
-                      {linkModalType === 'battery' ? 'Link Battery via Raspberry Pi' :
-                       linkModalType === 'consumption' ? 'Add Consumption Profile' :
-                       'Link Another System'}
+                    <h3
+                      style={{
+                        fontSize: '20px',
+                        fontWeight: '600',
+                        color: '#191818',
+                        marginBottom: '8px',
+                        marginTop: 0,
+                      }}
+                    >
+                      {linkModalType === 'battery'
+                        ? 'Link Battery via Raspberry Pi'
+                        : linkModalType === 'consumption'
+                          ? 'Add Consumption Profile'
+                          : 'Link Another System'}
                     </h3>
 
                     <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '20px' }}>
                       {linkModalType === 'battery'
                         ? 'Enter your Raspberry Pi device ID to link a battery for real-time monitoring.'
                         : linkModalType === 'consumption'
-                        ? 'Enter your Raspberry Pi device ID to add a consumption profile for accurate tracking.'
-                        : 'Enter your Raspberry Pi device ID to link another solar panel system.'}
+                          ? 'Enter your Raspberry Pi device ID to add a consumption profile for accurate tracking.'
+                          : 'Enter your Raspberry Pi device ID to link another solar panel system.'}
                     </p>
 
                     {linkModalError && (
-                      <div style={{
-                        padding: '12px',
-                        background: '#FEE2E2',
-                        border: '1px solid #FCA5A5',
-                        borderRadius: '6px',
-                        marginBottom: '16px',
-                        color: '#DC2626',
-                        fontSize: '13px',
-                      }}>
+                      <div
+                        style={{
+                          padding: '12px',
+                          background: '#FEE2E2',
+                          border: '1px solid #FCA5A5',
+                          borderRadius: '6px',
+                          marginBottom: '16px',
+                          color: '#DC2626',
+                          fontSize: '13px',
+                        }}
+                      >
                         {linkModalError}
                       </div>
                     )}
 
                     <div style={{ marginBottom: '20px' }}>
-                      <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', marginBottom: '8px', color: '#374151' }}>
+                      <label
+                        style={{
+                          display: 'block',
+                          fontSize: '13px',
+                          fontWeight: '500',
+                          marginBottom: '8px',
+                          color: '#374151',
+                        }}
+                      >
                         Device ID
                       </label>
                       <input
@@ -656,32 +776,36 @@ export default function Account() {
               )}
 
               {selectedSystem && (
-                <div style={{ 
-                  marginTop: '16px', 
-                  padding: '16px', 
-                  backgroundColor: '#F0F9FF', 
-                  borderRadius: '8px',
-                  border: '1px solid #BAE6FD'
-                }}>
+                <div
+                  style={{
+                    marginTop: '16px',
+                    padding: '16px',
+                    backgroundColor: '#F0F9FF',
+                    borderRadius: '8px',
+                    border: '1px solid #BAE6FD',
+                  }}
+                >
                   <p style={{ fontSize: '14px', color: '#0369A1', margin: 0 }}>
-                    <strong>Selected:</strong> {selectedSystem.panelCount} panels — {selectedSystem.capacity}
+                    <strong>Selected:</strong> {selectedSystem.panelCount} panels —{' '}
+                    {selectedSystem.capacity}
                   </p>
                   <p style={{ fontSize: '13px', color: '#075985', margin: '4px 0 0 0' }}>
-                    <strong>Avg. daily yield:</strong> {selectedSystem.avgDailyYield} • <strong>% Covered:</strong> {selectedSystem.pctCovered}
+                    <strong>Avg. daily yield:</strong> {selectedSystem.avgDailyYield} •{' '}
+                    <strong>% Covered:</strong> {selectedSystem.pctCovered}
                   </p>
                   {estimateDaily(selectedSystem) && (
                     <p style={{ fontSize: '13px', color: '#075985', margin: '4px 0 0 0' }}>
                       Estimated daily production: {estimateDaily(selectedSystem)}
                     </p>
                   )}
-                  <p style={{ fontSize: '13px', color: '#333', marginTop: '8px' }}><strong>Verdict:</strong> {selectedSystem.verdict}</p>
+                  <p style={{ fontSize: '13px', color: '#333', marginTop: '8px' }}>
+                    <strong>Verdict:</strong> {selectedSystem.verdict}
+                  </p>
                 </div>
               )}
 
               <div style={{ marginTop: '24px' }}>
-                <PrimaryButton loading={solarLoading}>
-                  Save Solar Configuration
-                </PrimaryButton>
+                <PrimaryButton loading={solarLoading}>Save Solar Configuration</PrimaryButton>
               </div>
             </form>
           </section>
@@ -689,12 +813,14 @@ export default function Account() {
           {/* Password Section */}
           <section className={styles.accountSection}>
             <h2 className={styles.sectionTitle}>Change Password</h2>
-            
+
             <form onSubmit={handlePasswordSubmit}>
               <ErrorMessage message={passwordError} />
               <SuccessMessage message={passwordSuccess} />
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '400px' }}>
+
+              <div
+                style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '400px' }}
+              >
                 <PasswordInput
                   label="New Password"
                   name="newPassword"
@@ -714,9 +840,7 @@ export default function Account() {
               </div>
 
               <div style={{ marginTop: '24px' }}>
-                <PrimaryButton loading={passwordLoading}>
-                  Update Password
-                </PrimaryButton>
+                <PrimaryButton loading={passwordLoading}>Update Password</PrimaryButton>
               </div>
             </form>
           </section>

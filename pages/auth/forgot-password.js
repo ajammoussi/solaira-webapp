@@ -21,7 +21,7 @@ import {
 export default function ForgotPassword() {
   const router = useRouter();
   const { user, isGuest, loading: authLoading, resetPassword } = useAuth();
-  
+
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [fieldError, setFieldError] = useState('');
@@ -64,9 +64,9 @@ export default function ForgotPassword() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateEmail()) return;
-    
+
     setLoading(true);
     setError('');
     setSuccess('');
@@ -115,7 +115,7 @@ export default function ForgotPassword() {
 
       <AuthContainer>
         <BackLink href="/signin" text="Back to Sign In" />
-        
+
         <AuthLogo subtitle="PV Energy Management" />
         <AuthHeader
           title="Forgot password?"
@@ -172,12 +172,14 @@ export default function ForgotPassword() {
           width: 32px;
           height: 32px;
           border: 3px solid #e2e2e2;
-          border-top-color: #00D9A3;
+          border-top-color: #00d9a3;
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
         }
         @keyframes spin {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
       `}</style>
     </>

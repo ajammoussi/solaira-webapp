@@ -1,6 +1,6 @@
 /**
  * Maintenance Page - PV Energy Management System
- * 
+ *
  * System health and maintenance alerts:
  * - System health dashboard
  * - Active maintenance alerts
@@ -11,7 +11,17 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import * as LucideIcons from 'lucide-react';
-import { ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  ComposedChart,
+  Line,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import Layout from '../../components/Layout';
 import { useAuth } from '../../lib/hooks/useAuth';
 import PVSystemsGrid from '../../components/PVSystemsGrid';
@@ -45,36 +55,42 @@ const Maintenance = () => {
   useEffect(() => {
     const checkAndConfigureSystems = async () => {
       if (profile && profile.current_system) {
-        const systemConfig = SOLAR_SYSTEMS.find(s => s.value === String(profile.current_system));
+        const systemConfig = SOLAR_SYSTEMS.find((s) => s.value === String(profile.current_system));
         if (systemConfig) {
           try {
             // Check current status first to avoid resetting simulation on every page load
             const status = await pvMonitoringService.getAllSystemsStatus();
             const currentCount = status.systems ? status.systems.length : 0;
-            
+
             // Calculate capacity per PV system (all systems have equal capacity)
-            const numSystems = systemConfig.panelCount;  // Number of PV systems user has
+            const numSystems = systemConfig.panelCount; // Number of PV systems user has
             const capacityPerSystem = systemConfig.capacity_kw / numSystems;
-            
-            console.log(`User has ${numSystems} PV systems, ${capacityPerSystem.toFixed(2)} kW each`);
+
+            console.log(
+              `User has ${numSystems} PV systems, ${capacityPerSystem.toFixed(2)} kW each`
+            );
             console.log(`Total capacity: ${systemConfig.capacity_kw} kW`);
-            
+
             // Only reconfigure if count doesn't match
             if (currentCount !== numSystems) {
-              console.log(`Reconfiguring: Current ${currentCount} systems → Target ${numSystems} systems`);
-              
+              console.log(
+                `Reconfiguring: Current ${currentCount} systems → Target ${numSystems} systems`
+              );
+
               await pvMonitoringService.configureSystems(numSystems, capacityPerSystem);
-              
+
               // Start monitoring after configuration
               await pvMonitoringService.startMonitoring(60);
-              
+
               // Wait a moment for data to be generated
-              await new Promise(resolve => setTimeout(resolve, 1000));
-              
-              setConfigKey(prev => prev + 1); // Refresh grid
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+
+              setConfigKey((prev) => prev + 1); // Refresh grid
             } else {
               // Systems already configured, ensure monitoring is active
-              console.log(`Systems already configured (${currentCount}), ensuring monitoring is active`);
+              console.log(
+                `Systems already configured (${currentCount}), ensuring monitoring is active`
+              );
               try {
                 await pvMonitoringService.startMonitoring(60);
               } catch (monitorErr) {
@@ -82,31 +98,33 @@ const Maintenance = () => {
               }
             }
           } catch (err) {
-            console.error("Failed to check/configure systems:", err);
+            console.error('Failed to check/configure systems:', err);
             // If check fails (e.g. 404 or empty), try to configure
             try {
-               const numSystems = systemConfig.panelCount;
-               const capacityPerSystem = systemConfig.capacity_kw / numSystems;
-               
-               console.log(`Configuring ${numSystems} PV systems, ${capacityPerSystem.toFixed(2)} kW each`);
-               
-               await pvMonitoringService.configureSystems(numSystems, capacityPerSystem);
-               
-               // Start monitoring after configuration
-               await pvMonitoringService.startMonitoring(60);
-               
-               // Wait a moment for data to be generated
-               await new Promise(resolve => setTimeout(resolve, 1000));
-               
-               setConfigKey(prev => prev + 1);
+              const numSystems = systemConfig.panelCount;
+              const capacityPerSystem = systemConfig.capacity_kw / numSystems;
+
+              console.log(
+                `Configuring ${numSystems} PV systems, ${capacityPerSystem.toFixed(2)} kW each`
+              );
+
+              await pvMonitoringService.configureSystems(numSystems, capacityPerSystem);
+
+              // Start monitoring after configuration
+              await pvMonitoringService.startMonitoring(60);
+
+              // Wait a moment for data to be generated
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+
+              setConfigKey((prev) => prev + 1);
             } catch (retryErr) {
-               console.error("Retry configuration failed:", retryErr);
+              console.error('Retry configuration failed:', retryErr);
             }
           }
         }
       }
     };
-    
+
     if (profile) {
       checkAndConfigureSystems();
     }
@@ -123,69 +141,81 @@ const Maintenance = () => {
         const actual = [];
         const predicted = [];
         const now = new Date();
-        
+
         for (let i = 29; i >= 0; i--) {
           let efficiency = 0.95;
           if (i < 5) efficiency = 0.65; // Fault!
-          
-          actual.push(parseFloat((baseProd * efficiency * (0.95 + Math.random() * 0.1)).toFixed(2)));
+
+          actual.push(
+            parseFloat((baseProd * efficiency * (0.95 + Math.random() * 0.1)).toFixed(2))
+          );
         }
-        
+
         const results = await pythonApi.analyzeMaintenance(dates, actual, predicted);
-        
+
         // Transform backend response to frontend state
-        const alerts = (results.analysis?.issues || []).map(issue => ({
-            issue: "Performance Issue",
-            severity: results.analysis?.status === 'critical' ? 'Critical' : 'Warning',
-            description: issue
+        const alerts = (results.analysis?.issues || []).map((issue) => ({
+          issue: 'Performance Issue',
+          severity: results.analysis?.status === 'critical' ? 'Critical' : 'Warning',
+          description: issue,
         }));
 
         // Create a map of PR values by date for easy lookup
         const prMap = {};
         if (results.pr_history) {
-            results.pr_history.forEach(item => {
-                const d = new Date(item.date).toISOString().split('T')[0];
-                prMap[d] = item.pr;
-            });
+          results.pr_history.forEach((item) => {
+            const d = new Date(item.date).toISOString().split('T')[0];
+            prMap[d] = item.pr;
+          });
         }
 
         const chartData = dates.map((date, idx) => ({
-            date,
-            actual: actual[idx],
-            predicted: predicted[idx],
-            pr: (prMap[date] || 0) * 100
+          date,
+          actual: actual[idx],
+          predicted: predicted[idx],
+          pr: (prMap[date] || 0) * 100,
         }));
 
         setMaintenanceData({
-            alerts,
-            chartData
+          alerts,
+          chartData,
         });
       } catch (err) {
-        console.error("Maintenance analysis failed:", err);
-        setMaintError("Failed to analyze maintenance data. Is the backend running?");
+        console.error('Maintenance analysis failed:', err);
+        setMaintError('Failed to analyze maintenance data. Is the backend running?');
       } finally {
         setMaintLoading(false);
       }
     };
-    
+
     runAnalysis();
   }, [user]);
 
   if (authLoading || !user) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f5f5f5' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          background: '#f5f5f5',
+        }}
+      >
         <div className="spinner" />
         <style jsx>{`
           .spinner {
             width: 40px;
             height: 40px;
             border: 3px solid #e2e2e2;
-            border-top-color: #00D9A3;
+            border-top-color: #00d9a3;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
           }
           @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+              transform: rotate(360deg);
+            }
           }
         `}</style>
       </div>
@@ -203,8 +233,8 @@ const Maintenance = () => {
             </p>
           </div>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginTop: '24px' }}>
-            <button 
-              onClick={() => setConfigKey(prev => prev + 1)}
+            <button
+              onClick={() => setConfigKey((prev) => prev + 1)}
               style={{
                 padding: '0.75rem 1.5rem',
                 background: '#00D9A3',
@@ -216,14 +246,14 @@ const Maintenance = () => {
                 alignItems: 'center',
                 gap: '0.5rem',
                 fontSize: '0.95rem',
-                fontWeight: '500'
+                fontWeight: '500',
               }}
             >
               <LucideIcons.RefreshCw size={18} />
               Refresh Results
             </button>
-            
-            <button 
+
+            <button
               className={styles.infoButton}
               onClick={() => setShowHelp(true)}
               aria-label="How does this work?"
@@ -236,25 +266,40 @@ const Maintenance = () => {
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <LucideIcons.Activity className={styles.sectionIcon} />
-            <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
               <div>
                 <h2 className={styles.sectionTitle}>PV System Monitoring</h2>
-                <p className={styles.sectionDescription} style={{marginBottom: 0}}>
+                <p className={styles.sectionDescription} style={{ marginBottom: 0 }}>
                   Real-time status of all connected PV systems.
                 </p>
               </div>
               {systemsLastUpdated && (
-                <div style={{ fontSize: '0.9rem', color: '#666', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div
+                  style={{
+                    fontSize: '0.9rem',
+                    color: '#666',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
                   <LucideIcons.Clock size={16} />
                   Last updated: {systemsLastUpdated.toLocaleTimeString()}
                 </div>
               )}
             </div>
           </div>
-          <PVSystemsGrid 
-            key={configKey} 
-            refreshInterval={60000} 
-            noPadding={true} 
+          <PVSystemsGrid
+            key={configKey}
+            refreshInterval={60000}
+            noPadding={true}
             onUpdate={(data) => setSystemsLastUpdated(data.lastUpdated)}
           />
         </section>
@@ -262,35 +307,49 @@ const Maintenance = () => {
         {/* Help Modal */}
         {showHelp && (
           <div className={styles.modalOverlay} onClick={() => setShowHelp(false)}>
-            <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-              <button 
-                className={styles.modalClose}
-                onClick={() => setShowHelp(false)}
-              >
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <button className={styles.modalClose} onClick={() => setShowHelp(false)}>
                 <LucideIcons.X size={24} />
               </button>
-              
+
               <h3 className={styles.modalTitle}>System Monitoring Guide</h3>
-              
+
               <p className={styles.modalText}>
-                This dashboard monitors your solar panels in real-time to detect performance issues and anomalies.
+                This dashboard monitors your solar panels in real-time to detect performance issues
+                and anomalies.
               </p>
-              
+
               <h4 className={styles.modalSubtitle}>Understanding the Metrics</h4>
               <ul className={styles.modalList}>
-                <li><strong>Deviation Score:</strong> Indicates how much the actual performance differs from the expected output based on weather conditions.</li>
-                <li><strong>Status Colors:</strong>
+                <li>
+                  <strong>Deviation Score:</strong> Indicates how much the actual performance
+                  differs from the expected output based on weather conditions.
+                </li>
+                <li>
+                  <strong>Status Colors:</strong>
                   <ul style={{ marginTop: '8px' }}>
-                    <li><span style={{ color: '#00D9A3', fontWeight: 'bold' }}>Green (Healthy):</span> Deviation &lt; 10%. System is performing optimally.</li>
-                    <li><span style={{ color: '#ffaa00', fontWeight: 'bold' }}>Orange (Warning):</span> Deviation 10-20%. Performance is slightly below expected.</li>
-                    <li><span style={{ color: '#ff4444', fontWeight: 'bold' }}>Red (Critical):</span> Deviation &gt; 20%. Significant issue detected (e.g., shading, dirt, failure).</li>
+                    <li>
+                      <span style={{ color: '#00D9A3', fontWeight: 'bold' }}>Green (Healthy):</span>{' '}
+                      Deviation &lt; 10%. System is performing optimally.
+                    </li>
+                    <li>
+                      <span style={{ color: '#ffaa00', fontWeight: 'bold' }}>
+                        Orange (Warning):
+                      </span>{' '}
+                      Deviation 10-20%. Performance is slightly below expected.
+                    </li>
+                    <li>
+                      <span style={{ color: '#ff4444', fontWeight: 'bold' }}>Red (Critical):</span>{' '}
+                      Deviation &gt; 20%. Significant issue detected (e.g., shading, dirt, failure).
+                    </li>
                   </ul>
                 </li>
               </ul>
 
               <h4 className={styles.modalSubtitle}>Automatic Configuration</h4>
               <p className={styles.modalText}>
-                The number of panels is automatically configured based on your profile settings. You can update your system size in the Settings page.
+                The number of panels is automatically configured based on your profile settings. You
+                can update your system size in the Settings page.
               </p>
             </div>
           </div>

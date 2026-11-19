@@ -37,7 +37,7 @@ const PVSystemsGrid = ({ refreshInterval = 60000, noPadding = false, onUpdate })
         if (onUpdate) {
           onUpdate({
             lastUpdated: timestamp,
-            systemCount: (data.systems || []).length
+            systemCount: (data.systems || []).length,
           });
         }
         setError(null);
@@ -111,7 +111,7 @@ const PVSystemsGrid = ({ refreshInterval = 60000, noPadding = false, onUpdate })
       panel_soiling: 'Panel Soiling Detected',
       partial_shading: 'Partial Shading',
       inverter_issue: 'Inverter Issue',
-      micro_failure: 'Micro Failure'
+      micro_failure: 'Micro Failure',
     };
     return anomalyLabels[anomaly] || 'Unknown Anomaly';
   };
@@ -156,8 +156,8 @@ const PVSystemsGrid = ({ refreshInterval = 60000, noPadding = false, onUpdate })
       <div className={styles.gridHeader}>
         <div>
           <p className={styles.subtitle} style={{ marginTop: 0 }}>
-            {systems.length} system{systems.length !== 1 ? 's' : ''} • 
-            Last updated: {lastUpdated ? lastUpdated.toLocaleTimeString() : 'Never'}
+            {systems.length} system{systems.length !== 1 ? 's' : ''} • Last updated:{' '}
+            {lastUpdated ? lastUpdated.toLocaleTimeString() : 'Never'}
           </p>
         </div>
       </div>
@@ -169,31 +169,30 @@ const PVSystemsGrid = ({ refreshInterval = 60000, noPadding = false, onUpdate })
             className={styles.systemCard}
             onClick={() => setSelectedSystem(system)}
             style={{
-              borderLeft: `4px solid ${getStatusColor(system.severity)}`
+              borderLeft: `4px solid ${getStatusColor(system.severity)}`,
             }}
           >
             <div className={styles.systemHeader}>
               <div className={styles.systemInfo}>
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '8px',
-                  background: `${getStatusColor(system.severity)}15`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '18px',
-                  fontWeight: '700',
-                  color: getStatusColor(system.severity)
-                }}>
+                <div
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '8px',
+                    background: `${getStatusColor(system.severity)}15`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '18px',
+                    fontWeight: '700',
+                    color: getStatusColor(system.severity),
+                  }}
+                >
                   {system.system_id}
                 </div>
                 <span className={styles.systemName}>{system.system_name}</span>
               </div>
-              <div 
-                className={styles.statusIcon}
-                style={{ color: getStatusColor(system.severity) }}
-              >
+              <div className={styles.statusIcon} style={{ color: getStatusColor(system.severity) }}>
                 {getStatusIcon(system.severity)}
               </div>
             </div>
@@ -201,19 +200,24 @@ const PVSystemsGrid = ({ refreshInterval = 60000, noPadding = false, onUpdate })
             <div className={styles.systemMetrics}>
               <div className={styles.metric}>
                 <span className={styles.metricLabel}>Deviation Score</span>
-                <span 
+                <span
                   className={styles.metricValue}
                   style={{ color: getStatusColor(system.severity) }}
                 >
-                  {system.mean_deviation !== undefined ? `${(system.mean_deviation * 100).toFixed(1)}%` : 'N/A'}
+                  {system.mean_deviation !== undefined
+                    ? `${(system.mean_deviation * 100).toFixed(1)}%`
+                    : 'N/A'}
                 </span>
               </div>
 
               <div className={styles.metric}>
                 <span className={styles.metricLabel}>Status</span>
                 <span className={styles.metricValue}>
-                  {system.status === 'healthy' ? 'Healthy' : 
-                   system.status === 'critical' ? 'Critical' : 'Warning'}
+                  {system.status === 'healthy'
+                    ? 'Healthy'
+                    : system.status === 'critical'
+                      ? 'Critical'
+                      : 'Warning'}
                 </span>
               </div>
             </div>
@@ -233,10 +237,7 @@ const PVSystemsGrid = ({ refreshInterval = 60000, noPadding = false, onUpdate })
       </div>
 
       {selectedSystem && (
-        <SystemDetailModal
-          system={selectedSystem}
-          onClose={() => setSelectedSystem(null)}
-        />
+        <SystemDetailModal system={selectedSystem} onClose={() => setSelectedSystem(null)} />
       )}
     </div>
   );
@@ -284,7 +285,9 @@ const SystemDetailModal = ({ system, onClose }) => {
               <div>
                 <span className={styles.label}>Deviation Score:</span>
                 <span className={styles.value}>
-                  {system.mean_deviation != null ? (system.mean_deviation * 100).toFixed(1) + '%' : 'N/A'}
+                  {system.mean_deviation != null
+                    ? (system.mean_deviation * 100).toFixed(1) + '%'
+                    : 'N/A'}
                 </span>
               </div>
               <div>
@@ -317,9 +320,7 @@ const SystemDetailModal = ({ system, onClose }) => {
             <div className={styles.detailSection}>
               <h4>Recent History</h4>
               <div className={styles.historyChart}>
-                <p className={styles.chartPlaceholder}>
-                  Historical data available
-                </p>
+                <p className={styles.chartPlaceholder}>Historical data available</p>
               </div>
             </div>
           )}

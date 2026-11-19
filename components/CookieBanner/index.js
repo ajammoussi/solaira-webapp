@@ -1,6 +1,6 @@
-import React from 'react'
-import Button from '../Button'
-import styles from './styles.module.css'
+import React from 'react';
+import Button from '../Button';
+import styles from './styles.module.css';
 
 const CookieBanner = ({
   title,
@@ -40,11 +40,7 @@ const CookieBanner = ({
             </div>
           </div>
           <div className={styles.container283} onClick={onClose}>
-            <img
-              src={closeIcon}
-              alt={closeIconAlt}
-              className={styles.closeIcon}
-            />
+            <img src={closeIcon} alt={closeIconAlt} className={styles.closeIcon} />
           </div>
           <button className={styles.buttonmargin} onClick={onAccept}>
             <div className={styles.component17}>
@@ -70,8 +66,7 @@ const CookieBanner = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CookieBanner
-
+export default CookieBanner;

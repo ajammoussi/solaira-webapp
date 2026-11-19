@@ -7,12 +7,12 @@ const DEFAULT_SOLAR = [0, 0, 0.1, 0.5, 0.8, 0.3];
 const DEFAULT_GRID_EXPORT = [-0.2, -0.1, -0.1, -0.4, -0.6, -0.2];
 const DEFAULT_CATEGORIES = ['12AM', '4AM', '8AM', '12PM', '4PM', '8PM'];
 
-const ElectricityUsage = ({ 
+const ElectricityUsage = ({
   gridImportData = DEFAULT_GRID_IMPORT,
   solarData = DEFAULT_SOLAR,
   gridExportData = DEFAULT_GRID_EXPORT,
   categories = DEFAULT_CATEGORIES,
-  card = true
+  card = true,
 }) => {
   const chartRef = useRef(null);
   const chartInstanceRef = useRef(null);
@@ -28,105 +28,105 @@ const ElectricityUsage = ({
           series: [
             {
               name: 'Grid Import',
-              data: gridImportData
+              data: gridImportData,
             },
             {
               name: 'Solar',
-              data: solarData
+              data: solarData,
             },
             {
               name: 'Grid Export',
-              data: gridExportData
-            }
+              data: gridExportData,
+            },
           ],
           chart: {
             type: 'bar',
             height: 350,
             stacked: true,
             toolbar: {
-              show: false
+              show: false,
             },
             animations: {
-              enabled: false
-            }
+              enabled: false,
+            },
           },
           plotOptions: {
             bar: {
               borderRadius: 6,
-              columnWidth: '60%'
-            }
+              columnWidth: '60%',
+            },
           },
           colors: ['#4bc0c0', '#ffce56', '#ff6384'],
           dataLabels: {
-            enabled: false
+            enabled: false,
           },
           xaxis: {
             categories: categories,
             title: {
-              text: 'Time of Day'
-            }
+              text: 'Time of Day',
+            },
           },
           yaxis: {
             title: {
-              text: 'kWh'
+              text: 'kWh',
             },
             labels: {
-              formatter: function(val) {
+              formatter: function (val) {
                 return val.toFixed(1);
-              }
-            }
+              },
+            },
           },
           grid: {
             borderColor: '#e0e0e0',
             strokeDashArray: 3,
             xaxis: {
               lines: {
-                show: false
-              }
-            }
+                show: false,
+              },
+            },
           },
           legend: {
             position: 'top',
             horizontalAlign: 'left',
             onItemClick: {
-              toggleDataSeries: true
+              toggleDataSeries: true,
             },
             onItemHover: {
-              highlightDataSeries: true
-            }
+              highlightDataSeries: true,
+            },
           },
           states: {
             hover: {
               filter: {
                 type: 'none',
-                value: 0
-              }
+                value: 0,
+              },
             },
             active: {
               allowMultipleDataPointsSelection: false,
               filter: {
                 type: 'none',
-                value: 0
-              }
-            }
+                value: 0,
+              },
+            },
           },
           tooltip: {
             shared: true,
             intersect: false,
             x: {
-              show: true
+              show: true,
             },
             y: {
-              formatter: function(val) {
+              formatter: function (val) {
                 return Math.abs(val).toFixed(2) + ' kWh';
-              }
+              },
             },
             fixed: {
-              enabled: false
+              enabled: false,
             },
             offsetY: -120,
-            offsetX: 40
-          }
+            offsetX: 40,
+          },
         };
 
         if (chartRef.current) {
@@ -134,7 +134,7 @@ const ElectricityUsage = ({
           if (chartInstanceRef.current) {
             chartInstanceRef.current.destroy();
           }
-          
+
           chartInstanceRef.current = new ApexCharts(chartRef.current, electricityOptions);
           chartInstanceRef.current.render();
 
@@ -150,7 +150,7 @@ const ElectricityUsage = ({
 
           observer.observe(chartRef.current, {
             childList: true,
-            subtree: true
+            subtree: true,
           });
         }
       }
@@ -158,11 +158,11 @@ const ElectricityUsage = ({
 
     const attachHoverEffects = () => {
       if (!chartRef.current) return;
-      
+
       const allSeriesGroups = chartRef.current.querySelectorAll('.apexcharts-series');
-      
+
       allSeriesGroups.forEach((seriesGroup, seriesIndex) => {
-        seriesGroup.addEventListener('mouseenter', function() {
+        seriesGroup.addEventListener('mouseenter', function () {
           allSeriesGroups.forEach((series, idx) => {
             if (idx !== seriesIndex) {
               series.style.opacity = '0.2';
@@ -171,9 +171,9 @@ const ElectricityUsage = ({
             }
           });
         });
-        
-        seriesGroup.addEventListener('mouseleave', function() {
-          allSeriesGroups.forEach(series => {
+
+        seriesGroup.addEventListener('mouseleave', function () {
+          allSeriesGroups.forEach((series) => {
             series.style.opacity = '1';
           });
         });

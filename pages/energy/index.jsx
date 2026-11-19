@@ -1,6 +1,6 @@
 /**
  * Energy Page - PV Energy Management System
- * 
+ *
  * Detailed energy analysis including:
  * - Solar production panel
  * - Consumption analysis
@@ -21,15 +21,20 @@ import styles from './styles.module.css';
 import EnergyDistributionCard from '../../components/EnergyDistributionCard';
 import BarChart from '../../components/BarChart';
 
-
 const Energy = () => {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [timeRange, setTimeRange] = useState('day');
-  
+
   // Get CSV data for various components
-  const { historical, realtime: realtimeCSV, loading: csvLoading, error: csvError, config } = useCSVData();
-  
+  const {
+    historical,
+    realtime: realtimeCSV,
+    loading: csvLoading,
+    error: csvError,
+    config,
+  } = useCSVData();
+
   // Use unified data hook for consistency with Dashboard
   const { realtime: realtimeData, stats } = useAllEnergyData(false);
   const todayStats = stats?.today;
@@ -43,19 +48,19 @@ const Energy = () => {
       stats: {
         today: todayStats || {},
         month: monthStats || {},
-        year: yearStats || {}
-      }
+        year: yearStats || {},
+      },
     };
-    
+
     const emissions = calculateCO2Emissions(energyData);
     const equivalents = calculateCO2Equivalents(emissions.daily.co2Avoided);
-    
+
     return {
       ...emissions,
       daily: {
         ...emissions.daily,
-        equivalents
-      }
+        equivalents,
+      },
     };
   }, [realtimeData, todayStats, monthStats, yearStats]);
 
@@ -64,15 +69,15 @@ const Energy = () => {
     if (!historical || historical.length === 0) {
       return { data: [], categories: [] };
     }
-    
+
     // Get last 14 days of data
     const last14Days = historical.slice(-14);
-    const data = last14Days.map(d => Number(d.actual_pv_kwh) || 0);
-    const categories = last14Days.map(d => {
+    const data = last14Days.map((d) => Number(d.actual_pv_kwh) || 0);
+    const categories = last14Days.map((d) => {
       const date = new Date(d.date);
       return date.toLocaleDateString('en-US', { weekday: 'short' });
     });
-    
+
     return { data, categories };
   }, [historical]);
 
@@ -83,7 +88,7 @@ const Energy = () => {
       dailyAvg: '15.0',
       peakHours: '18:00-22:00', // Adjusted to match typical evening peak
       hvacUsage: 35, // Reduced to fit within daily average with base load
-      baseLoad: '0.4' // Consistent with ~15kWh daily total (0.4 * 24 = 9.6kWh base)
+      baseLoad: '0.4', // Consistent with ~15kWh daily total (0.4 * 24 = 9.6kWh base)
     };
   }, [historical]);
 
@@ -92,22 +97,22 @@ const Energy = () => {
     if (!todayStats) {
       return { exported: 0, imported: 0, netEnergy: 0, netSavings: 0, balancePercent: 50 };
     }
-    
+
     const exported = todayStats.gridExport || 0;
     const imported = todayStats.gridImport || 0;
     const netEnergy = exported - imported;
     const netSavings = netEnergy * EXPORT_PRICE_KWH;
-    
+
     // Calculate balance indicator position (0% = all import, 100% = all export)
     const total = exported + imported;
     const balancePercent = total > 0 ? (exported / total) * 100 : 50;
-    
+
     return {
       exported: exported.toFixed(1),
       imported: imported.toFixed(1),
       netEnergy: netEnergy.toFixed(1),
       netSavings: netSavings.toFixed(2),
-      balancePercent: Math.max(10, Math.min(90, balancePercent))
+      balancePercent: Math.max(10, Math.min(90, balancePercent)),
     };
   }, [todayStats]);
 
@@ -116,10 +121,10 @@ const Energy = () => {
     if (!realtimeCSV || realtimeCSV.length === 0) {
       return Array(7 * 24).fill({ intensity: 0.5, value: 0 });
     }
-    
+
     // Get last 7 days of hourly data
     const last7Days = realtimeCSV.slice(-168); // 7 days * 24 hours
-    return last7Days.map(d => {
+    return last7Days.map((d) => {
       const consumption = Number(d.consumption_kw) || 0;
       // Normalize to 0-1 range (max intensity at 1.1 kW)
       // Using power of 0.7 to provide distinction for small values while keeping them visible
@@ -133,23 +138,23 @@ const Energy = () => {
     if (!realtimeData) {
       return null;
     }
-    
+
     const solar = realtimeData.pv_production_kw || 0;
     const consumption = realtimeData.consumption_kw || 0;
     const gridImport = realtimeData.grid_import_kw || 0;
     const gridExport = realtimeData.grid_export_kw || 0;
     const batteryFlow = realtimeData.battery?.flow_kw || 0; // Positive = Charging, Negative = Discharging
-    
+
     // Battery State
     const batteryIn = batteryFlow > 0 ? batteryFlow : 0;
     const batteryOut = batteryFlow < 0 ? Math.abs(batteryFlow) : 0;
-    
+
     // Calculate Flows based on instantaneous power balance
-    
+
     // 1. Solar Distribution
     // Solar -> Grid is fixed by export data
     const solarToGrid = gridExport;
-    
+
     // Solar -> Battery
     // We assume solar charges battery first before grid does
     // Available solar for battery = Solar - Export - (Consumption covered by solar)
@@ -159,38 +164,38 @@ const Energy = () => {
     // But Solar also feeds Home.
     // Usually: Solar -> Home (Priority 1), Solar -> Battery (Priority 2), Solar -> Grid (Priority 3)
     // But we have the final numbers.
-    
+
     // Let's work backwards from Sinks.
-    
+
     // Sink: Grid Export
     // Source: Solar (almost always)
     // solarToGrid = gridExport
-    
+
     // Sink: Battery Charge (batteryIn)
     // Sources: Solar, Grid
     // We assume Solar charges first.
     // solarToBattery = Math.min(batteryIn, Math.max(0, solar - solarToGrid))
     // gridToBattery = batteryIn - solarToBattery
-    
+
     // Sink: Home Consumption
     // Sources: Solar, Grid, Battery Discharge
     // batteryToHome = batteryOut
     // gridToHome = Math.max(0, gridImport - gridToBattery)
     // solarToHome = Math.max(0, consumption - batteryToHome - gridToHome)
-    
+
     // Verify Solar Balance:
     // SolarUsed = solarToGrid + solarToBattery + solarToHome
     // Should equal 'solar' (approx, due to losses/rounding)
-    
+
     const solarToBattery = Math.min(batteryIn, Math.max(0, solar - solarToGrid));
     const gridToBattery = Math.max(0, batteryIn - solarToBattery);
-    
+
     const batteryToHome = batteryOut;
     const batteryToGrid = 0; // Assumption
-    
+
     const gridToHome = Math.max(0, gridImport - gridToBattery);
     const solarToHome = Math.max(0, consumption - batteryToHome - gridToHome);
-    
+
     return {
       solar,
       totalFromGrid: gridImport,
@@ -260,8 +265,8 @@ const Energy = () => {
           <p className={styles.sectionDescription}>
             Monitor your solar panel output with interactive charts
           </p>
-          
-          <BarChart 
+
+          <BarChart
             color="#4FC3F7"
             unit="kWh"
             yAxisTitle="Energy (kWh)"
@@ -270,7 +275,6 @@ const Energy = () => {
             categories={chartData.categories}
           />
         </section>
-
 
         {/* Consumption Patterns Section */}
         <section className={styles.section}>
@@ -281,7 +285,7 @@ const Energy = () => {
           <p className={styles.sectionDescription}>
             Analyze your energy usage with heatmaps and patterns
           </p>
-          
+
           <div className={styles.grid}>
             {/* Heatmap */}
             <div className={styles.heatmapContainer}>
@@ -292,14 +296,14 @@ const Energy = () => {
               <div className={styles.heatmap}>
                 {heatmapData.map((dataPoint, i) => {
                   const intensity = typeof dataPoint === 'object' ? dataPoint.intensity : dataPoint;
-                  const value = typeof dataPoint === 'object' ? dataPoint.value : (dataPoint * 5); // Fallback for legacy number format
-                  
+                  const value = typeof dataPoint === 'object' ? dataPoint.value : dataPoint * 5; // Fallback for legacy number format
+
                   return (
-                    <div 
-                      key={i} 
+                    <div
+                      key={i}
                       className={styles.heatmapCell}
-                      style={{ 
-                        backgroundColor: `rgba(59, 130, 246, ${Math.max(0.05, intensity)})`
+                      style={{
+                        backgroundColor: `rgba(59, 130, 246, ${Math.max(0.05, intensity)})`,
                       }}
                       title={`Hour ${i % 24} - ${Number(value).toFixed(2)} kW`}
                     />
@@ -366,7 +370,7 @@ const Energy = () => {
           <EnergyDistributionCard
             energyData={energyDistributionData}
             loading={csvLoading}
-            title="Energy Usage" 
+            title="Energy Usage"
             darkMode={false}
             locale="en-US"
           />
@@ -381,7 +385,7 @@ const Energy = () => {
           <p className={styles.sectionDescription}>
             Monitor your grid import and export statistics
           </p>
-          
+
           <div className={styles.gridContainer}>
             {/* Import/Export Cards */}
             <div className={styles.gridStats}>
@@ -390,16 +394,20 @@ const Energy = () => {
                 <div className={styles.gridCardContent}>
                   <div className={styles.gridCardValue}>{gridStats.exported} kWh</div>
                   <div className={styles.gridCardLabel}>Exported Today</div>
-                  <div className={styles.gridCardSub}>≈ €{(parseFloat(gridStats.exported) * EXPORT_PRICE_KWH).toFixed(2)} earned</div>
+                  <div className={styles.gridCardSub}>
+                    ≈ €{(parseFloat(gridStats.exported) * EXPORT_PRICE_KWH).toFixed(2)} earned
+                  </div>
                 </div>
               </div>
-              
+
               <div className={`${styles.gridCard} ${styles.importCard}`}>
                 <LucideIcons.Download className={styles.gridIcon} />
                 <div className={styles.gridCardContent}>
                   <div className={styles.gridCardValue}>{gridStats.imported} kWh</div>
                   <div className={styles.gridCardLabel}>Imported Today</div>
-                  <div className={styles.gridCardSub}>≈ €{(parseFloat(gridStats.imported) * EXPORT_PRICE_KWH).toFixed(2)} cost</div>
+                  <div className={styles.gridCardSub}>
+                    ≈ €{(parseFloat(gridStats.imported) * EXPORT_PRICE_KWH).toFixed(2)} cost
+                  </div>
                 </div>
               </div>
             </div>
@@ -408,16 +416,25 @@ const Energy = () => {
               <h3>Grid Balance</h3>
               <div className={styles.balanceMeter}>
                 <div className={styles.balanceScale}>
-                  <div className={styles.balanceIndicator} style={{ left: `${gridStats.balancePercent}%` }}>
-                    <div 
+                  <div
+                    className={styles.balanceIndicator}
+                    style={{ left: `${gridStats.balancePercent}%` }}
+                  >
+                    <div
                       className={styles.indicatorLabel}
-                      style={{ color: parseFloat(gridStats.netEnergy) >= 0 ? '#00D9A3' : '#F44336' }}
+                      style={{
+                        color: parseFloat(gridStats.netEnergy) >= 0 ? '#00D9A3' : '#F44336',
+                      }}
                     >
-                      {parseFloat(gridStats.netEnergy) >= 0 ? 'Net Export' : 'Net Import'}: {Math.abs(parseFloat(gridStats.netEnergy)).toFixed(1)} kWh
+                      {parseFloat(gridStats.netEnergy) >= 0 ? 'Net Export' : 'Net Import'}:{' '}
+                      {Math.abs(parseFloat(gridStats.netEnergy)).toFixed(1)} kWh
                     </div>
-                    <div 
+                    <div
                       className={styles.indicatorMarker}
-                      style={{ backgroundColor: parseFloat(gridStats.netEnergy) >= 0 ? '#00D9A3' : '#F44336' }}
+                      style={{
+                        backgroundColor:
+                          parseFloat(gridStats.netEnergy) >= 0 ? '#00D9A3' : '#F44336',
+                      }}
                     />
                   </div>
                 </div>
@@ -426,17 +443,30 @@ const Energy = () => {
                   <span>Export</span>
                 </div>
               </div>
-              
+
               <div className={styles.netStats}>
                 <div className={styles.netStat}>
                   <span className={styles.netLabel}>Net Energy:</span>
-                  <span className={parseFloat(gridStats.netEnergy) >= 0 ? styles.netValuePositive : styles.netValueNegative}>
-                    {parseFloat(gridStats.netEnergy) >= 0 ? '+' : ''}{gridStats.netEnergy} kWh
+                  <span
+                    className={
+                      parseFloat(gridStats.netEnergy) >= 0
+                        ? styles.netValuePositive
+                        : styles.netValueNegative
+                    }
+                  >
+                    {parseFloat(gridStats.netEnergy) >= 0 ? '+' : ''}
+                    {gridStats.netEnergy} kWh
                   </span>
                 </div>
                 <div className={styles.netStat}>
                   <span className={styles.netLabel}>Net Savings:</span>
-                  <span className={parseFloat(gridStats.netSavings) >= 0 ? styles.netValuePositive : styles.netValueNegative}>
+                  <span
+                    className={
+                      parseFloat(gridStats.netSavings) >= 0
+                        ? styles.netValuePositive
+                        : styles.netValueNegative
+                    }
+                  >
                     {parseFloat(gridStats.netSavings) >= 0 ? '+' : ''}€{gridStats.netSavings}
                   </span>
                 </div>
